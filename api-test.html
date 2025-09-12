@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTRIA ERP API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+        }
+        button {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            overflow: auto;
+            white-space: pre-wrap;
+            max-height: 200px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .credentials-box {
+            background-color: #e2f3f8;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .server-status {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .status-online {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status-offline {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>VTRIA ERP API Test</h1>
+    
+    <div id="server-status" class="server-status">Checking server status...</div>
+    
+    <div class="credentials-box">
+        <h3>Default Admin Credentials:</h3>
+        <p><strong>Email:</strong> admin@vtria.com</p>
+        <p><strong>Password:</strong> VtriaAdmin@2024</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>1. Health Check</h2>
+        <button onclick="testHealth()">Test Health API</button>
+        <pre id="health-result">Results will appear here...</pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Authentication</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <pre id="login-result">Results will appear here...</pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Protected API</h2>
+        <button onclick="testProtectedApi()">Test Protected API</button>
+        <pre id="protected-result">Results will appear here...</pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. CORS Test</h2>
+        <button onclick="testCors()">Test CORS</button>
+        <pre id="cors-result">Results will appear here...</pre>
+    </div>
+    
+    <script>
+        // Check server status on page load
+        window.addEventListener('load', () => {
+            testHealth();
+        });
+        
+        // Store the JWT token
+        let authToken = '';
+        
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            const serverStatus = document.getElementById('server-status');
+            
+            resultDiv.innerHTML = 'Testing health API...';
+            
+            try {
+                console.log('Sending health request to:', 'http://localhost:3000/health');
+                const response = await fetch('http://localhost:3000/health', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('Health response received:', response);
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = 'Status: ' + response.status + '\n\nResponse: ' + JSON.stringify(data, null, 2);
+                    serverStatus.innerHTML = 'Server Status: ONLINE';
+                    serverStatus.className = 'server-status status-online';
+                } else {
+                    resultDiv.innerHTML = 'Health API Status: ' + response.status;
+                    serverStatus.innerHTML = 'Server Status: OFFLINE (Status ' + response.status + ')';
+                    serverStatus.className = 'server-status status-offline';
+                }
+            } catch (error) {
+                console.error('Health check error:', error);
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                serverStatus.innerHTML = 'Server Status: OFFLINE (Connection Error)';
+                serverStatus.className = 'server-status status-offline';
+            }
+        }
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                console.log('Sending login request to:', 'http://localhost:3000/api/auth/login');
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({ 
+                        email: 'admin@vtria.com', 
+                        password: 'VtriaAdmin@2024' 
+                    }),
+                });
+                
+                console.log('Login response received:', response);
+                const data = await response.json();
+                resultDiv.innerHTML = 'Status: ' + response.status + '\n\nResponse: ' + JSON.stringify(data, null, 2);
+                
+                if (response.ok && data.data && data.data.token) {
+                    authToken = data.data.token;
+                    localStorage.setItem('token', data.data.token);
+                    resultDiv.innerHTML += '\n\nToken saved to localStorage!';
+                    resultDiv.className = 'success';
+                } else {
+                    resultDiv.className = 'error';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                resultDiv.className = 'error';
+            }
+        }
+        
+        async function testProtectedApi() {
+            const resultDiv = document.getElementById('protected-result');
+            
+            resultDiv.innerHTML = 'Testing protected API...';
+            
+            // Get token from localStorage if not already set
+            if (!authToken) {
+                authToken = localStorage.getItem('token');
+            }
+            
+            if (!authToken) {
+                resultDiv.innerHTML = 'No authentication token available. Please login first.';
+                resultDiv.className = 'error';
+                return;
+            }
+            
+            try {
+                console.log('Sending request to protected API');
+                const response = await fetch('http://localhost:3000/api/users/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('Protected API response received:', response);
+                const data = await response.json();
+                resultDiv.innerHTML = 'Status: ' + response.status + '\n\nResponse: ' + JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    resultDiv.className = 'success';
+                } else {
+                    resultDiv.className = 'error';
+                }
+            } catch (error) {
+                console.error('Protected API error:', error);
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                resultDiv.className = 'error';
+            }
+        }
+        
+        async function testCors() {
+            const resultDiv = document.getElementById('cors-result');
+            
+            resultDiv.innerHTML = 'Testing CORS configuration...';
+            
+            try {
+                console.log('Sending CORS test request');
+                const response = await fetch('http://localhost:3000/health', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type, Authorization'
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('CORS test response received:', response);
+                
+                // Check CORS headers
+                const allowOrigin = response.headers.get('Access-Control-Allow-Origin');
+                const allowMethods = response.headers.get('Access-Control-Allow-Methods');
+                const allowHeaders = response.headers.get('Access-Control-Allow-Headers');
+                
+                resultDiv.innerHTML = 'Status: ' + response.status + '\n\n' +
+                    'Access-Control-Allow-Origin: ' + allowOrigin + '\n' +
+                    'Access-Control-Allow-Methods: ' + allowMethods + '\n' +
+                    'Access-Control-Allow-Headers: ' + allowHeaders;
+                
+                if (response.ok && allowOrigin) {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML += '\n\nCORS is properly configured!';
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML += '\n\nCORS may not be properly configured.';
+                }
+            } catch (error) {
+                console.error('CORS test error:', error);
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                resultDiv.className = 'error';
+            }
+        }
+    </script>
+</body>
+</html>

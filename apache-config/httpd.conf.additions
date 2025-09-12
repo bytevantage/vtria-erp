@@ -1,0 +1,83 @@
+# VTRIA ERP Apache Configuration Additions
+# Add these configurations to your WAMP httpd.conf file
+# Location: C:\wamp64\bin\apache\apache2.4.xx\conf\httpd.conf
+
+# Enable required modules for proxy and rewrite
+LoadModule rewrite_module modules/mod_rewrite.so
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+LoadModule headers_module modules/mod_headers.so
+
+# VTRIA ERP Virtual Host Configuration
+<VirtualHost *:80>
+    ServerName vtria-erp.local
+    DocumentRoot "C:/wamp64/www/vtria-erp/client/build"
+    
+    # Enable directory browsing and .htaccess
+    <Directory "C:/wamp64/www/vtria-erp/client/build">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        
+        # Handle React Router (SPA routing)
+        RewriteEngine On
+        RewriteBase /
+        RewriteRule ^index\.html$ - [L]
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule . /index.html [L]
+    </Directory>
+    
+    # Proxy API requests to Node.js server
+    ProxyPreserveHost On
+    ProxyRequests Off
+    
+    # API routes proxy to Node.js on localhost:3000
+    ProxyPass /api/ http://localhost:3000/api/
+    ProxyPassReverse /api/ http://localhost:3000/api/
+    
+    # Health check proxy
+    ProxyPass /health http://localhost:3000/health
+    ProxyPassReverse /health http://localhost:3000/health
+    
+    # Set CORS headers for API requests
+    <LocationMatch "^/api/">
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-License-Key"
+        Header always set Access-Control-Max-Age "3600"
+    </LocationMatch>
+    
+    # Handle preflight OPTIONS requests
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+    
+    # Security headers
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Logging
+    ErrorLog "logs/vtria-erp-error.log"
+    CustomLog "logs/vtria-erp-access.log" combined
+</VirtualHost>
+
+# Alternative configuration for subdirectory deployment
+# Use this if you want to deploy under http://localhost/vtria-erp/
+<Directory "C:/wamp64/www/vtria-erp">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# Alias for subdirectory access
+Alias /vtria-erp "C:/wamp64/www/vtria-erp/client/build"
+
+# Proxy configuration for subdirectory
+<LocationMatch "^/vtria-erp/api/">
+    ProxyPass http://localhost:3000/api/
+    ProxyPassReverse http://localhost:3000/api/
+    ProxyPreserveHost On
+</LocationMatch>

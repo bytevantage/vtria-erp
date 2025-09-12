@@ -1,0 +1,21 @@
+2025-09-01 18:39:54:3954 [31merror[39m: [31mFailed to start server: password authentication failed for user "postgres"[39m
+2025-09-01 18:55:16:5516 [31merror[39m: [31mFailed to start server: database "vtria_erp_dev" does not exist[39m
+2025-09-01 21:43:32:4332 [31merror[39m: [31mFailed to start server: stockScheduler.start is not a function[39m
+2025-09-01 21:52:27:5227 [31merror[39m: [31mFailed to start server: stockScheduler.start is not a function[39m
+2025-09-01 21:55:28:5528 [31merror[39m: [31mFailed to start server: stockScheduler.start is not a function[39m
+2025-09-01 21:56:55:5655 [31merror[39m: [31mFailed to start server: websocketService.init is not a function[39m
+2025-09-02 00:44:33:4433 [31merror[39m: [31mUnhandled error: Bad escaped character in JSON at position 9 (line 1 column 10)[39m
+2025-09-02 00:44:54:4454 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:45:05:455 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:46:13:4613 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:46:28:4628 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:46:51:4651 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:46:58:4658 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:46:59:4659 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:54:13:5413 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:58:27:5827 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 00:58:36:5836 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-02 01:00:00:00 [31merror[39m: [31mFailed to update ticket aging: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'EPOCH FROM (NOW() - created_at))/3600 > 4 THEN true[39m
+[31m          WHEN priority = 'h' at line 3[39m
+2025-09-02 01:07:01:71 [31merror[39m: [31mLogin error: Unknown column 'User.is_active' in 'field list'[39m
+2025-09-02 01:09:10:910 [31merror[39m: [31mLogin error: Unknown column 'User.is_active' in 'field list'[39m

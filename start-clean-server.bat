@@ -1,0 +1,3 @@
+@echo off
+echo Starting VTRIA ERP server with clean port check...
+node start-clean-server.js

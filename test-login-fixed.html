@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTRIA ERP Login Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+        .server-status {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .status-online {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status-offline {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .credentials-box {
+            background-color: #e2f3f8;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>VTRIA ERP Login Test</h1>
+    
+    <div id="server-status" class="server-status">Checking server status...</div>
+    
+    <div class="credentials-box">
+        <h3>Default Admin Credentials:</h3>
+        <p><strong>Email:</strong> admin@vtria.com</p>
+        <p><strong>Password:</strong> VtriaAdmin@2024</p>
+    </div>
+    
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" value="admin@vtria.com">
+    </div>
+    
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" value="VtriaAdmin@2024">
+    </div>
+    
+    <div>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testHealth()">Test Health API</button>
+        <button onclick="clearResult()">Clear Results</button>
+    </div>
+    
+    <h2>Result:</h2>
+    <pre id="result">Results will appear here...</pre>
+
+    <script>
+        // Check server status on page load
+        window.addEventListener('load', () => {
+            testHealth();
+        });
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            const serverStatus = document.getElementById('server-status');
+            
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                console.log('Sending login request to:', 'http://localhost:8080/vtria-erp/api/auth/login');
+                const response = await fetch('http://localhost:8080/vtria-erp/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                console.log('Login response received:', response);
+                const data = await response.json();
+                resultDiv.innerHTML = 'Status: ' + response.status + '\n\nResponse: ' + JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.data.token);
+                    resultDiv.innerHTML += '\n\nToken saved to localStorage!';
+                    resultDiv.style.backgroundColor = '#d4edda';
+                } else {
+                    resultDiv.style.backgroundColor = '#f8d7da';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                resultDiv.style.backgroundColor = '#f8d7da';
+            }
+        }
+        
+        async function testHealth() {
+            const resultDiv = document.getElementById('result');
+            const serverStatus = document.getElementById('server-status');
+            
+            resultDiv.innerHTML = 'Testing health API...';
+            
+            try {
+                console.log('Sending health request to:', 'http://localhost:8080/vtria-erp/api/health');
+                const response = await fetch('http://localhost:8080/vtria-erp/api/health', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('Health response received:', response);
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = 'Health API Status: ' + response.status + '\n\nResponse: ' + JSON.stringify(data, null, 2);
+                    resultDiv.style.backgroundColor = '#d4edda';
+                    serverStatus.innerHTML = 'Server Status: ONLINE';
+                    serverStatus.className = 'server-status status-online';
+                } else {
+                    resultDiv.innerHTML = 'Health API Status: ' + response.status;
+                    resultDiv.style.backgroundColor = '#f8d7da';
+                    serverStatus.innerHTML = 'Server Status: OFFLINE (Status ' + response.status + ')';
+                    serverStatus.className = 'server-status status-offline';
+                }
+            } catch (error) {
+                console.error('Health check error:', error);
+                resultDiv.innerHTML = 'Error: ' + error.message;
+                resultDiv.style.backgroundColor = '#f8d7da';
+                serverStatus.innerHTML = 'Server Status: OFFLINE (Connection Error)';
+                serverStatus.className = 'server-status status-offline';
+            }
+        }
+        
+        function clearResult() {
+            document.getElementById('result').innerHTML = 'Results cleared...';
+            document.getElementById('result').style.backgroundColor = '#f5f5f5';
+        }
+    </script>
+</body>
+</html>

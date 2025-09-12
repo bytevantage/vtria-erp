@@ -1,0 +1,25 @@
+<VirtualHost *:8080>
+    ServerName localhost
+    DocumentRoot "C:/wamp64/www/vtria-erp/"
+    
+    <Directory "C:/wamp64/www/vtria-erp/">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Proxy API requests to Node.js backend
+    ProxyPass /vtria-erp/api http://localhost:3000/api
+    ProxyPassReverse /vtria-erp/api http://localhost:3000/api
+    
+    # Enable required modules
+    <IfModule !mod_proxy.c>
+        LoadModule proxy_module modules/mod_proxy.so
+    </IfModule>
+    <IfModule !mod_proxy_http.c>
+        LoadModule proxy_http_module modules/mod_proxy_http.so
+    </IfModule>
+    <IfModule !mod_rewrite.c>
+        LoadModule rewrite_module modules/mod_rewrite.so
+    </IfModule>
+</VirtualHost>

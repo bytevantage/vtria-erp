@@ -1,0 +1,4 @@
+2025-09-01 23:00:00:00 [31merror[39m: [31mFailed to update ticket aging: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'EPOCH FROM (NOW() - created_at))/3600 > 4 THEN true[39m
+[31m          WHEN priority = 'h' at line 3[39m
+2025-09-01 23:13:59:1359 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
+2025-09-01 23:18:48:1848 [31merror[39m: [31mLogin error: Unknown column 'User.phone' in 'field list'[39m
