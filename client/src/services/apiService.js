@@ -132,13 +132,15 @@ export const apiService = {
     getById: (id) => apiClient.get(`/locations/${id}`)
   },
 
-  // Notifications APIs
-  notifications: {
-    getAll: (params = {}) => apiClient.get('/notifications', { params }),
-    markAsRead: (id) => apiClient.put(`/notifications/${id}/read`),
-    markAllAsRead: () => apiClient.put('/notifications/mark-all-read'),
-    getUnreadCount: () => apiClient.get('/notifications/unread-count')
-  }
+  // Case Management APIs
+  caseManagement: {
+    getWorkflowProgress: (caseId) => apiClient.get(`/case-management/${caseId}/workflow-progress`),
+    getCaseQueue: (params = {}) => apiClient.get('/case-management/assignments/queue', { params }),
+    assignCase: (caseId, data) => apiClient.put(`/case-management/assignments/${caseId}/assign`, data),
+    unassignCase: (caseId) => apiClient.put(`/case-management/assignments/${caseId}/unassign`),
+    getCaseAssignmentHistory: (caseId) => apiClient.get(`/case-management/assignments/${caseId}/history`),
+    getAvailableAssignees: (caseId) => apiClient.get(`/case-management/assignments/${caseId}/available-users`)
+  },
 };
 
 // Utility functions for API responses

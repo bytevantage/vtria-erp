@@ -1,0 +1,56 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Create a simple API endpoints file
+        send "cat > dashboard_api.txt << 'EOF'\r"
+        expect "> "
+        send "// Dashboard API endpoint\r"
+        expect "> "
+        send "app.get('/api/admin/dashboard', (req, res) => {\r"
+        expect "> "
+        send "  res.json({\r"
+        expect "> "
+        send "    stats: {\r"
+        expect "> "
+        send "      activeLicenses: 156,\r"
+        expect "> "
+        send "      totalCustomers: 89,\r"
+        expect "> "
+        send "      totalRevenue: 2847500,\r"
+        expect "> "
+        send "      expiringSoon: 7\r"
+        expect "> "
+        send "    }\r"
+        expect "> "
+        send "  });\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        send "echo 'Created dashboard_api.txt file'\r"
+        expect "$ "
+        
+        send "cat dashboard_api.txt\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

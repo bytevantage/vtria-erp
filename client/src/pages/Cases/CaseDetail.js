@@ -30,6 +30,7 @@ import {
   Attachment,
   History
 } from '@mui/icons-material';
+import WorkflowProgressChart from '../../components/WorkflowProgressChart';
 
 // Sample case data - replace with API call
 const sampleCase = {
@@ -301,6 +302,9 @@ const CaseDetail = () => {
               </Grid>
             </Grid>
           </Paper>
+
+          {/* Workflow Progress Chart */}
+          <WorkflowProgressChart caseId={id} />
         </Grid>
 
         {/* Sidebar */}
@@ -388,6 +392,11 @@ const CaseDetail = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Workflow Progress Chart at the bottom */}
+      <Box sx={{ mt: 4 }}>
+        <WorkflowProgressChart caseId={id} compact={true} />
+      </Box>
     </Box>
   );
 };

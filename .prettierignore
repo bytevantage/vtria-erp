@@ -1,0 +1,15 @@
+node_modules
+build
+dist
+coverage
+*.min.js
+*.min.css
+public
+logs
+uploads
+.git
+.vscode
+.idea
+*.md
+*.sql
+*.log

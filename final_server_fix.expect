@@ -1,0 +1,127 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Check current server process status  
+        send "echo '=== CURRENT SERVER STATUS ==='\r"
+        expect "$ "
+        send "ps aux | grep node | grep -v grep\r"
+        expect "$ "
+        
+        # Kill any existing processes
+        send "pkill -f 'node server.js' || true\r"
+        expect "$ "
+        send "sleep 3\r"
+        expect "$ "
+        
+        # Check the current log for errors
+        send "echo '=== CHECKING CURRENT LOG ==='\r"
+        expect "$ "
+        send "tail -20 server_restart.log\r"
+        expect "$ "
+        
+        # Create a robust startup script with PM2-like functionality
+        send "cat > robust_start.sh << 'EOF'\r"
+        expect "> "
+        send "#!/bin/bash\r"
+        expect "> "
+        send "echo 'Starting ByteVantage Server with robust monitoring...'\r"
+        expect "> "
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "# Function to start server\r"
+        expect "> "
+        send "start_server() {\r"
+        expect "> "
+        send "  echo 'Starting server at' $(date)\r"
+        expect "> "
+        send "  nohup node server.js > server.log 2>&1 &\r"
+        expect "> "
+        send "  SERVER_PID=$!\r"
+        expect "> "
+        send "  echo $SERVER_PID > server.pid\r"
+        expect "> "
+        send "  echo 'Server started with PID: '$SERVER_PID\r"
+        expect "> "
+        send "}\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "# Start server\r"
+        expect "> "
+        send "start_server\r"
+        expect "> "
+        send "sleep 5\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "# Monitor and restart if needed\r"
+        expect "> "
+        send "while true; do\r"
+        expect "> "
+        send "  if [ -f server.pid ]; then\r"
+        expect "> "
+        send "    PID=$(cat server.pid)\r"
+        expect "> "
+        send "    if ! ps -p $PID > /dev/null 2>&1; then\r"
+        expect "> "
+        send "      echo 'Server crashed! Restarting...' $(date)\r"
+        expect "> "
+        send "      start_server\r"
+        expect "> "
+        send "    fi\r"
+        expect "> "
+        send "  else\r"
+        expect "> "
+        send "    echo 'No PID file, starting server...'\r"
+        expect "> "
+        send "    start_server\r"
+        expect "> "
+        send "  fi\r"
+        expect "> "
+        send "  sleep 30\r"
+        expect "> "
+        send "done\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Make it executable and start it
+        send "chmod +x robust_start.sh\r"
+        expect "$ "
+        send "nohup ./robust_start.sh > monitor.log 2>&1 &\r"
+        expect "$ "
+        send "sleep 10\r"
+        expect "$ "
+        
+        # Check if server is running
+        send "echo '=== CHECKING NEW SERVER STATUS ==='\r"
+        expect "$ "
+        send "ps aux | grep 'node server.js' | grep -v grep\r"
+        expect "$ "
+        send "curl -s http://localhost:3001/health | head -c 100\r"
+        expect "$ "
+        
+        send "echo 'Robust server monitoring system deployed'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

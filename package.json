@@ -1,6 +1,67 @@
 {
-  "dependencies": {
-    "node-fetch": "^3.3.2",
-    "node-windows": "^1.0.0-beta.8"
-  }
+  "name": "vtria-erp",
+  "version": "1.0.0",
+  "description": "VTRIA ERP System - Complete Enterprise Resource Planning Solution",
+  "private": true,
+  "workspaces": [
+    "client",
+    "api"
+  ],
+  "scripts": {
+    "install": "npm install --prefix client && npm install --prefix api",
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "prod": "docker-compose -f docker-compose.production.yml up -d",
+    "build": "npm run build --prefix client",
+    "test": "npm run test --prefix client && npm run test --prefix api",
+    "lint": "npm run lint --prefix client && npm run lint --prefix api",
+    "lint:fix": "npm run lint:fix --prefix client && npm run lint:fix --prefix api",
+    "format": "npm run format --prefix client && npm run format --prefix api",
+    "format:check": "npm run format:check --prefix client && npm run format:check --prefix api",
+    "validate": "npm run validate --prefix client && npm run validate --prefix api",
+    "docs": "npm run docs --prefix api",
+    "prepare": "husky install",
+    "clean": "rm -rf client/node_modules api/node_modules node_modules",
+    "reset": "npm run clean && npm install"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "concurrently": "^8.2.2"
+  },
+  "lint-staged": {
+    "client/src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "api/src/**/*.{js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,scss}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/vtria-erp.git"
+  },
+  "keywords": [
+    "erp",
+    "vtria",
+    "engineering",
+    "automation",
+    "industrial",
+    "react",
+    "nodejs",
+    "mysql",
+    "docker"
+  ],
+  "author": "VTRIA Engineering Solutions Pvt Ltd",
+  "license": "PROPRIETARY"
 }

@@ -1,0 +1,52 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push checks for VTRIA ERP..."
+
+# Get the current branch name
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Prevent pushing to main/master without proper review
+if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+    echo "❌ Direct push to $current_branch is not allowed!"
+    echo "Please create a pull request for code review."
+    exit 1
+fi
+
+# Run full validation suite
+echo "🔍 Running full validation..."
+npm run validate
+
+if [ $? -ne 0 ]; then
+    echo "❌ Validation failed. Please fix issues before pushing."
+    exit 1
+fi
+
+# Check if package-lock.json is updated
+if git diff --name-only HEAD~1 HEAD | grep -q "package.json"; then
+    if ! git diff --name-only HEAD~1 HEAD | grep -q "package-lock.json"; then
+        echo "⚠️  package.json was modified but package-lock.json wasn't updated."
+        echo "Consider running 'npm install' to update package-lock.json"
+    fi
+fi
+
+# Security check: ensure no sensitive files are being committed
+sensitive_files=".env .env.local .env.production .env.staging"
+for file in $sensitive_files; do
+    if git diff --name-only HEAD~1 HEAD | grep -q "$file"; then
+        echo "❌ Sensitive file detected: $file"
+        echo "Please remove sensitive files from git tracking"
+        exit 1
+    fi
+done
+
+# Check for large files (>10MB)
+large_files=$(git diff --cached --name-only | xargs ls -la 2>/dev/null | awk '$5 > 10485760 {print $9}')
+if [ -n "$large_files" ]; then
+    echo "❌ Large files detected (>10MB):"
+    echo "$large_files"
+    echo "Consider using Git LFS for large files"
+    exit 1
+fi
+
+echo "✅ Pre-push checks completed successfully!"

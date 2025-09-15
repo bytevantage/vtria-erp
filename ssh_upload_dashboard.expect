@@ -1,0 +1,44 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api/public\r"
+        expect "$ "
+        
+        # Create dashboard.html content
+        send "cat > dashboard.html << 'DASHBOARD_EOF'\r"
+        expect "> "
+        
+        # Read and send the dashboard content from the local file
+        set fp [open "/Users/srbhandary/Documents/Projects/vtria-erp/dashboard.html" r]
+        while {[gets \$fp line] >= 0} {
+            send "\$line\r"
+            expect "> "
+        }
+        close \$fp
+        
+        send "DASHBOARD_EOF\r"
+        expect "$ "
+        
+        # Verify the file was created
+        send "ls -la dashboard.html\r"
+        expect "$ "
+        
+        send "echo 'Dashboard uploaded successfully'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

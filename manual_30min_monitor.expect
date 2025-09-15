@@ -1,0 +1,87 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Kill current monitor
+        send "pkill -f monitor_server.sh || true\r"
+        expect "$ "
+        send "sleep 3\r"
+        expect "$ "
+        
+        # Create new monitor script with manual editing
+        send "echo '#!/bin/bash' > monitor_30min.sh\r"
+        expect "$ "
+        send "echo 'echo \"Starting ByteVantage Server Monitor (30-minute intervals)...\"' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo 'cd /home/u570718221/domains/api.bytevantage.in/public_html/api' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo 'while true; do' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '  if ! pgrep -f \"node server.js\" > /dev/null; then' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    echo \"Server not running, starting...\"' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    nohup node server.js > server.log 2>&1 &' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    sleep 10' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '  fi' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '  if ! curl -s http://localhost:3001/health > /dev/null; then' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    echo \"Server not responding, restarting...\"' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    pkill -f \"node server.js\"' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    sleep 3' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    nohup node server.js > server.log 2>&1 &' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '    sleep 10' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '  fi' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo '  sleep 1800' >> monitor_30min.sh\r"
+        expect "$ "
+        send "echo 'done' >> monitor_30min.sh\r"
+        expect "$ "
+        
+        # Make executable and start
+        send "chmod +x monitor_30min.sh\r"
+        expect "$ "
+        send "nohup ./monitor_30min.sh > monitor_30min.log 2>&1 &\r"
+        expect "$ "
+        send "sleep 5\r"
+        expect "$ "
+        
+        # Verify
+        send "ps aux | grep monitor_30min.sh | grep -v grep\r"
+        expect "$ "
+        send "ps aux | grep 'node server.js' | grep -v grep\r"
+        expect "$ "
+        send "curl -s http://localhost:3001/health | head -c 50\r"
+        expect "$ "
+        
+        send "echo '30-minute monitoring system deployed'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

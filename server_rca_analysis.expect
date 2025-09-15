@@ -1,0 +1,57 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Check current server status
+        send "echo '=== SERVER PROCESS STATUS ==='\r"
+        expect "$ "
+        send "ps aux | grep 'node server.js' | grep -v grep\r"
+        expect "$ "
+        
+        # Check recent server logs
+        send "echo '=== RECENT SERVER LOGS ==='\r"
+        expect "$ "
+        send "tail -30 server_restart.log\r"
+        expect "$ "
+        
+        # Check for any error logs
+        send "echo '=== ERROR LOGS ==='\r"
+        expect "$ "
+        send "find . -name '*.log' -exec tail -10 {} +\r"
+        expect "$ "
+        
+        # Check system resources
+        send "echo '=== SYSTEM RESOURCES ==='\r"
+        expect "$ "
+        send "free -h\r"
+        expect "$ "
+        send "df -h .\r"
+        expect "$ "
+        
+        # Check if there are any crashed node processes
+        send "echo '=== CRASHED PROCESSES ==='\r"
+        expect "$ "
+        send "pgrep -f node || echo 'No node processes running'\r"
+        expect "$ "
+        
+        send "echo 'RCA analysis complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

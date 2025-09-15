@@ -1,0 +1,53 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Check what's currently in the web root
+        send "echo '=== CHECKING HOSTINGER WEB ROOT ==='\r"
+        expect "$ "
+        send "ls -la\r"
+        expect "$ "
+        
+        # Check if there's an existing .htaccess
+        send "echo '=== CURRENT .HTACCESS CONFIG ==='\r"
+        expect "$ "
+        send "cat .htaccess 2>/dev/null || echo 'No .htaccess file'\r"
+        expect "$ "
+        
+        # Check the current directory structure
+        send "echo '=== DIRECTORY STRUCTURE ==='\r"
+        expect "$ "
+        send "find . -type f -name '*.html' | head -10\r"
+        expect "$ "
+        
+        # Check if Node.js server is still running
+        send "cd api\r"
+        expect "$ "
+        send "ps aux | grep 'node server.js' | grep -v grep\r"
+        expect "$ "
+        
+        # Test local Node.js server
+        send "curl -s http://localhost:3001/health | head -c 30 || echo 'Node server not responding'\r"
+        expect "$ "
+        
+        send "echo 'Configuration check complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

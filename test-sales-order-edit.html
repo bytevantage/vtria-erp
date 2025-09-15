@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Order Edit & Preview Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #0056b3; }
+        .edit-btn { background: #28a745; }
+        .preview-btn { background: #17a2b8; }
+        .result { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .preview-dialog { 
+            position: fixed; top: 50px; left: 50px; right: 50px; bottom: 50px; 
+            background: white; border: 2px solid #ddd; border-radius: 8px; 
+            z-index: 1000; padding: 20px; overflow: auto; display: none; 
+        }
+        .dialog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: #dc3545; }
+        .form-group { margin: 10px 0; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sales Order Edit & Preview Test</h1>
+        
+        <div class="section">
+            <h2>API Connection Test</h2>
+            <button class="button" onclick="testApiConnection()">Test API Connection</button>
+            <div id="apiResult" class="result"></div>
+        </div>
+
+        <div class="section">
+            <h2>Sales Orders List</h2>
+            <button class="button" onclick="loadSalesOrders()">Load Sales Orders</button>
+            <div id="salesOrdersResult" class="result"></div>
+        </div>
+
+        <div class="section">
+            <h2>Edit Sales Order Form</h2>
+            <form id="editForm">
+                <div class="form-group">
+                    <label>Sales Order ID:</label>
+                    <input type="text" id="editOrderId" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Customer PO Number:</label>
+                    <input type="text" id="editPoNumber">
+                </div>
+                <div class="form-group">
+                    <label>Customer PO Date:</label>
+                    <input type="date" id="editPoDate">
+                </div>
+                <div class="form-group">
+                    <label>Expected Delivery Date:</label>
+                    <input type="date" id="editDeliveryDate">
+                </div>
+                <div class="form-group">
+                    <label>Advance Amount:</label>
+                    <input type="number" id="editAdvanceAmount">
+                </div>
+                <div class="form-group">
+                    <label>Production Priority:</label>
+                    <select id="editPriority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Special Instructions:</label>
+                    <textarea id="editInstructions" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Billing Address:</label>
+                    <textarea id="editBillingAddress" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Shipping Address:</label>
+                    <textarea id="editShippingAddress" rows="3"></textarea>
+                </div>
+                <button type="button" class="button edit-btn" onclick="saveOrder()">Save Changes</button>
+            </form>
+            <div id="editResult" class="result"></div>
+        </div>
+    </div>
+
+    <!-- Preview Dialog -->
+    <div id="previewDialog" class="preview-dialog">
+        <div class="dialog-header">
+            <h2>Sales Order Preview</h2>
+            <button class="button close-btn" onclick="closePreview()">Close</button>
+        </div>
+        <div id="previewContent"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        
+        async function testApiConnection() {
+            const resultDiv = document.getElementById('apiResult');
+            try {
+                const response = await fetch('http://localhost:3001/health');
+                const data = await response.json();
+                resultDiv.innerHTML = `<strong>API Status:</strong> ✅ Connected<br><strong>Response:</strong> ${JSON.stringify(data, null, 2)}`;
+                resultDiv.style.background = '#d4edda';
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>API Status:</strong> ❌ Failed<br><strong>Error:</strong> ${error.message}`;
+                resultDiv.style.background = '#f8d7da';
+            }
+        }
+
+        async function loadSalesOrders() {
+            const resultDiv = document.getElementById('salesOrdersResult');
+            try {
+                const response = await fetch(`${API_BASE}/sales-order`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = `<h3>Found ${data.count} Sales Orders</h3><table>`;
+                    html += `<tr><th>ID</th><th>Sales Order ID</th><th>Status</th><th>Client</th><th>Actions</th></tr>`;
+                    
+                    data.data.forEach(order => {
+                        html += `<tr>
+                            <td>${order.id}</td>
+                            <td>${order.sales_order_id}</td>
+                            <td>${order.status}</td>
+                            <td>${order.client_name || 'N/A'}</td>
+                            <td>
+                                <button class="button preview-btn" onclick="previewOrder(${order.id})">👁️ Preview</button>
+                                ${order.status === 'draft' ? `<button class="button edit-btn" onclick="editOrder(${order.id})">✏️ Edit</button>` : ''}
+                            </td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    resultDiv.innerHTML = html;
+                    resultDiv.style.background = '#d4edda';
+                } else {
+                    resultDiv.innerHTML = `<strong>Error:</strong> ${data.message}`;
+                    resultDiv.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                resultDiv.style.background = '#f8d7da';
+            }
+        }
+
+        async function editOrder(orderId) {
+            try {
+                const response = await fetch(`${API_BASE}/sales-order/${orderId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const order = data.data;
+                    document.getElementById('editOrderId').value = order.sales_order_id;
+                    document.getElementById('editPoNumber').value = order.customer_po_number || '';
+                    document.getElementById('editPoDate').value = order.customer_po_date ? order.customer_po_date.split('T')[0] : '';
+                    document.getElementById('editDeliveryDate').value = order.expected_delivery_date ? order.expected_delivery_date.split('T')[0] : '';
+                    document.getElementById('editAdvanceAmount').value = order.advance_amount || '';
+                    document.getElementById('editPriority').value = order.production_priority || 'medium';
+                    document.getElementById('editInstructions').value = order.special_instructions || '';
+                    document.getElementById('editBillingAddress').value = order.billing_address || '';
+                    document.getElementById('editShippingAddress').value = order.shipping_address || '';
+                    
+                    // Store the order ID for saving
+                    document.getElementById('editForm').dataset.orderId = orderId;
+                    
+                    document.getElementById('editResult').innerHTML = `<strong>Loaded order for editing:</strong> ${order.sales_order_id}`;
+                    document.getElementById('editResult').style.background = '#d4edda';
+                } else {
+                    alert('Failed to load order for editing');
+                }
+            } catch (error) {
+                alert('Error loading order: ' + error.message);
+            }
+        }
+
+        async function saveOrder() {
+            const form = document.getElementById('editForm');
+            const orderId = form.dataset.orderId;
+            
+            if (!orderId) {
+                alert('No order selected for editing');
+                return;
+            }
+
+            const formData = {
+                customer_po_number: document.getElementById('editPoNumber').value,
+                customer_po_date: document.getElementById('editPoDate').value,
+                expected_delivery_date: document.getElementById('editDeliveryDate').value,
+                advance_amount: parseFloat(document.getElementById('editAdvanceAmount').value) || 0,
+                production_priority: document.getElementById('editPriority').value,
+                special_instructions: document.getElementById('editInstructions').value,
+                billing_address: document.getElementById('editBillingAddress').value,
+                shipping_address: document.getElementById('editShippingAddress').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/sales-order/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                const resultDiv = document.getElementById('editResult');
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<strong>✅ Success:</strong> ${data.message}`;
+                    resultDiv.style.background = '#d4edda';
+                    // Reload the sales orders list
+                    loadSalesOrders();
+                } else {
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${data.message}`;
+                    resultDiv.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                document.getElementById('editResult').innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+                document.getElementById('editResult').style.background = '#f8d7da';
+            }
+        }
+
+        async function previewOrder(orderId) {
+            try {
+                const response = await fetch(`${API_BASE}/sales-order/${orderId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const order = data.data;
+                    const previewContent = document.getElementById('previewContent');
+                    
+                    previewContent.innerHTML = `
+                        <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1976d2; padding-bottom: 20px;">
+                                <h1 style="color: #1976d2; margin: 0;">VTRIA ERP SYSTEMS</h1>
+                                <p style="margin: 5px 0;">Professional ERP Solutions</p>
+                                <p style="margin: 5px 0;">📧 info@vtria.com | 📞 +91-XXXXXXXXXX</p>
+                            </div>
+                            
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2 style="color: #1976d2; margin: 0;">SALES ORDER</h2>
+                                <p style="font-size: 18px; font-weight: bold; margin: 10px 0;">${order.sales_order_id}</p>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                                <div>
+                                    <h3 style="color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 10px;">📋 Order Details</h3>
+                                    <p><strong>Order Date:</strong> ${new Date(order.date).toLocaleDateString('en-IN')}</p>
+                                    <p><strong>Customer PO:</strong> ${order.customer_po_number || 'N/A'}</p>
+                                    <p><strong>PO Date:</strong> ${order.customer_po_date ? new Date(order.customer_po_date).toLocaleDateString('en-IN') : 'N/A'}</p>
+                                    <p><strong>Expected Delivery:</strong> ${order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString('en-IN') : 'N/A'}</p>
+                                    <p><strong>Status:</strong> <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">${order.status}</span></p>
+                                </div>
+                                
+                                <div>
+                                    <h3 style="color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 10px;">👤 Client Information</h3>
+                                    <p><strong>Company:</strong> ${order.client_name || 'N/A'}</p>
+                                    <p><strong>Project:</strong> ${order.project_name || 'N/A'}</p>
+                                    <p><strong>Location:</strong> ${order.city || 'N/A'}, ${order.state || 'N/A'}</p>
+                                    <p><strong>Priority:</strong> <span style="background: ${order.production_priority === 'high' ? '#dc3545' : order.production_priority === 'medium' ? '#ffc107' : '#28a745'}; color: white; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">${order.production_priority}</span></p>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 10px;">💰 Financial Summary</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                        <p><strong>Total Amount:</strong> ₹${parseFloat(order.total_amount || 0).toLocaleString('en-IN')}</p>
+                                        <p><strong>Advance Amount:</strong> ₹${parseFloat(order.advance_amount || 0).toLocaleString('en-IN')}</p>
+                                        <p><strong>Balance Amount:</strong> ₹${(parseFloat(order.total_amount || 0) - parseFloat(order.advance_amount || 0)).toLocaleString('en-IN')}</p>
+                                    </div>
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                        <p><strong>Payment Terms:</strong> ${order.payment_terms || 'N/A'}</p>
+                                        <p><strong>Delivery Terms:</strong> ${order.delivery_terms || 'N/A'}</p>
+                                        <p><strong>Warranty:</strong> ${order.warranty_terms || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                                <div>
+                                    <h3 style="color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 10px;">📤 Billing Address</h3>
+                                    <p style="background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-line;">${order.billing_address || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <h3 style="color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 10px;">📦 Shipping Address</h3>
+                                    <p style="background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-line;">${order.shipping_address || 'N/A'}</p>
+                                </div>
+                            </div>
+                            
+                            ${order.special_instructions ? `
+                                <div style="margin-bottom: 30px;">
+                                    <h3 style="color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 10px;">📝 Special Instructions</h3>
+                                    <p style="background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-line;">${order.special_instructions}</p>
+                                </div>
+                            ` : ''}
+                            
+                            <div style="background: #1976d2; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-top: 30px;">
+                                <h3 style="margin: 0 0 10px 0;">Thank you for your business!</h3>
+                                <p style="margin: 0; opacity: 0.9;">For any queries, please contact us at info@vtria.com | +91-XXXXXXXXXX</p>
+                                <p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.7;">This is a computer generated sales order. Generated on ${new Date().toLocaleDateString('en-IN')}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('previewDialog').style.display = 'block';
+                } else {
+                    alert('Failed to load order for preview');
+                }
+            } catch (error) {
+                alert('Error loading order preview: ' + error.message);
+            }
+        }
+
+        function closePreview() {
+            document.getElementById('previewDialog').style.display = 'none';
+        }
+
+        // Auto-test API connection on page load
+        window.onload = function() {
+            testApiConnection();
+        };
+    </script>
+</body>
+</html>

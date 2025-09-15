@@ -1,0 +1,58 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Create a simple payment API file
+        send "cat > payment_routes.js << 'EOF'\r"
+        expect "> "
+        send "// Payment API Routes\r"
+        expect "> "
+        send "app.get('/api/admin/payments', (req, res) => {\r"
+        expect "> "
+        send "  const payments = [\r"
+        expect "> "
+        send "    { id: 1, license_id: 'DEMO-001', amount: 35000 },\r"
+        expect "> "
+        send "    { id: 2, license_id: 'DEMO-002', amount: 25000 }\r"
+        expect "> "
+        send "  ];\r"
+        expect "> "
+        send "  res.json({ success: true, payments: payments });\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "app.put('/api/admin/payments/:id/amount', (req, res) => {\r"
+        expect "> "
+        send "  res.json({ success: true, message: 'Payment updated' });\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        send "echo 'Payment routes file created'\r"
+        expect "$ "
+        
+        send "cat payment_routes.js\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

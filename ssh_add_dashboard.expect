@@ -1,0 +1,45 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # First, let's add the missing dashboard route - find where to insert it
+        send "grep -n \"app.get('/admin'\" server.js\r"
+        expect "$ "
+        
+        # Backup the current server.js
+        send "cp server.js server_backup_dashboard.js\r"
+        expect "$ "
+        
+        # Add the missing /dashboard route
+        send "sed -i \"288i\\\\app.get('/dashboard', (req, res) => {\\n    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));\\n});\\n\" server.js\r"
+        expect "$ "
+        
+        # Add the root route
+        send "sed -i \"288i\\\\app.get('/', (req, res) => {\\n    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));\\n});\\n\" server.js\r"
+        expect "$ "
+        
+        # Verify the changes
+        send "grep -A2 -B2 \"/dashboard\" server.js\r"
+        expect "$ "
+        
+        send "echo 'Dashboard routes added successfully'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

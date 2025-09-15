@@ -1,0 +1,160 @@
+[dotenv@17.2.2] injecting env (38) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+Rate limiting disabled due to missing dependencies
+Redis disabled - using in-memory cache fallback
+
+============================================================
+🚀 VTRIA ERP API Server Started Successfully
+============================================================
+📡 Server running on: http://localhost:3001
+🏥 Health check: http://localhost:3001/health
+📚 API Documentation: http://localhost:3001/api-docs
+🗄️  Database: vtria_erp@localhost
+🌍 Environment: development
+============================================================
+
+INFO: SLA Scheduler and Notification Service disabled for testing
+Database connected as id 4169
+Database connection successful
+ERROR: Failed to initialize email transporter:
+INFO: GET /api/multi-location-inventory/transfers
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /api/case-management/stats/overview
+INFO: GET /api/case-management/state/enquiry
+INFO: GET /health
+Database connected as id 4189
+Error fetching cases by state: Error: Unknown column 'u.role' in 'field list'
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at exports.getCasesByState (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/caseManagement.controller.js:503:34)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:295:15
+    at param (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:600:14)
+    at param (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:610:14) {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sql: '\n' +
+    '            SELECT \n' +
+    '                c.case_number,\n' +
+    '                c.current_state,\n' +
+    '                c.created_at,\n' +
+    '                c.updated_at,\n' +
+    '                se.project_name,\n' +
+    '                se.description,\n' +
+    '                cl.company_name as client_name,\n' +
+    '                cl.contact_person as client_email,\n' +
+    '                u.full_name as case_owner_name,\n' +
+    '                u.role as case_owner_role,\n' +
+    '                DATEDIFF(CURRENT_DATE, c.created_at) as days_in_system,\n' +
+    '                CASE \n' +
+    "                    WHEN c.current_state = 'enquiry' THEN se.description\n" +
+    "                    WHEN c.current_state = 'estimation' THEN CONCAT('Est Value: ₹', COALESCE(e.total_final_price, 0))\n" +
+    "                    WHEN c.current_state = 'quotation' THEN CONCAT('Quote Value: ₹', COALESCE(q.grand_total, 0))\n" +
+    "                    WHEN c.current_state = 'order' THEN CONCAT('Order Value: ₹', COALESCE(so.total_amount, 0))\n" +
+    "                    ELSE 'In Progress'\n" +
+    '                END as current_info\n' +
+    '            FROM cases c\n' +
+    '            JOIN sales_enquiries se ON c.enquiry_id = se.id\n' +
+    '            JOIN clients cl ON se.client_id = cl.id\n' +
+    '            LEFT JOIN users u ON c.assigned_to = u.id\n' +
+    '            LEFT JOIN estimations e ON se.id = e.enquiry_id\n' +
+    '            LEFT JOIN quotations q ON e.id = q.estimation_id\n' +
+    '            LEFT JOIN sales_orders so ON q.id = so.quotation_id\n' +
+    '            WHERE c.current_state = ?\n' +
+    '            ORDER BY c.created_at ASC\n' +
+    '        ',
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'u.role' in 'field list'"
+}
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /api/clients
+INFO: GET /api/sales-enquiry
+INFO: GET /api/users
+Database connected as id 4215
+INFO: GET /health
+INFO: GET /health
+INFO: GET /api/estimation
+INFO: GET /api/sales-enquiry
+INFO: GET /api/sales-enquiry
+INFO: GET /api/estimation
+INFO: GET /api/estimation/18/details
+INFO: GET /api/estimation/17/details
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /api/estimation/9/details
+INFO: GET /health
+INFO: GET /api/estimation/9/details
+INFO: GET /api/quotation
+INFO: GET /api/estimation
+INFO: GET /api/estimation
+INFO: POST /api/quotation
+Error creating quotation: Error: Approved estimation not found
+    at exports.createQuotation (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/quotation.controller.js:80:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /api/quotation
+INFO: GET /api/estimation
+INFO: GET /health
+INFO: GET /api/estimation
+INFO: GET /api/quotation
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: POST /api/quotation
+Error creating quotation: Error: Approved estimation not found
+    at exports.createQuotation (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/quotation.controller.js:80:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: POST /api/quotation
+Error creating quotation: Error: Approved estimation not found
+    at exports.createQuotation (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/quotation.controller.js:80:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health
+INFO: GET /health

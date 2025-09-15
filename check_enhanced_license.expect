@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api/public\r"
+        expect "$ "
+        
+        # Search for payment-related content in the enhanced license file
+        send "grep -n -A3 -B3 -i 'payment\\|edit.*payment\\|pay' admin-licenses-enhanced.html\r"
+        expect "$ "
+        
+        send "echo 'Enhanced license payment search complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

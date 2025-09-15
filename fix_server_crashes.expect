@@ -1,0 +1,87 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Create a backup of current server.js
+        send "cp server.js server.js.pre_crash_fix\r"
+        expect "$ "
+        
+        # Add comprehensive error handling to the beginning of server.js
+        send "cat > crash_prevention.js << 'EOF'\r"
+        expect "> "
+        send "// Crash Prevention and Error Handling\r"
+        expect "> "
+        send "process.on('uncaughtException', (error) => {\r"
+        expect "> "
+        send "  console.error('Uncaught Exception:', error);\r"
+        expect "> "
+        send "  console.error('Stack:', error.stack);\r"
+        expect "> "
+        send "  // Don't exit, keep server running\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "process.on('unhandledRejection', (reason, promise) => {\r"
+        expect "> "
+        send "  console.error('Unhandled Rejection at:', promise, 'reason:', reason);\r"
+        expect "> "
+        send "  // Don't exit, keep server running\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "process.on('SIGTERM', () => {\r"
+        expect "> "
+        send "  console.log('SIGTERM received, shutting down gracefully');\r"
+        expect "> "
+        send "  process.exit(0);\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "process.on('SIGINT', () => {\r"
+        expect "> "
+        send "  console.log('SIGINT received, shutting down gracefully');\r"
+        expect "> "
+        send "  process.exit(0);\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Insert crash prevention at the top of server.js
+        send "sed -i '1r crash_prevention.js' server.js\r"
+        expect "$ "
+        
+        # Add database connection retry mechanism
+        send "sed -i '/Database connection successful/a\\// Keep database connection alive\\nsetInterval(() => {\\n  if (db) {\\n    db.query(\"SELECT 1\", (err) => {\\n      if (err) console.error(\"DB keepalive error:\", err);\\n    });\\n  }\\n}, 60000);' server.js\r"
+        expect "$ "
+        
+        send "echo 'Crash prevention measures added to server.js'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

@@ -1,0 +1,55 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Check if server is still running
+        send "echo '=== SERVER STATUS ==='\r"
+        expect "$ "
+        send "ps aux | grep 'node server.js' | grep -v grep\r"
+        expect "$ "
+        
+        # Test health endpoint
+        send "echo '=== HEALTH ENDPOINT ==='\r"
+        expect "$ "
+        send "curl -s http://localhost:3001/health\r"
+        expect "$ "
+        
+        # Test dashboard endpoint
+        send "echo '=== DASHBOARD ENDPOINT ==='\r"
+        expect "$ "
+        send "curl -s http://localhost:3001/dashboard | grep -o 'ByteVantage' | head -3\r"
+        expect "$ "
+        
+        # Test admin licenses endpoint
+        send "echo '=== ADMIN LICENSES ENDPOINT ==='\r"
+        expect "$ "
+        send "curl -s 'http://localhost:3001/admin/licenses-enhanced' | grep -o 'Edit Payment' | head -2\r"
+        expect "$ "
+        
+        # Test payment API endpoint
+        send "echo '=== PAYMENTS API ENDPOINT ==='\r"
+        expect "$ "
+        send "curl -s 'http://localhost:3001/api/admin/payments' | head -c 100\r"
+        expect "$ "
+        
+        send "echo 'Local endpoint testing complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

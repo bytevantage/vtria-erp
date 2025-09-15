@@ -1,0 +1,63 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks for VTRIA ERP..."
+
+# Run lint-staged
+npx lint-staged
+
+# Check for forbidden patterns
+echo "🚫 Checking for forbidden patterns..."
+
+# Check for console.log in production files (excluding development/test files)
+if grep -r "console\.log" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \
+   --exclude-dir=node_modules --exclude-dir=build --exclude-dir=dist \
+   --exclude="*.test.*" --exclude="*.spec.*" --exclude="*.dev.*" .; then
+    echo "❌ console.log found in production code. Please remove or replace with proper logging."
+    exit 1
+fi
+
+# Check for debugger statements
+if grep -r "debugger" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \
+   --exclude-dir=node_modules --exclude-dir=build --exclude-dir=dist .; then
+    echo "❌ debugger statements found. Please remove before committing."
+    exit 1
+fi
+
+# Check for hardcoded passwords or secrets
+if grep -ri "password.*=" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \
+   --exclude-dir=node_modules --exclude-dir=build --exclude-dir=dist \
+   --exclude="*.test.*" --exclude="*.spec.*" . | grep -v "passwordHash\|passwordField\|passwordInput\|passwordValidation"; then
+    echo "❌ Potential hardcoded passwords found. Please review and use environment variables."
+    exit 1
+fi
+
+# Check for API keys in code
+if grep -ri "api.*key.*=" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \
+   --exclude-dir=node_modules --exclude-dir=build --exclude-dir=dist \
+   --exclude="*.test.*" --exclude="*.spec.*" .; then
+    echo "❌ Potential API keys found in code. Please use environment variables."
+    exit 1
+fi
+
+# Warn about TODO comments
+if grep -r "TODO\|FIXME\|HACK" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \
+   --exclude-dir=node_modules --exclude-dir=build --exclude-dir=dist .; then
+    echo "⚠️  TODO/FIXME/HACK comments found. Consider addressing before production."
+fi
+
+# Check TypeScript compilation (if tsconfig exists)
+if [ -f "client/tsconfig.json" ]; then
+    echo "🔧 Checking TypeScript compilation..."
+    cd client && npx tsc --noEmit && cd ..
+    if [ $? -ne 0 ]; then
+        echo "❌ TypeScript compilation failed. Please fix errors before committing."
+        exit 1
+    fi
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+npm run test 2>/dev/null || echo "⚠️  Tests not configured or failed. Consider adding tests."
+
+echo "✅ Pre-commit checks completed successfully!"

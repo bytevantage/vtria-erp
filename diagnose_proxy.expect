@@ -1,0 +1,79 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Test internal connection first
+        send "echo '=== TESTING INTERNAL CONNECTION ==='\r"
+        expect "$ "
+        send "curl -s http://127.0.0.1:3001/health | head -c 100\r"
+        expect "$ "
+        
+        # Check if the web server can access the Node server
+        send "echo '=== TESTING PROXY ACCESS ==='\r"
+        expect "$ "
+        send "curl -s -H 'Host: api.bytevantage.in' http://127.0.0.1/health | head -c 100\r"
+        expect "$ "
+        
+        # Check .htaccess permissions
+        send "echo '=== CHECKING HTACCESS PERMISSIONS ==='\r"
+        expect "$ "
+        send "ls -la .htaccess\r"
+        expect "$ "
+        
+        # Try creating a simple index.html that redirects
+        send "echo '=== CREATING FALLBACK INDEX ==='\r"
+        expect "$ "
+        send "cat > index.html << 'EOF'\r"
+        expect "> "
+        send "<!DOCTYPE html>\r"
+        expect "> "
+        send "<html>\r"
+        expect "> "
+        send "<head>\r"
+        expect "> "
+        send "<meta http-equiv=\"refresh\" content=\"0; url=http://127.0.0.1:3001/dashboard\">\r"
+        expect "> "
+        send "<title>ByteVantage - Loading...</title>\r"
+        expect "> "
+        send "</head>\r"
+        expect "> "
+        send "<body>\r"
+        expect "> "
+        send "<p>Loading ByteVantage Dashboard...</p>\r"
+        expect "> "
+        send "<p>If not redirected, <a href=\"http://127.0.0.1:3001/dashboard\">click here</a></p>\r"
+        expect "> "
+        send "</body>\r"
+        expect "> "
+        send "</html>\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Test if the server logs show any proxy attempts
+        send "echo '=== CHECKING SERVER LOGS ==='\r"
+        expect "$ "
+        send "cd api && tail -10 server.log 2>/dev/null || echo 'No server log found'\r"
+        expect "$ "
+        
+        send "echo 'Proxy diagnostic complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

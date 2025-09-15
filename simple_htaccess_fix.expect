@@ -1,0 +1,123 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Back up current .htaccess
+        send "cp .htaccess .htaccess.backup\r"
+        expect "$ "
+        
+        # Create simpler .htaccess without proxy directives
+        send "cat > .htaccess << 'EOF'\r"
+        expect "> "
+        send "RewriteEngine On\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-f\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-d\r"
+        expect "> "
+        send "RewriteRule ^(.*)$ index.php?path=$1 [QSA,L]\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Create index.php that acts as a proxy
+        send "cat > index.php << 'EOF'\r"
+        expect "> "
+        send "<?php\r"
+        expect "> "
+        send "error_reporting(0);\r"
+        expect "> "
+        send "header('Access-Control-Allow-Origin: *');\r"
+        expect "> "
+        send "header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');\r"
+        expect "> "
+        send "header('Access-Control-Allow-Headers: Content-Type, Authorization');\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "if (\$_SERVER['REQUEST_METHOD'] === 'OPTIONS') {\r"
+        expect "> "
+        send "    http_response_code(200);\r"
+        expect "> "
+        send "    exit;\r"
+        expect "> "
+        send "}\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "\$nodeUrl = 'http://127.0.0.1:3001' . \$_SERVER['REQUEST_URI'];\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "\$ch = curl_init();\r"
+        expect "> "
+        send "curl_setopt(\$ch, CURLOPT_URL, \$nodeUrl);\r"
+        expect "> "
+        send "curl_setopt(\$ch, CURLOPT_RETURNTRANSFER, true);\r"
+        expect "> "
+        send "curl_setopt(\$ch, CURLOPT_FOLLOWLOCATION, true);\r"
+        expect "> "
+        send "curl_setopt(\$ch, CURLOPT_TIMEOUT, 30);\r"
+        expect "> "
+        send "curl_setopt(\$ch, CURLOPT_CUSTOMREQUEST, \$_SERVER['REQUEST_METHOD']);\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "if (in_array(\$_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH'])) {\r"
+        expect "> "
+        send "    \$postData = file_get_contents('php://input');\r"
+        expect "> "
+        send "    curl_setopt(\$ch, CURLOPT_POSTFIELDS, \$postData);\r"
+        expect "> "
+        send "}\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "\$response = curl_exec(\$ch);\r"
+        expect "> "
+        send "\$httpCode = curl_getinfo(\$ch, CURLINFO_HTTP_CODE);\r"
+        expect "> "
+        send "curl_close(\$ch);\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "if (\$response === FALSE) {\r"
+        expect "> "
+        send "    http_response_code(503);\r"
+        expect "> "
+        send "    echo 'Node.js server unavailable';\r"
+        expect "> "
+        send "} else {\r"
+        expect "> "
+        send "    http_response_code(\$httpCode);\r"
+        expect "> "
+        send "    echo \$response;\r"
+        expect "> "
+        send "}\r"
+        expect "> "
+        send "?>\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        send "echo 'PHP proxy setup complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

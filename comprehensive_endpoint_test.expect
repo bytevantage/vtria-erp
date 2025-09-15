@@ -1,0 +1,53 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Check for syntax errors in server.js
+        send "echo '=== CHECKING SERVER.JS SYNTAX ==='\r"
+        expect "$ "
+        send "node -c server.js\r"
+        expect "$ "
+        
+        # Extract all endpoints from server.js
+        send "echo '=== ALL ENDPOINTS IN SERVER.JS ==='\r"
+        expect "$ "
+        send "grep -n 'app\\.\\(get\\|post\\|put\\|delete\\)' server.js | head -20\r"
+        expect "$ "
+        
+        # Check for missing files referenced in server.js
+        send "echo '=== CHECKING MISSING FILES ==='\r"
+        expect "$ "
+        send "grep -o \"sendFile.*'.*'\" server.js | head -10\r"
+        expect "$ "
+        
+        # Check if all HTML files exist
+        send "ls -la public/ | grep -E '\\.(html|js)$' | head -10\r"
+        expect "$ "
+        
+        # Test startup with verbose logging
+        send "echo '=== TESTING SERVER STARTUP ==='\r"
+        expect "$ "
+        send "timeout 10s node server.js 2>&1 | head -20\r"
+        expect "$ "
+        
+        send "echo 'Comprehensive endpoint analysis complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

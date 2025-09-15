@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Get current server structure
+        send "head -50 server.js\r"
+        expect "$ "
+        
+        # Check what routes exist
+        send "grep -n 'app\\.' server.js | head -20\r"
+        expect "$ "
+        
+        # Check if public directory exists
+        send "ls -la public/\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

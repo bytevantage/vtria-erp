@@ -1,0 +1,51 @@
+
+> api@1.0.0 start
+> node src/server.js
+
+[dotenv@17.2.2] injecting env (37) from .env -- tip: 📡 auto-backup env with Radar: https://dotenvx.com/radar
+Ignoring invalid configuration option passed to Connection: acquireTimeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: timeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: reconnect. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+Rate limiting disabled due to missing dependencies
+Redis disabled - using in-memory cache fallback
+Server is running on port 3001
+Health check available at: http://localhost:3001/health
+Database connected as id 10
+Database connection successful
+Database connected as id 253
+Database connected as id 254
+Error fetching GRNs: Error: Unknown column 'po.po_number' in 'field list'
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getAllGRNs (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/grn.controller.js:119:37)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:295:15
+    at processParams (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:582:12)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:291:5) {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    grn.*,\n' +
+    '                    s.company_name as supplier_name,\n' +
+    '                    po.po_number,\n' +
+    '                    u.full_name as received_by_name,\n' +
+    '                    v.full_name as verified_by_name,\n' +
+    '                    a.full_name as approved_by_name\n' +
+    '                FROM goods_received_notes grn\n' +
+    '                LEFT JOIN suppliers s ON grn.supplier_id = s.id\n' +
+    '                LEFT JOIN purchase_orders po ON grn.purchase_order_id = po.id\n' +
+    '                LEFT JOIN users u ON grn.received_by = u.id\n' +
+    '                LEFT JOIN users v ON grn.verified_by = v.id\n' +
+    '                LEFT JOIN users a ON grn.approved_by = a.id\n' +
+    '                ORDER BY grn.created_at DESC\n' +
+    '            ',
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'po.po_number' in 'field list'"
+}
+Database connected as id 453
+Database connected as id 467

@@ -1,0 +1,55 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Create a simple index.php file
+        send "echo '<?php' > index.php\r"
+        expect "$ "
+        send "echo 'header(\"Content-Type: application/json\");' >> index.php\r"
+        expect "$ "
+        send "echo '\$url = \"http://127.0.0.1:3001\" . \$_SERVER[\"REQUEST_URI\"];' >> index.php\r"
+        expect "$ "
+        send "echo '\$response = file_get_contents(\$url);' >> index.php\r"
+        expect "$ "
+        send "echo 'if (\$response === FALSE) { echo \"Server down\"; } else { echo \$response; }' >> index.php\r"
+        expect "$ "
+        send "echo '?>' >> index.php\r"
+        expect "$ "
+        
+        # Create simple .htaccess
+        send "echo 'RewriteEngine On' > .htaccess\r"
+        expect "$ "
+        send "echo 'RewriteCond %{REQUEST_FILENAME} !-f' >> .htaccess\r"
+        expect "$ "
+        send "echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> .htaccess\r"
+        expect "$ "
+        send "echo 'RewriteRule . index.php [L]' >> .htaccess\r"
+        expect "$ "
+        
+        # Test it
+        send "cat index.php\r"
+        expect "$ "
+        send "cat .htaccess\r"
+        expect "$ "
+        
+        send "echo 'Manual proxy setup complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

@@ -1,0 +1,97 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Create a PHP proxy script
+        send "cat > proxy.php << 'PHPEOF'\r"
+        expect "> "
+        send "<?php\r"
+        expect "> "
+        send "// Simple PHP proxy to Node.js server\r"
+        expect "> "
+        send "error_reporting(0);\r"
+        expect "> "
+        send "\$nodeServerUrl = 'http://127.0.0.1:3001';\r"
+        expect "> "
+        send "\$requestUri = \$_SERVER['REQUEST_URI'];\r"
+        expect "> "
+        send "\$fullUrl = \$nodeServerUrl . \$requestUri;\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "// Forward the request\r"
+        expect "> "
+        send "\$context = stream_context_create([\r"
+        expect "> "
+        send "    'http' => [\r"
+        expect "> "
+        send "        'method' => \$_SERVER['REQUEST_METHOD'],\r"
+        expect "> "
+        send "        'header' => \"User-Agent: PHP-Proxy\\r\\n\",\r"
+        expect "> "
+        send "        'timeout' => 30\r"
+        expect "> "
+        send "    ]\r"
+        expect "> "
+        send "]);\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "\$response = file_get_contents(\$fullUrl, false, \$context);\r"
+        expect "> "
+        send "if (\$response === FALSE) {\r"
+        expect "> "
+        send "    http_response_code(503);\r"
+        expect "> "
+        send "    echo 'Service temporarily unavailable - Node.js server down';\r"
+        expect "> "
+        send "} else {\r"
+        expect "> "
+        send "    echo \$response;\r"
+        expect "> "
+        send "}\r"
+        expect "> "
+        send "?>\r"
+        expect "> "
+        send "PHPEOF\r"
+        expect "$ "
+        
+        # Create .htaccess to route everything through PHP proxy
+        send "cat > .htaccess << 'HTEOF'\r"
+        expect "> "
+        send "RewriteEngine On\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-f\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-d\r"
+        expect "> "
+        send "RewriteRule ^(.*)$ proxy.php [L]\r"
+        expect "> "
+        send "HTEOF\r"
+        expect "$ "
+        
+        # Test the PHP proxy
+        send "php proxy.php\r"
+        expect "$ "
+        
+        send "echo 'PHP proxy created'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

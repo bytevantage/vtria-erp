@@ -1,0 +1,47 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Kill any existing processes
+        send "pkill -f 'node server.js' || true\r"
+        expect "$ "
+        
+        send "sleep 3\r"
+        expect "$ "
+        
+        # Start server properly in background
+        send "nohup node server.js > /dev/null 2>&1 &\r"
+        expect "$ "
+        
+        send "sleep 5\r"
+        expect "$ "
+        
+        # Check if it's running and test locally
+        send "curl -s http://localhost:3001/health || echo 'Local test failed'\r"
+        expect "$ "
+        
+        # Check process
+        send "pgrep -f 'node server.js' || echo 'No process found'\r"
+        expect "$ "
+        
+        send "echo 'Final server start complete'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

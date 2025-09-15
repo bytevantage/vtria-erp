@@ -1,0 +1,79 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # First, let's create a backup
+        send "cp server.js server.js.backup\r"
+        expect "$ "
+        
+        # Add the dashboard API endpoint
+        send "cat >> api_endpoints.js << 'EOF'\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "// Dashboard API endpoint\r"
+        expect "> "
+        send "app.get('/api/admin/dashboard', (req, res) => {\r"
+        expect "> "
+        send "  const dashboardData = {\r"
+        expect "> "
+        send "    stats: {\r"
+        expect "> "
+        send "      activeLicenses: 156,\r"
+        expect "> "
+        send "      totalCustomers: 89,\r"
+        expect "> "
+        send "      totalRevenue: 2847500,\r"
+        expect "> "
+        send "      expiringSoon: 7\r"
+        expect "> "
+        send "    },\r"
+        expect "> "
+        send "    uptime: '2d 14h 23m',\r"
+        expect "> "
+        send "    recentActivity: [\r"
+        expect "> "
+        send "      { type: 'license_created', description: 'New license created for ABC Corp', time: '2 minutes ago' },\r"
+        expect "> "
+        send "      { type: 'payment_received', description: 'Payment of 35000 received', time: '15 minutes ago' },\r"
+        expect "> "
+        send "      { type: 'customer_registered', description: 'New customer XYZ Ltd registered', time: '1 hour ago' }\r"
+        expect "> "
+        send "    ]\r"
+        expect "> "
+        send "  };\r"
+        expect "> "
+        send "  res.json(dashboardData);\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Now append this to server.js before the error handler
+        send "sed -i '/app.use.*errorHandler/i\\// Load API endpoints\\nrequire(\"./api_endpoints.js\");' server.js\r"
+        expect "$ "
+        
+        send "echo 'API endpoints script created and added to server.js'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

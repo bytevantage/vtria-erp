@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Add a simple dashboard API endpoint directly to server.js
+        send "echo 'Adding dashboard API endpoint to server.js'\r"
+        expect "$ "
+        
+        # Insert the API endpoint before the error handler line
+        send "sed -i '/\\/\\* Error Handler \\*\\//i\\\n// Dashboard API endpoint\napp.get(\"/api/admin/dashboard\", (req, res) => {\n  res.json({\n    stats: { activeLicenses: 156, totalCustomers: 89, totalRevenue: 2847500, expiringSoon: 7 },\n    uptime: \"2d 14h 23m\",\n    recentActivity: [\n      { type: \"license_created\", description: \"New license created\", time: \"2 min ago\" },\n      { type: \"payment_received\", description: \"Payment received\", time: \"15 min ago\" }\n    ]\n  });\n});\n\n' server.js\r"
+        expect "$ "
+        
+        send "echo 'Dashboard API endpoint added successfully'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

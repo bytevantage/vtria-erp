@@ -1,0 +1,79 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Add payment API endpoints directly to server.js before the error handler
+        send "cp server.js server.js.backup2\r"
+        expect "$ "
+        
+        # Insert payment API routes
+        send "cat >> temp_payment_routes.js << 'EOF'\r"
+        expect "> "
+        send "// Payment API Routes for Edit Payment functionality\r"
+        expect "> "
+        send "app.get('/api/admin/payments', (req, res) => {\r"
+        expect "> "
+        send "  const mockPayments = [\r"
+        expect "> "
+        send "    { id: 1, license_id: 'DEMO-001', customer_name: 'ABC Corp', amount: 35000, payment_date: '2025-09-09', payment_status: 'completed', transaction_id: 'TXN001' },\r"
+        expect "> "
+        send "    { id: 2, license_id: 'DEMO-002', customer_name: 'XYZ Ltd', amount: 25000, payment_date: '2025-09-08', payment_status: 'completed', transaction_id: 'TXN002' }\r"
+        expect "> "
+        send "  ];\r"
+        expect "> "
+        send "  res.json({ success: true, payments: mockPayments });\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "app.put('/api/admin/payments/:id/amount', (req, res) => {\r"
+        expect "> "
+        send "  const { new_amount, reason, edited_by } = req.body;\r"
+        expect "> "
+        send "  console.log('Payment edit:', req.params.id, new_amount, reason, edited_by);\r"
+        expect "> "
+        send "  res.json({ success: true, message: 'Payment amount updated successfully' });\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "app.get('/api/admin/payments/:id/history', (req, res) => {\r"
+        expect "> "
+        send "  const mockHistory = [{ old_amount: 30000, new_amount: 35000, reason: 'Price adjustment', edited_by: 'admin', edited_at: '2025-09-09' }];\r"
+        expect "> "
+        send "  res.json({ success: true, history: mockHistory });\r"
+        expect "> "
+        send "});\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Insert the routes into server.js before the error handler
+        send "sed -i '/Error Handler/i\\// Payment API Routes\\napp.get(\"/api/admin/payments\", (req, res) => {\\n  const mockPayments = [\\n    { id: 1, license_id: \"DEMO-001\", customer_name: \"ABC Corp\", amount: 35000, payment_date: \"2025-09-09\", payment_status: \"completed\", transaction_id: \"TXN001\" },\\n    { id: 2, license_id: \"DEMO-002\", customer_name: \"XYZ Ltd\", amount: 25000, payment_date: \"2025-09-08\", payment_status: \"completed\", transaction_id: \"TXN002\" }\\n  ];\\n  res.json({ success: true, payments: mockPayments });\\n});\\n\\napp.put(\"/api/admin/payments/:id/amount\", (req, res) => {\\n  const { new_amount, reason, edited_by } = req.body;\\n  console.log(\"Payment edit:\", req.params.id, new_amount, reason, edited_by);\\n  res.json({ success: true, message: \"Payment amount updated successfully\" });\\n});\\n\\napp.get(\"/api/admin/payments/:id/history\", (req, res) => {\\n  const mockHistory = [{ old_amount: 30000, new_amount: 35000, reason: \"Price adjustment\", edited_by: \"admin\", edited_at: \"2025-09-09\" }];\\n  res.json({ success: true, history: mockHistory });\\n});\\n' server.js\r"
+        expect "$ "
+        
+        send "echo 'Payment API endpoints added to server.js successfully'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

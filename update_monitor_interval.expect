@@ -1,0 +1,119 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Stop current monitoring script
+        send "pkill -f monitor_server.sh\r"
+        expect "$ "
+        send "sleep 3\r"
+        expect "$ "
+        
+        # Create updated monitoring script with 30-minute intervals
+        send "cat > monitor_server.sh << 'SCRIPT'\r"
+        expect "> "
+        send "#!/bin/bash\r"
+        expect "> "
+        send "echo 'Starting ByteVantage Server Monitor (30-minute intervals)...'\r"
+        expect "> "
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "while true; do\r"
+        expect "> "
+        send "  echo \"[$(date)] Checking server status...\"\r"
+        expect "> "
+        send "  \r"
+        expect "> "
+        send "  # Check if server is running\r"
+        expect "> "
+        send "  if ! pgrep -f 'node server.js' > /dev/null; then\r"
+        expect "> "
+        send "    echo \"[$(date)] Server not running, starting...\"\r"
+        expect "> "
+        send "    nohup node server.js > server.log 2>&1 &\r"
+        expect "> "
+        send "    sleep 10\r"
+        expect "> "
+        send "    echo \"[$(date)] Server restart attempt completed\"\r"
+        expect "> "
+        send "  fi\r"
+        expect "> "
+        send "  \r"
+        expect "> "
+        send "  # Test if server is responding\r"
+        expect "> "
+        send "  if ! curl -s http://localhost:3001/health > /dev/null; then\r"
+        expect "> "
+        send "    echo \"[$(date)] Server not responding, restarting...\"\r"
+        expect "> "
+        send "    pkill -f 'node server.js'\r"
+        expect "> "
+        send "    sleep 3\r"
+        expect "> "
+        send "    nohup node server.js > server.log 2>&1 &\r"
+        expect "> "
+        send "    sleep 10\r"
+        expect "> "
+        send "    echo \"[$(date)] Server health restart completed\"\r"
+        expect "> "
+        send "  else\r"
+        expect "> "
+        send "    echo \"[$(date)] Server is healthy and responding\"\r"
+        expect "> "
+        send "  fi\r"
+        expect "> "
+        send "  \r"
+        expect "> "
+        send "  # Sleep for 30 minutes (1800 seconds)\r"
+        expect "> "
+        send "  echo \"[$(date)] Next check in 30 minutes...\"\r"
+        expect "> "
+        send "  sleep 1800\r"
+        expect "> "
+        send "done\r"
+        expect "> "
+        send "SCRIPT\r"
+        expect "$ "
+        
+        # Make it executable
+        send "chmod +x monitor_server.sh\r"
+        expect "$ "
+        
+        # Start the updated monitoring script
+        send "nohup ./monitor_server.sh > monitor.log 2>&1 &\r"
+        expect "$ "
+        send "sleep 5\r"
+        expect "$ "
+        
+        # Verify server is running
+        send "ps aux | grep 'node server.js' | grep -v grep\r"
+        expect "$ "
+        send "ps aux | grep 'monitor_server.sh' | grep -v grep\r"
+        expect "$ "
+        
+        # Test health endpoint
+        send "curl -s http://localhost:3001/health | head -c 50\r"
+        expect "$ "
+        
+        send "echo 'Updated monitoring system to 30-minute intervals'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

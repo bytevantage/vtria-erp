@@ -1,0 +1,57 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Check current .htaccess
+        send "echo '=== CURRENT HTACCESS ===' && cat .htaccess\r"
+        expect "$ "
+        
+        # Create new .htaccess with corrected proxy rules
+        send "cat > .htaccess << 'ENDFILE'\r"
+        expect "> "
+        send "RewriteEngine On\r"
+        expect "> "
+        send "# Redirect all requests to Node.js server on port 3001\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-f\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-d\r"
+        expect "> "
+        send "RewriteRule ^(.*)$ http://127.0.0.1:3001/\$1 [P,L]\r"
+        expect "> "
+        send "# Enable proxy module\r"
+        expect "> "
+        send "ProxyPreserveHost On\r"
+        expect "> "
+        send "ProxyPass / http://127.0.0.1:3001/\r"
+        expect "> "
+        send "ProxyPassReverse / http://127.0.0.1:3001/\r"
+        expect "> "
+        send "ENDFILE\r"
+        expect "$ "
+        
+        # Verify the new .htaccess
+        send "echo '=== NEW HTACCESS ===' && cat .htaccess\r"
+        expect "$ "
+        
+        send "echo 'Proxy configuration updated'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

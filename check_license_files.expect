@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api/public\r"
+        expect "$ "
+        
+        # Check if license management files exist
+        send "ls -la admin-licenses*\r"
+        expect "$ "
+        
+        # Check what's in the license file if it exists
+        send "if [ -f admin-licenses.html ]; then echo 'File exists, showing content:'; head -30 admin-licenses.html; else echo 'File does not exist'; fi\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

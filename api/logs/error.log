@@ -1,0 +1,399 @@
+2025-09-11T09:18:06.889Z ERROR: Migration failed:
+2025-09-11T09:34:08.457Z ERROR: Error during migration:
+2025-09-11T09:34:08.459Z ERROR: Migration failed:
+2025-09-11T09:34:51.669Z ERROR: Error during migration:
+2025-09-11T09:34:51.671Z ERROR: Migration failed:
+2025-09-12T03:22:50.884Z ERROR: Error fetching departments:
+2025-09-12T03:23:36.476Z ERROR: Error fetching departments:
+2025-09-12T03:24:42.882Z ERROR: Error fetching departments:
+2025-09-12T03:25:16.350Z ERROR: Error creating employee:
+2025-09-12T06:08:00.143Z ERROR: Error fetching manufacturing units:
+2025-09-12T06:08:34.632Z ERROR: Error fetching manufacturing units:
+2025-09-12T06:12:33.695Z ERROR: Error fetching production items:
+2025-09-12T06:12:47.710Z ERROR: Error fetching work orders:
+2025-09-12T06:14:33.556Z ERROR: Error fetching production items:
+2025-09-12T06:14:42.780Z ERROR: Error fetching work orders:
+2025-09-12T06:17:26.207Z ERROR: Error fetching production items:
+2025-09-12T06:17:30.083Z ERROR: Error fetching work orders:
+2025-09-12T06:17:43.368Z ERROR: Error fetching production dashboard:
+2025-09-12T06:20:33.625Z ERROR: Error fetching production items:
+2025-09-12T06:20:36.756Z ERROR: Error fetching work orders:
+2025-09-12T06:20:53.411Z ERROR: Error fetching production items:
+2025-09-12T06:22:59.848Z ERROR: Error creating BOM:
+2025-09-12T06:48:48.323Z ERROR: Audit logging failed:
+2025-09-12T06:48:48.324Z ERROR: Error on GET /api/sales-enquiries:
+2025-09-12T06:48:54.599Z ERROR: Audit logging failed:
+2025-09-12T06:48:54.600Z ERROR: Error on GET /api/salesEnquiry:
+2025-09-12T07:04:23.171Z ERROR: Audit logging failed:
+2025-09-12T07:04:23.181Z ERROR: Error on GET /dashboard:
+2025-09-12T08:20:19.891Z ERROR: Authentication error:
+2025-09-12T09:12:46.693Z ERROR: Authentication error:
+2025-09-12T09:14:33.875Z ERROR: Authentication error:
+2025-09-12T17:51:27.718Z ERROR: Audit logging failed:
+2025-09-12T17:51:27.721Z ERROR: Error on GET /api/cases:
+2025-09-12T18:54:06.673Z ERROR: Audit logging failed:
+2025-09-12T18:54:06.684Z ERROR: Error on GET /api/case-management/workflow/definitions:
+2025-09-12T19:48:45.545Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.557Z ERROR: Error on GET /api/production/dashboard:
+2025-09-12T19:48:45.578Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.583Z ERROR: Error on GET /api/production/work-orders:
+2025-09-12T19:48:45.594Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.598Z ERROR: Error on GET /api/production/master/manufacturing-units:
+2025-09-12T19:48:45.607Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.612Z ERROR: Error on GET /api/production/work-orders:
+2025-09-12T19:48:45.623Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.628Z ERROR: Error on GET /api/production/dashboard:
+2025-09-12T19:48:45.635Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.639Z ERROR: Error on GET /api/production/items:
+2025-09-12T19:48:45.647Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.651Z ERROR: Error on GET /api/production/master/operations:
+2025-09-12T19:48:45.660Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.667Z ERROR: Error on GET /api/production/items:
+2025-09-12T19:48:45.676Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.679Z ERROR: Error on GET /api/production/master/manufacturing-units:
+2025-09-12T19:48:45.688Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.691Z ERROR: Error on GET /api/production/master/operations:
+2025-09-12T19:48:45.701Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.704Z ERROR: Error on GET /api/production/master/categories:
+2025-09-12T19:48:45.714Z ERROR: Audit logging failed:
+2025-09-12T19:48:45.718Z ERROR: Error on GET /api/production/master/categories:
+2025-09-12T19:49:01.587Z ERROR: Audit logging failed:
+2025-09-12T19:49:01.592Z ERROR: Error on GET /quotation:
+2025-09-12T19:49:01.603Z ERROR: Audit logging failed:
+2025-09-12T19:49:01.608Z ERROR: Error on GET /suppliers:
+2025-09-12T19:49:01.619Z ERROR: Audit logging failed:
+2025-09-12T19:49:01.623Z ERROR: Error on GET /purchase-requisition:
+2025-09-13T02:03:59.100Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:04:00.469Z ERROR: Error processing notification queue:
+2025-09-13T02:04:47.437Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:05:41.761Z ERROR: Audit logging failed:
+2025-09-13T02:05:41.786Z ERROR: Error on GET /api/case-management/milestones/VESPL/C/2025/001:
+2025-09-13T02:06:00.140Z ERROR: Error processing notification queue:
+2025-09-13T02:06:37.816Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:08:07.179Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:10:00.853Z ERROR: Error processing notification queue:
+2025-09-13T02:10:06.592Z ERROR: Error processing notification queue:
+2025-09-13T02:41:34.640Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:43:46.080Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:43:54.335Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:44:00.713Z ERROR: Error processing notification queue:
+2025-09-13T02:45:06.585Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:46:00.066Z ERROR: Error processing notification queue:
+2025-09-13T02:47:06.243Z ERROR: Error processing notification queue:
+2025-09-13T02:48:00.447Z ERROR: Error processing notification queue:
+2025-09-13T02:49:05.998Z ERROR: Error processing notification queue:
+2025-09-13T02:50:00.409Z ERROR: Error processing notification queue:
+2025-09-13T02:51:05.976Z ERROR: Error processing notification queue:
+2025-09-13T02:52:00.831Z ERROR: Error processing notification queue:
+2025-09-13T02:53:31.843Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:54:00.334Z ERROR: Error processing notification queue:
+2025-09-13T02:54:28.299Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:57:23.854Z ERROR: Failed to initialize email transporter:
+2025-09-13T02:58:27.840Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:00:00.357Z ERROR: Error checking SLA warnings:
+2025-09-13T03:00:00.381Z ERROR: Error processing notification queue:
+2025-09-13T03:00:00.406Z ERROR: Error queueing notification:
+2025-09-13T03:00:00.415Z ERROR: Error processing escalations:
+2025-09-13T03:00:00.425Z ERROR: Error updating case metrics:
+2025-09-13T03:00:27.137Z ERROR: Error processing notification queue:
+2025-09-13T03:02:00.640Z ERROR: Error processing notification queue:
+2025-09-13T03:02:27.134Z ERROR: Error processing notification queue:
+2025-09-13T03:04:01.277Z ERROR: Error processing notification queue:
+2025-09-13T03:04:27.189Z ERROR: Error processing notification queue:
+2025-09-13T03:06:00.372Z ERROR: Error processing notification queue:
+2025-09-13T03:06:27.191Z ERROR: Error processing notification queue:
+2025-09-13T03:08:00.624Z ERROR: Error processing notification queue:
+2025-09-13T03:08:27.194Z ERROR: Error processing notification queue:
+2025-09-13T03:10:00.873Z ERROR: Error processing notification queue:
+2025-09-13T03:10:27.195Z ERROR: Error processing notification queue:
+2025-09-13T03:12:00.144Z ERROR: Error processing notification queue:
+2025-09-13T03:12:27.199Z ERROR: Error processing notification queue:
+2025-09-13T03:14:00.619Z ERROR: Error processing notification queue:
+2025-09-13T03:14:27.200Z ERROR: Error processing notification queue:
+2025-09-13T03:15:00.675Z ERROR: Error checking SLA warnings:
+2025-09-13T03:15:00.688Z ERROR: Error processing escalations:
+2025-09-13T03:15:00.706Z ERROR: Error updating case metrics:
+2025-09-13T03:16:00.792Z ERROR: Error processing notification queue:
+2025-09-13T03:16:27.207Z ERROR: Error processing notification queue:
+2025-09-13T03:18:25.320Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:18:58.629Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:19:39.280Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:20:00.584Z ERROR: Error processing notification queue:
+2025-09-13T03:21:15.054Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:21:54.390Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:22:00.840Z ERROR: Error processing notification queue:
+2025-09-13T03:22:42.885Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:23:02.168Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:23:37.464Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:24:00.863Z ERROR: Error processing notification queue:
+2025-09-13T03:24:40.869Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:26:27.802Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:28:00.379Z ERROR: Error processing notification queue:
+2025-09-13T03:28:27.107Z ERROR: Error processing notification queue:
+2025-09-13T03:30:00.615Z ERROR: Error checking SLA warnings:
+2025-09-13T03:30:00.619Z ERROR: Error processing notification queue:
+2025-09-13T03:30:00.630Z ERROR: Error processing escalations:
+2025-09-13T03:30:00.638Z ERROR: Error updating case metrics:
+2025-09-13T03:30:27.112Z ERROR: Error processing notification queue:
+2025-09-13T03:32:00.913Z ERROR: Error processing notification queue:
+2025-09-13T03:32:27.154Z ERROR: Error processing notification queue:
+2025-09-13T03:34:00.161Z ERROR: Error processing notification queue:
+2025-09-13T03:34:27.162Z ERROR: Error processing notification queue:
+2025-09-13T03:35:15.398Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:35:17.721Z ERROR: Failed to create audit log:
+2025-09-13T03:35:17.727Z ERROR: Error on POST /api/estimations:
+2025-09-13T03:36:00.829Z ERROR: Error processing notification queue:
+2025-09-13T03:37:14.729Z ERROR: Error processing notification queue:
+2025-09-13T03:38:00.067Z ERROR: Error processing notification queue:
+2025-09-13T03:39:14.728Z ERROR: Error processing notification queue:
+2025-09-13T03:40:00.512Z ERROR: Error processing notification queue:
+2025-09-13T03:55:13.374Z ERROR: Error processing notification queue:
+2025-09-13T03:57:26.497Z ERROR: Error processing notification queue:
+2025-09-13T03:58:00.205Z ERROR: Error processing notification queue:
+2025-09-13T03:58:14.556Z ERROR: Failed to initialize email transporter:
+2025-09-13T03:59:21.375Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:00:00.930Z ERROR: Error checking SLA warnings:
+2025-09-13T04:00:00.942Z ERROR: Error processing escalations:
+2025-09-13T04:00:00.953Z ERROR: Error updating case metrics:
+2025-09-13T04:00:00.976Z ERROR: Error processing notification queue:
+2025-09-13T04:00:49.917Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:01:13.717Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:01:39.174Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:02:00.792Z ERROR: Error processing notification queue:
+2025-09-13T04:02:12.474Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:03:05.199Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:03:24.442Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:03:49.867Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:04:00.167Z ERROR: Error processing notification queue:
+2025-09-13T04:04:25.613Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:05:21.640Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:05:32.068Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:05:53.019Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:06:22.472Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:06:33.302Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:07:12.015Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:07:41.399Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:08:00.797Z ERROR: Error processing notification queue:
+2025-09-13T04:14:00.600Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:14:00.974Z ERROR: Error processing notification queue:
+2025-09-13T04:14:18.558Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:15:09.106Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:16:38.286Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:18:12.198Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:23:18.480Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:23:48.813Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:26:01.703Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:26:44.919Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:27:38.997Z ERROR: Failed to initialize email transporter:
+2025-09-13T04:28:05.791Z ERROR: Failed to initialize email transporter:
+2025-09-13T05:05:03.469Z ERROR: Failed to initialize email transporter:
+2025-09-13T05:11:39.929Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:33:08.913Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:49:52.171Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:50:20.167Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:50:27.261Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:52:09.677Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:52:45.190Z ERROR: Failed to initialize email transporter:
+2025-09-13T09:53:20.438Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:00:56.747Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:01:04.259Z ERROR: Audit logging failed:
+2025-09-13T10:01:04.267Z ERROR: Error on GET /api/cases/1/workflow-progress:
+2025-09-13T10:07:46.089Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:09:11.720Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:17:25.937Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:21:44.081Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:30:44.304Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:36:57.560Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:37:12.074Z ERROR: Audit logging failed:
+2025-09-13T10:37:12.081Z ERROR: Error on GET /api/estimations:
+2025-09-13T10:45:11.464Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:45:36.344Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:53:46.650Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:57:27.602Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:58:08.689Z ERROR: Failed to initialize email transporter:
+2025-09-13T10:59:01.757Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:01:00.699Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:02:48.208Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:05:44.203Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:06:22.504Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:08:38.101Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:10:51.015Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:11:34.865Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:11:49.788Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:12:17.847Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:12:37.818Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:12:59.830Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:17:05.122Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:20:27.375Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:22:03.039Z ERROR: Failed to create audit log:
+2025-09-13T11:22:03.040Z ERROR: Error on POST /api/multi-location-inventory/transfer-request:
+2025-09-13T11:30:44.818Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:31:16.288Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:32:23.916Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:32:56.885Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:33:59.279Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:34:39.704Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:36:18.528Z ERROR: Failed to initialize email transporter:
+2025-09-13T11:48:06.525Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:30:01.268Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:31:39.104Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:31:46.770Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:32:23.937Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:32:31.803Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:32:47.398Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:32:55.068Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:33:44.786Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:33:50.054Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:34:59.327Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:35:05.525Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:35:30.820Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:35:38.703Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:35:54.350Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:36:52.229Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:37:06.767Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:37:14.918Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:37:27.479Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:37:35.649Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:37:53.121Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:38:02.480Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:38:16.728Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:39:16.842Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:39:32.693Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:39:47.837Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:40:50.714Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:41:07.203Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:42:17.779Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:48:45.967Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:49:51.531Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:51:18.438Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:51:44.004Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:51:56.265Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:53:04.455Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:53:23.161Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:53:42.010Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:53:59.675Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:54:12.987Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:54:21.911Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:54:43.242Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:54:54.818Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:55:10.478Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:55:24.102Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:55:46.124Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:55:56.123Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:56:25.075Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:56:53.098Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:57:05.642Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:57:38.651Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:57:49.927Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:58:06.708Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:58:29.034Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:58:39.606Z ERROR: Failed to initialize email transporter:
+2025-09-13T12:59:28.590Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:03:37.736Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:05:45.872Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:07:20.668Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:10:15.074Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:22:20.076Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:23:35.943Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:24:08.353Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:24:18.835Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:24:32.457Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:27:09.484Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:33:46.466Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:38:46.547Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:39:08.341Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:39:21.101Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:40:44.306Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:41:09.947Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:41:17.796Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:42:03.709Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:42:12.929Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:43:37.093Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:47:07.367Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:47:16.164Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:54:37.018Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:54:43.396Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:56:28.009Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:56:34.128Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:57:24.921Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:57:35.907Z ERROR: Failed to initialize email transporter:
+2025-09-13T13:57:43.642Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:16:34.850Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:17:17.312Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:17:24.779Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:19:03.087Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:27:38.399Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:27:45.027Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:28:30.784Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:28:37.764Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:28:45.211Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:29:17.787Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:29:25.366Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:31:52.876Z ERROR: Failed to create audit log:
+2025-09-13T14:31:52.879Z ERROR: Error on POST /api/query-db:
+2025-09-13T14:32:11.042Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:33:19.873Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:41:31.426Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:42:33.267Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:42:47.812Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:43:04.002Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:43:25.992Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:43:55.059Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:44:08.590Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:44:16.062Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:45:27.273Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:45:46.069Z ERROR: Failed to initialize email transporter:
+2025-09-13T14:46:13.233Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:02:19.661Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:02:49.869Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:03:19.547Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:05:49.159Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:09:56.254Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:10:02.358Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:10:40.174Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:14:20.694Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:16:00.206Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:19:42.983Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:23:44.662Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:24:16.904Z ERROR: Audit logging failed:
+2025-09-13T15:24:16.928Z ERROR: Error on GET /api/quotations/QUO-001/pdf:
+2025-09-13T15:24:31.486Z ERROR: Audit logging failed:
+2025-09-13T15:24:31.499Z ERROR: Error on GET /api/quotations/enhanced/QUO-001/pdf:
+2025-09-13T15:25:48.316Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:26:15.319Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:26:55.287Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:27:09.524Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:28:03.095Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:32:51.744Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:36:51.182Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:36:56.565Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:37:57.806Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:46:39.214Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:49:43.987Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:54:23.734Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:54:54.451Z ERROR: Failed to initialize email transporter:
+2025-09-13T15:55:59.811Z ERROR: Failed to initialize email transporter:
+2025-09-13T16:05:27.418Z ERROR: Failed to initialize email transporter:
+2025-09-13T16:11:54.215Z ERROR: Failed to initialize email transporter:
+2025-09-13T16:29:28.958Z ERROR: Failed to initialize email transporter:
+2025-09-13T16:30:05.526Z ERROR: Failed to initialize email transporter:
+2025-09-13T16:30:33.513Z ERROR: Failed to initialize email transporter:
+2025-09-13T16:47:42.454Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:02:42.375Z ERROR: Failed to create audit log:
+2025-09-13T17:02:42.379Z ERROR: Error on PUT /api/quotation/2/status:
+2025-09-13T17:06:46.731Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:06:54.881Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:07:39.777Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:08:07.989Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:08:43.142Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:09:21.628Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:09:39.302Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:09:47.114Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:13:49.328Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:14:02.242Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:14:30.760Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:16:24.363Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:16:36.155Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:16:44.744Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:17:27.262Z ERROR: Failed to initialize email transporter:
+2025-09-13T17:17:33.629Z ERROR: Failed to initialize email transporter:

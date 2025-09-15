@@ -1,0 +1,89 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html\r"
+        expect "$ "
+        
+        # Check current .htaccess configuration
+        send "echo '=== CHECKING CURRENT .HTACCESS ==='\r"
+        expect "$ "
+        send "ls -la .htaccess\r"
+        expect "$ "
+        
+        # Create/update .htaccess to proxy to Node.js server
+        send "cat > .htaccess << 'EOF'\r"
+        expect "> "
+        send "RewriteEngine On\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "# Proxy all requests to Node.js server on port 3001\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-f\r"
+        expect "> "
+        send "RewriteCond %{REQUEST_FILENAME} !-d\r"
+        expect "> "
+        send "RewriteRule ^(.*)$ http://localhost:3001/$1 [P,L]\r"
+        expect "> "
+        send "\r"
+        expect "> "
+        send "# Enable proxy module\r"
+        expect "> "
+        send "ProxyPreserveHost On\r"
+        expect "> "
+        send "ProxyPass / http://localhost:3001/\r"
+        expect "> "
+        send "ProxyPassReverse / http://localhost:3001/\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        # Check if the file was created
+        send "cat .htaccess\r"
+        expect "$ "
+        
+        # Also create index.html that redirects to the dashboard
+        send "cat > index.html << 'EOF'\r"
+        expect "> "
+        send "<!DOCTYPE html>\r"
+        expect "> "
+        send "<html>\r"
+        expect "> "
+        send "<head>\r"
+        expect "> "
+        send "    <meta http-equiv=\"refresh\" content=\"0; url=/dashboard\">\r"
+        expect "> "
+        send "    <title>ByteVantage Enterprise</title>\r"
+        expect "> "
+        send "</head>\r"
+        expect "> "
+        send "<body>\r"
+        expect "> "
+        send "    <p>Redirecting to <a href=\"/dashboard\">ByteVantage Dashboard</a>...</p>\r"
+        expect "> "
+        send "</body>\r"
+        expect "> "
+        send "</html>\r"
+        expect "> "
+        send "EOF\r"
+        expect "$ "
+        
+        send "echo 'LiteSpeed proxy configuration updated'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}

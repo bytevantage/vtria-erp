@@ -1,0 +1,50 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+spawn ssh -p 65002 -o StrictHostKeyChecking=no u570718221@82.25.125.174
+
+expect {
+    "password:" {
+        send "Ananyar@1\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/u570718221/domains/api.bytevantage.in/public_html/api\r"
+        expect "$ "
+        
+        # Create a simple monitoring script to prevent future crashes
+        send "cat > server_monitor.sh << 'EOF'\n#!/bin/bash\nPIDFILE=\"server.pid\"\nLOGFILE=\"server_startup.log\"\n\nwhile true; do\n    if ! pgrep -f \"node server.js\" > /dev/null; then\n        echo \"\\$(date): Server not running, starting...\" >> monitor.log\n        cd /home/u570718221/domains/api.bytevantage.in/public_html/api\n        nohup node server.js > \\$LOGFILE 2>&1 </dev/null &\n        echo \\$! > \\$PIDFILE\n        sleep 10\n    fi\n    sleep 30\ndone\nEOF\r"
+        expect "$ "
+        
+        # Make it executable
+        send "chmod +x server_monitor.sh\r"
+        expect "$ "
+        
+        # Add to crontab for auto-start on reboot
+        send "crontab -l > temp_cron.txt 2>/dev/null || echo '# New crontab' > temp_cron.txt\r"
+        expect "$ "
+        
+        send "echo '@reboot cd /home/u570718221/domains/api.bytevantage.in/public_html/api && nohup ./server_monitor.sh > monitor_cron.log 2>&1 &' >> temp_cron.txt\r"
+        expect "$ "
+        
+        send "crontab temp_cron.txt\r"
+        expect "$ "
+        
+        send "rm temp_cron.txt\r"
+        expect "$ "
+        
+        # Test that server is still running
+        send "curl -s http://localhost:3001/health | head -1\r"
+        expect "$ "
+        
+        send "echo 'Monitoring setup complete!'\r"
+        expect "$ "
+        
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timed out"
+        exit 1
+    }
+    eof
+}
