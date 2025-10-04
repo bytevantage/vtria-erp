@@ -54,8 +54,6 @@ if ($FirstTime) {
     Write-Status "  1. Edit C:\vtria-erp\.env.production" "White"
     Write-Status "  2. Run: docker-compose -f docker-compose.windows.yml up -d" "White"
     
-}
-    
 } else {
     Write-Status "🔄 UPDATE DEPLOYMENT" "Yellow"
     
