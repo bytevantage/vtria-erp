@@ -342,12 +342,14 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
       )}
 
       {/* Tabs */}
-      <Tabs value={currentTab} onChange={(e, newValue) => setCurrentTab(newValue)} mb={2}>
-        <Tab label="Insights" icon={<Insights />} />
-        <Tab label="Alerts" icon={<NotificationsActive />} />
-        <Tab label="Recommendations" icon={<Lightbulb />} />
-        <Tab label="Model Performance" icon={<Speed />} />
-      </Tabs>
+      <Box sx={{ mb: 2 }}>
+        <Tabs value={currentTab} onChange={(e, newValue) => setCurrentTab(newValue)}>
+          <Tab label="Insights" icon={<Insights />} />
+          <Tab label="Alerts" icon={<NotificationsActive />} />
+          <Tab label="Recommendations" icon={<Lightbulb />} />
+          <Tab label="Model Performance" icon={<Speed />} />
+        </Tabs>
+      </Box>
 
       {/* Tab Content */}
       {currentTab === 0 && (
