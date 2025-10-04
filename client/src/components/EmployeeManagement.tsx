@@ -38,7 +38,8 @@ import {
   InputAdornment,
   Divider,
   FormHelperText,
-  CircularProgress
+  CircularProgress,
+  SelectChangeEvent
 } from '@mui/material';
 import SelectOrAddField from './common/SelectOrAddField';
 import {
@@ -410,7 +411,7 @@ const EmployeeManagement: React.FC = () => {
   };
 
   // Handle select changes
-  const handleSelectChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     if (!name) return;
 
