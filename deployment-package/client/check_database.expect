@@ -1,0 +1,179 @@
+#!/usr/bin/expect -f
+
+# Set timeout for commands
+set timeout 30
+
+# Variables
+set ssh_host "82.25.125.174"
+set ssh_user "u570718221"
+set database "u570718221_byte_license"
+
+# Enable debug output
+exp_internal 1
+
+# Start SSH connection
+spawn ssh $ssh_user@$ssh_host
+
+# Handle SSH connection prompts
+expect {
+    "Are you sure you want to continue connecting" {
+        send "yes\r"
+        exp_continue
+    }
+    "password:" {
+        puts "Please enter the SSH password when prompted"
+        interact -o "\r" return
+    }
+    "$ " {
+        puts "Connected successfully!"
+    }
+    timeout {
+        puts "SSH connection timeout"
+        exit 1
+    }
+}
+
+# Connect to MySQL
+send "mysql -u $ssh_user -p $database\r"
+
+expect {
+    "Enter password:" {
+        puts "Please enter the MySQL password when prompted"
+        interact -o "\r" return
+    }
+    "mysql>" {
+        puts "Connected to MySQL successfully!"
+    }
+    timeout {
+        puts "MySQL connection timeout"
+        exit 1
+    }
+}
+
+# Check if we're in the correct database
+send "SELECT DATABASE();\r"
+expect "mysql>"
+
+# List all tables in the database
+puts "\n=== CHECKING TABLES IN DATABASE ==="
+send "SHOW TABLES;\r"
+expect "mysql>"
+
+# Check products table
+puts "\n=== CHECKING PRODUCTS TABLE ==="
+send "SELECT COUNT(*) FROM products;\r"
+expect {
+    "mysql>" {
+        puts "Products count query executed"
+    }
+    "ERROR" {
+        puts "Products table might not exist"
+        expect "mysql>"
+    }
+}
+
+# Show products data if exists
+send "SELECT * FROM products LIMIT 5;\r"
+expect {
+    "mysql>" {
+        puts "Products data query executed"
+    }
+    "ERROR" {
+        puts "Could not retrieve products data"
+        expect "mysql>"
+    }
+}
+
+# Check pricing_tiers table
+puts "\n=== CHECKING PRICING_TIERS TABLE ==="
+send "SELECT COUNT(*) FROM pricing_tiers;\r"
+expect {
+    "mysql>" {
+        puts "Pricing tiers count query executed"
+    }
+    "ERROR" {
+        puts "Pricing_tiers table might not exist, trying 'tiers'"
+        expect "mysql>"
+        
+        # Try alternative table name
+        send "SELECT COUNT(*) FROM tiers;\r"
+        expect {
+            "mysql>" {
+                puts "Tiers count query executed"
+            }
+            "ERROR" {
+                puts "Neither pricing_tiers nor tiers table exists"
+                expect "mysql>"
+            }
+        }
+    }
+}
+
+# Show pricing_tiers data if exists
+send "SELECT * FROM pricing_tiers LIMIT 5;\r"
+expect {
+    "mysql>" {
+        puts "Pricing tiers data query executed"
+    }
+    "ERROR" {
+        puts "Could not retrieve pricing_tiers data, trying tiers"
+        expect "mysql>"
+        
+        # Try alternative table name
+        send "SELECT * FROM tiers LIMIT 5;\r"
+        expect {
+            "mysql>" {
+                puts "Tiers data query executed"
+            }
+            "ERROR" {
+                puts "Could not retrieve tiers data"
+                expect "mysql>"
+            }
+        }
+    }
+}
+
+# Check table structure
+puts "\n=== CHECKING TABLE STRUCTURES ==="
+send "DESCRIBE products;\r"
+expect {
+    "mysql>" {
+        puts "Products table structure shown"
+    }
+    "ERROR" {
+        puts "Products table does not exist"
+        expect "mysql>"
+    }
+}
+
+send "DESCRIBE pricing_tiers;\r"
+expect {
+    "mysql>" {
+        puts "Pricing_tiers table structure shown"
+    }
+    "ERROR" {
+        puts "Pricing_tiers table does not exist, trying tiers"
+        expect "mysql>"
+        
+        send "DESCRIBE tiers;\r"
+        expect {
+            "mysql>" {
+                puts "Tiers table structure shown"
+            }
+            "ERROR" {
+                puts "Tiers table does not exist"
+                expect "mysql>"
+            }
+        }
+    }
+}
+
+# Exit MySQL
+send "EXIT;\r"
+expect "$ "
+
+# Exit SSH
+send "exit\r"
+expect eof
+
+puts "\n=== DATABASE CHECK COMPLETED ==="

@@ -1,0 +1,339 @@
+const db = require('../config/database');
+const { generateDocumentId, DOCUMENT_TYPES } = require('../utils/documentIdGenerator');
+
+class RFQController {
+  // Create RFQ campaign for competitive bidding
+  async createRFQCampaign(req, res) {
+    try {
+      const { quotation_id, suppliers, title, description, deadline, terms } = req.body;
+      const created_by = req.user?.id || 1;
+
+      // Generate RFQ number
+      const rfq_number = await generateDocumentId(DOCUMENT_TYPES.RFQ || 'RFQ');
+
+      // Insert RFQ campaign
+      const [result] = await db.execute(
+        `INSERT INTO rfq_campaigns 
+                (rfq_number, quotation_id, title, description, deadline, terms, status, created_by, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, NOW())`,
+        [rfq_number, quotation_id, title, description, deadline, terms, created_by]
+      );
+
+      const rfq_id = result.insertId;
+
+      // Insert suppliers for this RFQ
+      if (suppliers && suppliers.length > 0) {
+        const supplierData = suppliers.map(supplier_id => [
+          rfq_id,
+          supplier_id,
+          'sent',
+          new Date()
+        ]);
+
+        await db.query(
+          `INSERT INTO rfq_suppliers (rfq_id, supplier_id, status, sent_at) VALUES ?`,
+          [supplierData]
+        );
+      }
+
+      // Update RFQ status to sent
+      await db.execute(
+        `UPDATE rfq_campaigns SET status = 'sent' WHERE id = ?`,
+        [rfq_id]
+      );
+
+      res.json({
+        success: true,
+        message: 'RFQ campaign created and sent to suppliers',
+        data: {
+          id: rfq_id,
+          rfq_number,
+          suppliers_count: suppliers.length
+        }
+      });
+    } catch (error) {
+      console.error('Error creating RFQ campaign:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating RFQ campaign',
+        error: error.message
+      });
+    }
+  }
+
+  // Get all RFQ campaigns
+  async getRFQCampaigns(req, res) {
+    try {
+      const query = `
+                SELECT 
+                    r.*,
+                    q.quotation_id as quotation_number,
+                    c.company_name as client_name,
+                    se.project_name,
+                    COUNT(DISTINCT rs.supplier_id) as suppliers_count,
+                    COUNT(DISTINCT sb.id) as bids_received,
+                    AVG(sb.total_price) as avg_bid_price,
+                    MIN(sb.total_price) as lowest_bid,
+                    MAX(sb.total_price) as highest_bid
+                FROM rfq_campaigns r
+                LEFT JOIN quotations q ON r.quotation_id = q.id
+                LEFT JOIN estimations e ON q.estimation_id = e.id
+                LEFT JOIN sales_enquiries se ON e.enquiry_id = se.id
+                LEFT JOIN clients c ON se.client_id = c.id
+                LEFT JOIN rfq_suppliers rs ON r.id = rs.rfq_id
+                LEFT JOIN supplier_bids sb ON r.id = sb.rfq_id
+                GROUP BY r.id
+                ORDER BY r.created_at DESC
+            `;
+
+      const [campaigns] = await db.execute(query);
+
+      res.json({
+        success: true,
+        data: campaigns,
+        count: campaigns.length
+      });
+    } catch (error) {
+      console.error('Error fetching RFQ campaigns:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching RFQ campaigns',
+        error: error.message
+      });
+    }
+  }
+
+  // Get bids for a specific RFQ
+  async getRFQBids(req, res) {
+    try {
+      const { rfq_id } = req.params;
+
+      const query = `
+                SELECT 
+                    sb.*,
+                    s.company_name as supplier_name,
+                    s.contact_person,
+                    s.email,
+                    s.phone,
+                    rs.status as supplier_status
+                FROM supplier_bids sb
+                JOIN rfq_suppliers rs ON sb.supplier_id = rs.supplier_id AND sb.rfq_id = rs.rfq_id
+                JOIN suppliers s ON sb.supplier_id = s.id
+                WHERE sb.rfq_id = ?
+                ORDER BY sb.total_price ASC
+            `;
+
+      const [bids] = await db.execute(query, [rfq_id]);
+
+      res.json({
+        success: true,
+        data: bids,
+        count: bids.length
+      });
+    } catch (error) {
+      console.error('Error fetching RFQ bids:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching RFQ bids',
+        error: error.message
+      });
+    }
+  }
+
+  // Select winning bid and create Purchase Requisition
+  async selectWinningBid(req, res) {
+    try {
+      const { rfq_id } = req.params;
+      const { winning_bid_id, supplier_id } = req.body;
+      const created_by = req.user?.id || 1;
+
+      // Start transaction
+      await db.beginTransaction();
+
+      try {
+        // Update RFQ status to completed
+        await db.execute(
+          `UPDATE rfq_campaigns SET status = 'completed', winner_supplier_id = ?, completed_at = NOW() WHERE id = ?`,
+          [supplier_id, rfq_id]
+        );
+
+        // Mark winning bid
+        await db.execute(
+          `UPDATE supplier_bids SET status = 'won', selected_at = NOW() WHERE id = ?`,
+          [winning_bid_id]
+        );
+
+        // Mark other bids as lost
+        await db.execute(
+          `UPDATE supplier_bids SET status = 'lost' WHERE rfq_id = ? AND id != ?`,
+          [rfq_id, winning_bid_id]
+        );
+
+        await db.commit();
+
+        res.json({
+          success: true,
+          message: 'Winning bid selected successfully'
+        });
+      } catch (error) {
+        await db.rollback();
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error selecting winning bid:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error selecting winning bid',
+        error: error.message
+      });
+    }
+  }
+
+  // Create Purchase Requisition from winning RFQ bid
+  async createPRFromRFQWinner(req, res) {
+    try {
+      const { rfq_id, supplier_id, bid_id } = req.body;
+      const created_by = req.user?.id || 1;
+
+      // Get RFQ and winning bid details
+      const [rfqDetails] = await db.execute(`
+                SELECT 
+                    r.*,
+                    sb.total_price,
+                    sb.delivery_days,
+                    sb.payment_terms,
+                    sb.notes as bid_notes,
+                    q.id as quotation_id,
+                    q.quotation_id as quotation_number
+                FROM rfq_campaigns r
+                JOIN supplier_bids sb ON r.id = sb.rfq_id AND sb.id = ?
+                JOIN quotations q ON r.quotation_id = q.id
+                WHERE r.id = ? AND sb.supplier_id = ?
+            `, [bid_id, rfq_id, supplier_id]);
+
+      if (rfqDetails.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'RFQ or winning bid not found'
+        });
+      }
+
+      const rfq = rfqDetails[0];
+
+      // Generate PR number
+      const pr_number = await generateDocumentId(DOCUMENT_TYPES.PURCHASE_REQUISITION);
+
+      // Create Purchase Requisition
+      const [result] = await db.execute(
+        `INSERT INTO purchase_requisitions 
+                (pr_number, quotation_id, supplier_id, pr_date, notes, created_by, rfq_id, status) 
+                VALUES (?, ?, ?, CURDATE(), ?, ?, ?, 'draft')`,
+        [
+          pr_number,
+          rfq.quotation_number, // Use quotation number, not ID
+          supplier_id,
+          `Created from RFQ: ${rfq.title}\nWinning bid: ₹${rfq.total_price}\nDelivery: ${rfq.delivery_days} days\nTerms: ${rfq.payment_terms}\n${rfq.bid_notes || ''}`,
+          created_by,
+          rfq_id
+        ]
+      );
+
+      const pr_id = result.insertId;
+
+      // Get quotation items for PR
+      const [items] = await db.execute(`
+                SELECT 
+                    qi.item_name,
+                    qi.description,
+                    qi.hsn_code,
+                    qi.unit,
+                    qi.quantity,
+                    qi.rate as estimated_price
+                FROM quotation_items qi
+                WHERE qi.quotation_id = ?
+            `, [rfq.quotation_number]);
+
+      // Insert PR items
+      if (items.length > 0) {
+        const itemsData = items.map(item => [
+          pr_id,
+          null, // product_id
+          item.quantity,
+          item.estimated_price,
+          `${item.item_name} - ${item.description || ''} (HSN: ${item.hsn_code || 'N/A'}, Unit: ${item.unit || 'Nos'})`
+        ]);
+
+        await db.query(
+          `INSERT INTO purchase_requisition_items (pr_id, product_id, quantity, estimated_price, notes) VALUES ?`,
+          [itemsData]
+        );
+      }
+
+      res.json({
+        success: true,
+        message: 'Purchase requisition created from winning bid',
+        data: {
+          pr_id,
+          pr_number,
+          supplier_id,
+          total_price: rfq.total_price
+        }
+      });
+    } catch (error) {
+      console.error('Error creating PR from RFQ winner:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating purchase requisition',
+        error: error.message
+      });
+    }
+  }
+
+  // Submit supplier bid (for suppliers to respond to RFQ)
+  async submitSupplierBid(req, res) {
+    try {
+      const { rfq_id, supplier_id, items, total_price, delivery_days, payment_terms, notes } = req.body;
+
+      // Insert supplier bid
+      const [result] = await db.execute(
+        `INSERT INTO supplier_bids 
+                (rfq_id, supplier_id, total_price, delivery_days, payment_terms, notes, status, submitted_at) 
+                VALUES (?, ?, ?, ?, ?, ?, 'submitted', NOW())`,
+        [rfq_id, supplier_id, total_price, delivery_days, payment_terms, notes]
+      );
+
+      const bid_id = result.insertId;
+
+      // Insert bid items if provided
+      if (items && items.length > 0) {
+        const itemsData = items.map(item => [
+          bid_id,
+          item.item_name,
+          item.quantity,
+          item.unit_price,
+          item.total_price
+        ]);
+
+        await db.query(
+          `INSERT INTO supplier_bid_items (bid_id, item_name, quantity, unit_price, total_price) VALUES ?`,
+          [itemsData]
+        );
+      }
+
+      res.json({
+        success: true,
+        message: 'Supplier bid submitted successfully',
+        data: { bid_id, total_price }
+      });
+    } catch (error) {
+      console.error('Error submitting supplier bid:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error submitting supplier bid',
+        error: error.message
+      });
+    }
+  }
+}
+
+module.exports = new RFQController();
