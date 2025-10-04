@@ -309,7 +309,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                   Avg Confidence
                 </Typography>
                 <Typography variant="h4">
-                  {Math.round(parseFloat(dashboardData.summary.avg_confidence || '0') * 100)}%
+                  {Math.round((dashboardData.summary.avg_confidence || 0) * 100)}%
                 </Typography>
               </CardContent>
             </Card>
