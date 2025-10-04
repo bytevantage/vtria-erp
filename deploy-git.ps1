@@ -87,6 +87,14 @@ if ($FirstTime) {
     Write-Status "Stopping services..." "Cyan"
     docker-compose -f docker-compose.windows.yml down
 
+    # Create production environment file if it doesn't exist
+    if (!(Test-Path ".env.production") -and (Test-Path ".env.example")) {
+        Write-Status "Creating production environment file..." "Cyan"
+        Copy-Item ".env.example" ".env.production"
+        Write-Status "Created .env.production from example" "Green"
+        Write-Status "IMPORTANT: Edit .env.production with your production settings!" "Yellow"
+    }
+
     # Update code
     Write-Status "Fetching latest changes..." "Cyan"
     git fetch origin
