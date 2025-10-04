@@ -297,12 +297,14 @@ const ClientPortalDashboard: React.FC<ClientPortalDashboardProps> = ({
       </Grid>
 
       {/* Tabs */}
-      <Tabs value={currentTab} onChange={(e, newValue) => setCurrentTab(newValue)} mb={2}>
-        <Tab label="Live Progress" icon={<Assessment />} />
-        <Tab label="Project Timeline" icon={<Timeline />} />
-        <Tab label="Pending Approvals" icon={<Approval />} />
-        <Tab label="Communications" icon={<Comment />} />
-      </Tabs>
+      <Box sx={{ mb: 2 }}>
+        <Tabs value={currentTab} onChange={(e, newValue) => setCurrentTab(newValue)}>
+          <Tab label="Live Progress" icon={<Assessment />} />
+          <Tab label="Project Timeline" icon={<Timeline />} />
+          <Tab label="Pending Approvals" icon={<Approval />} />
+          <Tab label="Communications" icon={<Comment />} />
+        </Tabs>
+      </Box>
 
       {/* Tab Content */}
       {currentTab === 0 && (
