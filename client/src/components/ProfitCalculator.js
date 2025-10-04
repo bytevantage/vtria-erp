@@ -32,10 +32,10 @@ import {
   Visibility as VisibilityIcon
 } from '@mui/icons-material';
 
-const ProfitCalculator = ({ 
-  quotationData, 
+const ProfitCalculator = ({
+  quotationData,
   onProfitCalculated,
-  showBreakdown = false 
+  showBreakdown = false
 }) => {
   const [profitAnalysis, setProfitAnalysis] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -50,7 +50,7 @@ const ProfitCalculator = ({
   const calculateProfit = () => {
     try {
       setLoading(true);
-      
+
       const analysis = {
         totalCost: 0,
         totalSellingPrice: 0,
@@ -94,12 +94,12 @@ const ProfitCalculator = ({
       }
 
       // Calculate overall profit percentage
-      analysis.profitPercentage = analysis.totalSellingPrice > 0 
-        ? (analysis.totalProfit / analysis.totalSellingPrice) * 100 
+      analysis.profitPercentage = analysis.totalSellingPrice > 0
+        ? (analysis.totalProfit / analysis.totalSellingPrice) * 100
         : 0;
 
       setProfitAnalysis(analysis);
-      
+
       if (onProfitCalculated) {
         onProfitCalculated(analysis);
       }
@@ -115,7 +115,7 @@ const ProfitCalculator = ({
     // For now, we'll estimate based on selling price and typical margins
     const sellingPrice = item.amount || 0;
     const discountPercentage = item.discount_percentage || 0;
-    
+
     // Estimate cost as 70% of discounted selling price (rough estimation)
     const discountedPrice = sellingPrice * (1 - discountPercentage / 100);
     return discountedPrice * 0.7;
@@ -139,8 +139,8 @@ const ProfitCalculator = ({
 
     if (profitPercentage < 10) {
       return (
-        <Alert 
-          severity="error" 
+        <Alert
+          severity="error"
           icon={<WarningIcon />}
           sx={{ mb: 2 }}
         >
@@ -156,8 +156,8 @@ const ProfitCalculator = ({
 
     if (profitPercentage < 20) {
       return (
-        <Alert 
-          severity="warning" 
+        <Alert
+          severity="warning"
           icon={<InfoIcon />}
           sx={{ mb: 2 }}
         >
@@ -172,8 +172,8 @@ const ProfitCalculator = ({
     }
 
     return (
-      <Alert 
-        severity="success" 
+      <Alert
+        severity="success"
         icon={<TrendingUpIcon />}
         sx={{ mb: 2 }}
       >
@@ -203,7 +203,7 @@ const ProfitCalculator = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={3}>
           <Card>
             <CardContent>
@@ -216,7 +216,7 @@ const ProfitCalculator = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={3}>
           <Card>
             <CardContent>
@@ -229,7 +229,7 @@ const ProfitCalculator = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={3}>
           <Card>
             <CardContent>
@@ -322,7 +322,7 @@ const ProfitCalculator = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={3}>
           <Card variant="outlined">
             <CardContent>
@@ -338,7 +338,7 @@ const ProfitCalculator = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={3}>
           <Card variant="outlined">
             <CardContent>
@@ -354,7 +354,7 @@ const ProfitCalculator = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={3}>
           <Card variant="outlined">
             <CardContent>
@@ -385,6 +385,39 @@ const ProfitCalculator = ({
     );
   }
 
+  // If no quotation data is provided, show a message
+  if (!quotationData) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          Profit Calculator
+        </Typography>
+        <Alert severity="info" sx={{ mb: 2 }}>
+          <Typography variant="body1">
+            This profit calculator analyzes the profitability of quotations by comparing selling prices with estimated costs.
+          </Typography>
+        </Alert>
+        <Alert severity="warning">
+          <Typography variant="body1">
+            No quotation data available. Please access this tool from within a quotation to calculate profit margins.
+          </Typography>
+        </Alert>
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Features:
+          </Typography>
+          <Typography component="div">
+            • Item-wise profit calculation<br />
+            • Cost breakdown analysis<br />
+            • Profit margin alerts<br />
+            • Visual profit indicators<br />
+            • Detailed cost analysis
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
@@ -405,8 +438,8 @@ const ProfitCalculator = ({
       {renderProfitSummary()}
 
       {/* Detailed Breakdown Dialog */}
-      <Dialog 
-        open={showDetails} 
+      <Dialog
+        open={showDetails}
         onClose={() => setShowDetails(false)}
         maxWidth="lg"
         fullWidth
@@ -417,7 +450,7 @@ const ProfitCalculator = ({
             Item-wise Breakdown
           </Typography>
           {renderItemBreakdown()}
-          
+
           <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
             Cost Breakdown
           </Typography>

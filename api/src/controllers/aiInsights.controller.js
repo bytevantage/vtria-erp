@@ -389,16 +389,16 @@ class AIInsightsController {
       const params = [caseId];
 
       if (type) {
-        query += ` AND i.insight_type = ?`;
+        query += ' AND i.insight_type = ?';
         params.push(type);
       }
 
       if (severity) {
-        query += ` AND i.severity_level = ?`;
+        query += ' AND i.severity_level = ?';
         params.push(severity);
       }
 
-      query += ` ORDER BY i.created_at DESC`;
+      query += ' ORDER BY i.created_at DESC';
 
       const [insights] = await db.execute(query, params);
 
@@ -564,16 +564,16 @@ class AIInsightsController {
       const params = [caseId];
 
       if (status) {
-        query += ` AND r.status = ?`;
+        query += ' AND r.status = ?';
         params.push(status);
       }
 
       if (priority) {
-        query += ` AND r.priority_level = ?`;
+        query += ' AND r.priority_level = ?';
         params.push(priority);
       }
 
-      query += ` ORDER BY r.priority_level DESC, r.confidence_score DESC`;
+      query += ' ORDER BY r.priority_level DESC, r.confidence_score DESC';
 
       const [recommendations] = await db.execute(query, params);
 
@@ -649,21 +649,21 @@ class AIInsightsController {
       const params = [clientId];
 
       if (status) {
-        query += ` AND a.status = ?`;
+        query += ' AND a.status = ?';
         params.push(status);
       }
 
       if (severity) {
-        query += ` AND a.severity = ?`;
+        query += ' AND a.severity = ?';
         params.push(severity);
       }
 
       if (alert_type) {
-        query += ` AND a.alert_type = ?`;
+        query += ' AND a.alert_type = ?';
         params.push(alert_type);
       }
 
-      query += ` ORDER BY a.severity DESC, a.created_at DESC`;
+      query += ' ORDER BY a.severity DESC, a.created_at DESC';
 
       const [alerts] = await db.execute(query, params);
 

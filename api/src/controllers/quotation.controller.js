@@ -7,32 +7,101 @@ const { validationResult } = require('express-validator');
 // Get all quotations with related information
 exports.getAllQuotations = async (req, res) => {
     try {
-        const query = `
+        // Get created quotations
+        const quotationsQuery = `
             SELECT 
-                q.*,
-                e.estimation_id,
+                'quotation' as record_type,
+                q.id,
+                q.quotation_id,
+                q.estimation_id AS estimation_fk_id,
+                e.estimation_id AS estimation_code,
+                e.total_mrp,
+                e.total_final_price,
+                CASE 
+                    WHEN e.total_mrp IS NOT NULL AND e.total_final_price IS NOT NULL AND e.total_mrp > 0 
+                        THEN ROUND( ( (e.total_mrp - e.total_final_price) / e.total_mrp ) * 100, 2)
+                    ELSE NULL
+                END AS profit_percentage_calculated,
                 se.enquiry_id,
                 se.project_name,
                 c.company_name as client_name,
                 c.city,
                 c.state,
                 u.full_name as created_by_name,
-                au.full_name as approved_by_name
+                au.full_name as approved_by_name,
+                cases.case_number,
+                q.status,
+                q.date,
+                q.created_at,
+                q.valid_until,
+                'Created Quotation' as workflow_status
             FROM quotations q
             LEFT JOIN estimations e ON q.estimation_id = e.id
             LEFT JOIN sales_enquiries se ON e.enquiry_id = se.id
             LEFT JOIN clients c ON se.client_id = c.id
             LEFT JOIN users u ON q.created_by = u.id
             LEFT JOIN users au ON q.approved_by = au.id
-            ORDER BY q.created_at DESC
+            LEFT JOIN cases ON e.case_id = cases.id
+            WHERE q.deleted_at IS NULL AND e.status = 'approved'
         `;
-        
-        const [quotations] = await db.execute(query);
-        
+
+        // Get approved estimations available for quotation creation
+        const availableEstimationsQuery = `
+            SELECT 
+                'available_estimation' as record_type,
+                e.id,
+                NULL as quotation_id,
+                e.id AS estimation_fk_id,
+                e.estimation_id AS estimation_code,
+                e.total_mrp,
+                e.total_final_price,
+                CASE 
+                    WHEN e.total_mrp IS NOT NULL AND e.total_final_price IS NOT NULL AND e.total_mrp > 0 
+                        THEN ROUND( ( (e.total_mrp - e.total_final_price) / e.total_mrp ) * 100, 2)
+                    ELSE NULL
+                END AS profit_percentage_calculated,
+                se.enquiry_id,
+                se.project_name,
+                c.company_name as client_name,
+                c.city,
+                c.state,
+                ue.full_name as created_by_name,
+                ua.full_name as approved_by_name,
+                cases.case_number,
+                e.status,
+                e.date,
+                e.approved_at as created_at,
+                NULL as valid_until,
+                'Ready for Quotation' as workflow_status
+            FROM estimations e
+            JOIN sales_enquiries se ON e.enquiry_id = se.id
+            JOIN clients c ON se.client_id = c.id
+            LEFT JOIN users ue ON e.created_by = ue.id
+            LEFT JOIN users ua ON e.approved_by = ua.id
+            LEFT JOIN cases ON e.case_id = cases.id
+            LEFT JOIN quotations q ON e.id = q.estimation_id
+            WHERE e.status = 'approved' 
+            AND e.deleted_at IS NULL
+            AND q.id IS NULL
+            AND se.status != 'closed'
+        `;
+
+        const [quotations] = await db.execute(quotationsQuery);
+        const [availableEstimations] = await db.execute(availableEstimationsQuery);
+
+        // Combine both arrays and sort by date
+        const combinedData = [...quotations, ...availableEstimations].sort((a, b) =>
+            new Date(b.created_at) - new Date(a.created_at)
+        );
+
         res.json({
             success: true,
-            data: quotations,
-            count: quotations.length
+            data: combinedData,
+            count: combinedData.length,
+            breakdown: {
+                created_quotations: quotations.length,
+                available_estimations: availableEstimations.length
+            }
         });
     } catch (error) {
         console.error('Error fetching quotations:', error);
@@ -46,36 +115,36 @@ exports.getAllQuotations = async (req, res) => {
 
 exports.createQuotation = async (req, res) => {
     const connection = await db.getConnection();
-    
+
     try {
         const { estimation_id } = req.body;
-        
+
         // Check if estimation exists and is approved
         const [estimation] = await connection.query(
-            `SELECT e.* FROM estimations e WHERE e.id = ? AND e.status = 'approved'`,
+            'SELECT e.* FROM estimations e WHERE e.id = ? AND e.status = \'approved\'',
             [estimation_id]
         );
-        
+
         if (!estimation[0]) {
             throw new Error('Approved estimation not found');
         }
-        
+
         // Check if quotation already exists for this estimation
         const [existing] = await connection.query(
-            `SELECT id FROM quotations WHERE estimation_id = ?`,
+            'SELECT id FROM quotations WHERE estimation_id = ?',
             [estimation_id]
         );
-        
+
         if (existing[0]) {
             throw new Error('Quotation already exists for this estimation');
         }
-        
+
         await connection.beginTransaction();
-        
+
         // Generate quotation ID
         const financialYear = DocumentNumberGenerator.getCurrentFinancialYear();
         const quotationId = await DocumentNumberGenerator.generateNumber('Q', financialYear);
-        
+
         // Insert quotation
         const [quotation] = await connection.execute(
             `INSERT INTO quotations 
@@ -89,12 +158,12 @@ exports.createQuotation = async (req, res) => {
             [
                 quotationId,
                 estimation_id,
-                req.user?.id || 1
+                req.user.id
             ]
         );
-        
+
         await connection.commit();
-        
+
         res.json({
             success: true,
             message: 'Quotation created successfully',
@@ -103,7 +172,7 @@ exports.createQuotation = async (req, res) => {
                 quotation_id: quotationId
             }
         });
-        
+
     } catch (error) {
         await connection.rollback();
         console.error('Error creating quotation:', error);
@@ -139,20 +208,20 @@ exports.getQuotation = async (req, res) => {
              WHERE q.id = ?`,
             [req.params.id]
         );
-        
+
         if (quotation.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'Quotation not found'
             });
         }
-        
+
         // Get quotation items
         const [items] = await db.execute(
-            `SELECT * FROM quotation_items WHERE quotation_id = ?`,
+            'SELECT * FROM quotation_items WHERE quotation_id = ?',
             [req.params.id]
         );
-        
+
         // Get BOM details
         const [bom] = await db.execute(
             `SELECT b.*, bi.*, p.name as product_name, p.make, p.model, p.part_code
@@ -162,7 +231,7 @@ exports.getQuotation = async (req, res) => {
              WHERE b.quotation_id = ?`,
             [req.params.id]
         );
-        
+
         // Get case history
         const [history] = await db.execute(
             `SELECT ch.*, u.full_name as created_by_name
@@ -173,7 +242,7 @@ exports.getQuotation = async (req, res) => {
              ORDER BY ch.created_at DESC`,
             [req.params.id]
         );
-        
+
         res.json({
             success: true,
             data: {
@@ -183,7 +252,7 @@ exports.getQuotation = async (req, res) => {
                 history
             }
         });
-        
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -195,18 +264,18 @@ exports.getQuotation = async (req, res) => {
 
 exports.submitForApproval = async (req, res) => {
     const connection = await db.getConnection();
-    
+
     try {
         await connection.beginTransaction();
-        
+
         const { id } = req.params;
-        
+
         // Check profit percentage
         const [quotation] = await connection.execute(
             'SELECT profit_percentage FROM quotations WHERE id = ?',
             [id]
         );
-        
+
         if (quotation[0].profit_percentage < 10) {
             // Special note in case history for low profit
             await connection.execute(
@@ -216,7 +285,7 @@ exports.submitForApproval = async (req, res) => {
                 ['quotation', id, 'warning', 'Submitted for approval with profit percentage below 10%', req.user.id]
             );
         }
-        
+
         // Update quotation status
         await connection.execute(
             `UPDATE quotations 
@@ -224,7 +293,7 @@ exports.submitForApproval = async (req, res) => {
              WHERE id = ?`,
             [id]
         );
-        
+
         // Create case history entry
         await connection.execute(
             `INSERT INTO case_history 
@@ -232,14 +301,14 @@ exports.submitForApproval = async (req, res) => {
             VALUES (?, ?, ?, ?, ?)`,
             ['quotation', id, 'pending_approval', 'Submitted for approval', req.user.id]
         );
-        
+
         await connection.commit();
-        
+
         res.json({
             success: true,
             message: 'Quotation submitted for approval successfully'
         });
-        
+
     } catch (error) {
         await connection.rollback();
         res.status(500).json({
@@ -254,17 +323,17 @@ exports.submitForApproval = async (req, res) => {
 
 exports.approve = async (req, res) => {
     const connection = await db.getConnection();
-    
+
     try {
         await connection.beginTransaction();
-        
+
         const { id } = req.params;
-        
+
         // Verify user role is director or admin
         if (!['director', 'admin'].includes(req.user.role)) {
             throw new Error('Unauthorized to approve quotations');
         }
-        
+
         // Update quotation status
         await connection.execute(
             `UPDATE quotations 
@@ -274,7 +343,31 @@ exports.approve = async (req, res) => {
              WHERE id = ?`,
             [req.user.id, id]
         );
-        
+
+        // Get the case_id from the quotation to update case state
+        const [quotationData] = await connection.execute(
+            'SELECT case_id FROM quotations WHERE id = ?',
+            [id]
+        );
+
+        if (quotationData[0]?.case_id) {
+            // Update case current_state to 'quotation' when quotation is approved
+            await connection.execute(
+                `UPDATE cases 
+                 SET current_state = 'quotation', updated_at = CURRENT_TIMESTAMP 
+                 WHERE id = ?`,
+                [quotationData[0].case_id]
+            );
+
+            // Create case state transition history
+            await connection.execute(
+                `INSERT INTO case_state_transitions 
+                (case_id, from_state, to_state, notes, created_by) 
+                VALUES (?, ?, ?, ?, ?)`,
+                [quotationData[0].case_id, 'estimation', 'quotation', 'Quotation approved - case moved to quotation stage', req.user.id]
+            );
+        }
+
         // Create case history entry
         await connection.execute(
             `INSERT INTO case_history 
@@ -282,14 +375,14 @@ exports.approve = async (req, res) => {
             VALUES (?, ?, ?, ?, ?)`,
             ['quotation', id, 'approved', 'Quotation approved', req.user.id]
         );
-        
+
         await connection.commit();
-        
+
         res.json({
             success: true,
             message: 'Quotation approved successfully'
         });
-        
+
     } catch (error) {
         await connection.rollback();
         res.status(500).json({
@@ -305,7 +398,7 @@ exports.approve = async (req, res) => {
 exports.generatePDF = async (req, res) => {
     try {
         const { id } = req.params;
-        
+
         // Get quotation details with all related information
         const [quotation] = await db.execute(
             `SELECT q.*, 
@@ -322,23 +415,23 @@ exports.generatePDF = async (req, res) => {
              WHERE q.id = ?`,
             [id]
         );
-        
+
         if (!quotation[0]) {
             return res.status(404).json({
                 success: false,
                 message: 'Quotation not found'
             });
         }
-        
+
         // Get quotation items
         const [items] = await db.execute(
             'SELECT * FROM quotation_items WHERE quotation_id = ?',
             [id]
         );
-        
+
         // Initialize PDF generator
         const pdf = new PDFGenerator();
-        
+
         // Generate PDF
         await pdf.generateHeader({
             logo: path.join(__dirname, '../../public/assets/logo.png'),
@@ -347,13 +440,13 @@ exports.generatePDF = async (req, res) => {
             email: 'email@company.com',
             gstin: 'GSTIN Number'
         });
-        
+
         await pdf.generateDocumentTitle(
             'QUOTATION',
             quotation[0].quotation_id,
             quotation[0].date
         );
-        
+
         // Add client details
         pdf.doc
             .fontSize(10)
@@ -361,7 +454,7 @@ exports.generatePDF = async (req, res) => {
             .text(quotation[0].client_name, 50, 215)
             .text(quotation[0].client_address, 50, 230)
             .text(`GSTIN: ${quotation[0].client_gstin}`, 50, 260);
-        
+
         // Add items table
         const headers = ['Sr No', 'Item', 'HSN/SAC', 'Qty', 'Unit', 'Rate', 'Amount'];
         const tableData = items.map((item, index) => [
@@ -373,9 +466,9 @@ exports.generatePDF = async (req, res) => {
             item.rate.toFixed(2),
             item.amount.toFixed(2)
         ]);
-        
+
         await pdf.generateTable(headers, tableData, 300);
-        
+
         // Add terms and conditions
         pdf.doc
             .addPage()
@@ -383,11 +476,11 @@ exports.generatePDF = async (req, res) => {
             .text('Terms and Conditions:', 50, 50)
             .fontSize(10)
             .text(quotation[0].terms_conditions, 50, 70);
-        
+
         // Save PDF
         const pdfPath = path.join(__dirname, `../../uploads/documents/quotations/${quotation[0].quotation_id}.pdf`);
         await pdf.savePDF(pdfPath);
-        
+
         res.json({
             success: true,
             message: 'PDF generated successfully',
@@ -395,7 +488,7 @@ exports.generatePDF = async (req, res) => {
                 path: pdfPath
             }
         });
-        
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -428,9 +521,9 @@ exports.getAvailableEstimations = async (req, res) => {
             AND se.status != 'closed'
             ORDER BY e.created_at DESC
         `;
-        
+
         const [estimations] = await db.execute(query);
-        
+
         res.json({
             success: true,
             data: estimations,
@@ -449,25 +542,25 @@ exports.getAvailableEstimations = async (req, res) => {
 // Delete quotation
 exports.deleteQuotation = async (req, res) => {
     const connection = await db.getConnection();
-    
+
     try {
         await connection.beginTransaction();
-        
+
         const { id } = req.params;
-        
+
         // Check if quotation exists and get details
         const [quotation] = await connection.execute(
             'SELECT * FROM quotations WHERE id = ?',
             [id]
         );
-        
+
         if (!quotation[0]) {
             return res.status(404).json({
                 success: false,
                 message: 'Quotation not found'
             });
         }
-        
+
         // Check if quotation can be deleted (only draft or pending_approval status)
         if (!['draft', 'pending_approval'].includes(quotation[0].status)) {
             return res.status(400).json({
@@ -475,50 +568,50 @@ exports.deleteQuotation = async (req, res) => {
                 message: 'Cannot delete approved or sent quotations'
             });
         }
-        
+
         // Delete quotation items first
         await connection.execute(
             'DELETE FROM quotation_items WHERE quotation_id = ?',
             [id]
         );
-        
+
         // Delete related BOM if exists
         const [bom] = await connection.execute(
             'SELECT id FROM bill_of_materials WHERE quotation_id = ?',
             [id]
         );
-        
+
         if (bom[0]) {
             await connection.execute(
                 'DELETE FROM bom_items WHERE bom_id = ?',
                 [bom[0].id]
             );
-            
+
             await connection.execute(
                 'DELETE FROM bill_of_materials WHERE quotation_id = ?',
                 [id]
             );
         }
-        
+
         // Delete case history entries
         await connection.execute(
             'DELETE FROM case_history WHERE reference_type = ? AND reference_id = ?',
             ['quotation', id]
         );
-        
+
         // Delete the quotation
         await connection.execute(
             'DELETE FROM quotations WHERE id = ?',
             [id]
         );
-        
+
         await connection.commit();
-        
+
         res.json({
             success: true,
             message: 'Quotation deleted successfully'
         });
-        
+
     } catch (error) {
         await connection.rollback();
         console.error('Error deleting quotation:', error);
@@ -535,12 +628,12 @@ exports.deleteQuotation = async (req, res) => {
 // Update quotation status
 exports.updateStatus = async (req, res) => {
     const connection = await db.getConnection();
-    
+
     try {
         const { id } = req.params;
         const { status } = req.body;
-        const updated_by = req.user?.id || 1;
-        
+        const updated_by = req.user.id;
+
         // Validate status
         const validStatuses = ['draft', 'pending_approval', 'approved', 'sent', 'accepted', 'rejected', 'expired'];
         if (!validStatuses.includes(status)) {
@@ -549,15 +642,15 @@ exports.updateStatus = async (req, res) => {
                 message: `Invalid status. Valid statuses are: ${validStatuses.join(', ')}`
             });
         }
-        
+
         await connection.beginTransaction();
-        
+
         // Check if quotation exists
         const [quotations] = await connection.execute(
             'SELECT * FROM quotations WHERE id = ?',
             [id]
         );
-        
+
         if (quotations.length === 0) {
             await connection.rollback();
             return res.status(404).json({
@@ -565,16 +658,16 @@ exports.updateStatus = async (req, res) => {
                 message: 'Quotation not found'
             });
         }
-        
+
         const oldStatus = quotations[0].status;
-        
+
         // Update quotation status
         await connection.execute(`
             UPDATE quotations 
             SET status = ?
             WHERE id = ?
         `, [status, id]);
-        
+
         // Log status change (create table if doesn't exist)
         try {
             await connection.execute(`
@@ -586,9 +679,9 @@ exports.updateStatus = async (req, res) => {
             // If history table doesn't exist, just log but don't fail the operation
             console.log('Quotation status history logging skipped (table may not exist)');
         }
-        
+
         await connection.commit();
-        
+
         res.json({
             success: true,
             message: `Quotation status updated to ${status}`,
@@ -598,7 +691,7 @@ exports.updateStatus = async (req, res) => {
                 updated_at: new Date().toISOString()
             }
         });
-        
+
     } catch (error) {
         await connection.rollback();
         console.error('Error updating quotation status:', error);
@@ -609,5 +702,58 @@ exports.updateStatus = async (req, res) => {
         });
     } finally {
         connection.release();
+    }
+};
+
+// Get quotation by case number
+exports.getQuotationByCase = async (req, res) => {
+    try {
+        const { caseNumber } = req.params;
+
+        const query = `
+            SELECT 
+                q.*,
+                e.estimation_id,
+                se.enquiry_id,
+                se.project_name,
+                c.company_name as client_name,
+                c.city,
+                c.state,
+                u.full_name as created_by_name,
+                au.full_name as approved_by_name,
+                cases.case_number
+            FROM quotations q
+            LEFT JOIN estimations e ON q.estimation_id = e.id
+            LEFT JOIN sales_enquiries se ON e.enquiry_id = se.id
+            LEFT JOIN clients c ON se.client_id = c.id
+            LEFT JOIN users u ON q.created_by = u.id
+            LEFT JOIN users au ON q.approved_by = au.id
+            LEFT JOIN cases ON e.case_id = cases.id
+            WHERE cases.case_number = ?
+            ORDER BY q.created_at DESC
+            LIMIT 1
+        `;
+
+        const [results] = await db.execute(query, [caseNumber]);
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: `No quotation found for case ${caseNumber}`
+            });
+        }
+
+        res.json({
+            success: true,
+            data: results[0]
+        });
+
+    } catch (error) {
+        console.error('Error fetching quotation by case:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching quotation by case number',
+            error: error.message
+        });
     }
 };

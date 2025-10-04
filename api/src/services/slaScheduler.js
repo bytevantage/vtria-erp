@@ -199,7 +199,7 @@ class SLAScheduler {
         try {
             // Get warning template
             const [templates] = await db.execute(
-                "SELECT id FROM notification_templates WHERE template_name = 'SLA Warning - 2 Hours'"
+                'SELECT id FROM notification_templates WHERE template_name = \'SLA Warning - 2 Hours\''
             );
 
             if (templates.length === 0) {
@@ -255,7 +255,7 @@ class SLAScheduler {
 
             // Get breach template
             const [templates] = await db.execute(
-                "SELECT id FROM notification_templates WHERE template_name = 'SLA Breach Alert'"
+                'SELECT id FROM notification_templates WHERE template_name = \'SLA Breach Alert\''
             );
 
             if (templates.length === 0) {
@@ -341,7 +341,7 @@ class SLAScheduler {
 
             // Get escalation template
             const [templates] = await db.execute(
-                "SELECT id FROM notification_templates WHERE template_name = 'Escalation Notice'"
+                'SELECT id FROM notification_templates WHERE template_name = \'Escalation Notice\''
             );
 
             if (templates.length > 0) {

@@ -4,26 +4,35 @@ const caseManagementController = require('../controllers/caseManagement.controll
 const caseAssignmentController = require('../controllers/caseAssignment.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
+// Get all cases (root route)
+router.get('/', authMiddleware.verifyToken, caseManagementController.getAllCases);
+
 // Create a new case
-router.post('/create', caseManagementController.createCase);
+router.post('/create', authMiddleware.verifyToken, caseManagementController.createCase);
+
+// Get case details by ID (numeric)
+router.get('/id/:id', authMiddleware.verifyToken, caseManagementController.getCaseById);
 
 // Get case details by case number
-router.get('/:caseNumber', caseManagementController.getCaseDetails);
+router.get('/:caseNumber', authMiddleware.verifyToken, caseManagementController.getCaseDetails);
 
 // Get cases by state for queue management
-router.get('/state/:state', caseManagementController.getCasesByState);
+router.get('/state/:state', authMiddleware.verifyToken, caseManagementController.getCasesByState);
 
 // Transition case to next state
-router.put('/:caseNumber/transition', caseManagementController.transitionCaseState);
+router.put('/:caseNumber/transition', authMiddleware.verifyToken, caseManagementController.transitionCaseState);
+
+// Cancel/Close case at any stage
+router.put('/:caseNumber/cancel', authMiddleware.verifyToken, caseManagementController.cancelCase);
 
 // Get case statistics
-router.get('/stats/overview', caseManagementController.getCaseStatistics);
+router.get('/stats/overview', authMiddleware.verifyToken, caseManagementController.getCaseStatistics);
 
 // Get case timeline
-router.get('/:caseNumber/timeline', caseManagementController.getCaseTimeline);
+router.get('/:caseNumber/timeline', authMiddleware.verifyToken, caseManagementController.getCaseTimeline);
 
 // Update case information
-router.put('/:caseNumber/update', caseManagementController.updateCase);
+router.put('/:caseNumber/update', authMiddleware.verifyToken, caseManagementController.updateCase);
 
 // Search cases
 router.get('/search/query', caseManagementController.searchCases);
@@ -66,11 +75,26 @@ router.put('/milestones/:milestoneId/progress', caseManagementController.updateM
 // Workflow Progress Endpoint
 router.get('/:caseId/workflow-progress', authMiddleware.verifyToken, caseManagementController.getWorkflowProgress);
 
+// Data integrity fix: Create missing estimation records
+router.post('/fix/missing-estimations', authMiddleware.verifyToken, caseManagementController.fixMissingEstimations);
+router.post('/fix/missing-quotations', authMiddleware.verifyToken, caseManagementController.fixMissingQuotations);
+router.post('/fix/workflow-integrity', authMiddleware.verifyToken, caseManagementController.fixWorkflowIntegrity);
+router.post('/fix/all-data-integrity', authMiddleware.verifyToken, caseManagementController.fixAllDataIntegrity);
+
 // Case Assignment & Queue Management
 router.get('/assignments/queue', authMiddleware.verifyToken, caseAssignmentController.getCaseQueue);
 router.put('/assignments/:case_id/assign', authMiddleware.verifyToken, caseAssignmentController.assignCase);
 router.put('/assignments/:case_id/unassign', authMiddleware.verifyToken, caseAssignmentController.unassignCase);
 router.get('/assignments/:case_id/history', authMiddleware.verifyToken, caseAssignmentController.getCaseAssignmentHistory);
 router.get('/assignments/:case_id/available-users', authMiddleware.verifyToken, caseAssignmentController.getAvailableAssignees);
+
+// Stage-Specific Delete & Recreation Management
+router.delete('/:caseNumber/stage', caseManagementController.deleteStageData);
+router.get('/:caseNumber/deleted-stages', caseManagementController.getDeletedStages);
+router.post('/stage-backup/:backupId/recreate', caseManagementController.recreateStage);
+
+// Legacy Case Delete & Recreation Management (kept for compatibility)
+router.delete('/:caseNumber/delete', caseManagementController.softDeleteCase);
+router.get('/deleted/list', caseManagementController.getDeletedCases);
 
 module.exports = router;

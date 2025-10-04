@@ -76,28 +76,119 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
   const [currentSubsectionId, setCurrentSubsectionId] = useState(null);
   const [costOptimizationData, setCostOptimizationData] = useState(null);
 
+  // Check if estimation is approved (read-only mode)
+  const isApproved = estimation?.status === 'approved';
+
   useEffect(() => {
-    if (estimation?.id) {
+    // Run on mount and whenever the incoming prop changes. Avoid depending on local
+    // `estimation` state because we update it inside fetchEstimationDetails which
+    // caused a re-run loop.
+    if (estimationProp) {
+      // initialize local estimation state from prop
+      setEstimation(estimationProp);
       fetchEstimationDetails();
       fetchProducts();
       fetchCategories();
       fetchCostOptimization();
     }
-  }, [estimation?.id]);
+  }, [estimationProp]);
+
+  const createDefaultSections = async () => {
+    try {
+      const defaultSections = ['Main Panel', 'Incoming', 'Outgoing'];
+      
+      for (const sectionName of defaultSections) {
+        await axios.post(`${API_BASE_URL}/api/estimation/${estimation.id}/sections`, {
+          section_name: sectionName
+        });
+      }
+      
+      // Refresh the estimation details after creating defaults
+      await fetchEstimationDetails();
+    } catch (error) {
+      console.error('Error creating default sections:', error);
+      setError('Failed to create default sections');
+    }
+  };
 
   const fetchEstimationDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/api/estimation/${estimation.id}/details`);
-      
+      setError(null); // Clear any previous errors
+
+      // Determine what ID parameter to use - prefer numeric id for API calls
+      let idParam = estimation.id ? estimation.id : null;
+
+      // If numeric ID is not present, try to resolve it by querying the estimation list
+      if (!idParam && estimation.estimation_id) {
+        try {
+          console.log('Numeric ID missing; attempting to resolve from estimation_id:', estimation.estimation_id);
+          const listResp = await axios.get(`${API_BASE_URL}/api/estimation`);
+          if (listResp.data.success && Array.isArray(listResp.data.data)) {
+            const found = listResp.data.data.find(e => e.estimation_id === estimation.estimation_id || (e.estimation_id && e.estimation_id.toLowerCase() === estimation.estimation_id.toLowerCase()) || e.case_number === estimation.case_number);
+            if (found) {
+              idParam = found.id;
+              console.log('Resolved numeric ID from list:', idParam);
+              // update local estimation object to include numeric id for future calls
+              setEstimation(found);
+            }
+          }
+        } catch (listError) {
+          console.warn('Failed to resolve numeric id from estimation list:', listError);
+        }
+      }
+
+      if (!idParam) {
+        setError('Invalid estimation reference. Missing numeric ID. The estimation object must have an "id" field or a resolvable estimation_id.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Fetching estimation details for ID:', idParam);
+      const response = await axios.get(`${API_BASE_URL}/api/estimation/${idParam}/details`);
+
       if (response.data.success) {
+        console.log('Estimation details fetched successfully:', response.data);
         const detailedEstimation = response.data.data;
         setEstimation(detailedEstimation);
-        setSections(detailedEstimation.sections || []);
+        const sections = detailedEstimation.sections || [];
+        setSections(sections);
+        
+        // If no sections exist, create default sections
+        if (sections.length === 0) {
+          setTimeout(() => createDefaultSections(), 500); // Small delay to avoid recursion
+        }
+      } else {
+        console.error('API returned success:false', response.data);
+        setError(response.data.message || 'Failed to load estimation details. The API returned an unsuccessful response.');
+
+        // Fallback to basic estimation data
+        setSections([]);
       }
     } catch (error) {
-      console.error('Error fetching estimation:', error);
-      setError('Failed to load estimation details');
+      console.error('Error fetching estimation details:', error);
+
+      // Enhanced error logging
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+
+        setError(`Failed to load estimation details: ${error.response.data?.message || error.response.statusText || error.message}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('Error request:', error.request);
+        setError('Failed to load estimation details: No response received from server. Please check your connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error message:', error.message);
+        setError(`Failed to load estimation details: ${error.message}`);
+      }
+
+      // Create empty sections as fallback
+      setSections([]);
     } finally {
       setLoading(false);
     }
@@ -105,7 +196,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/products`);
+      const response = await axios.get(`${API_BASE_URL}/api/inventory-enhanced/items/enhanced`);
       if (response.data.success) {
         setProducts(response.data.data);
       }
@@ -116,7 +207,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/products/categories`);
+      const response = await axios.get(`${API_BASE_URL}/api/inventory-enhanced/categories/main`);
       if (response.data.success) {
         setCategories(response.data.data);
       }
@@ -149,13 +240,13 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
     try {
       console.log('Adding intelligent product selection:', productData);
       console.log('Current subsection ID:', currentSubsectionId);
-      
+
       const finalPrice = productData.selected_price * productData.quantity;
-      
+
       const response = await axios.post(`${API_BASE_URL}/api/estimation/subsections/${currentSubsectionId}/items`, {
         product_id: productData.id,
         quantity: productData.quantity,
-        mrp: productData.mrp || productData.last_price || 0,
+        mrp: productData.selling_price || productData.last_price || 0,
         discount_percentage: 0,
         discounted_price: productData.selected_price,
         final_price: finalPrice
@@ -179,37 +270,15 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
     }
   };
 
-  const handleApproveEstimation = async () => {
+  const handleSaveAndClose = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/estimations/${estimation.id}/approve`);
-      if (response.data.success) {
-        await fetchEstimationDetails();
-        setError(null);
-        
-        // Transition case to estimation state if it exists
-        try {
-          if (estimation.enquiry_id) {
-            // Find the case number for this enquiry
-            const caseResponse = await axios.get(`${API_BASE_URL}/api/case-management/search/query?q=${estimation.enquiry_id}`);
-            if (caseResponse.data.success && caseResponse.data.data.length > 0) {
-              const caseNumber = caseResponse.data.data[0].case_number;
-              await axios.put(`${API_BASE_URL}/api/case-management/${caseNumber}/transition`, {
-                new_state: 'estimation',
-                notes: 'Estimation approved and ready for quotation'
-              });
-            }
-          }
-        } catch (caseError) {
-          console.error('Error updating case state:', caseError);
-          // Don't fail estimation approval if case update fails
-        }
-        
-        // Show success message
-        alert('Estimation approved successfully! You can now create quotations from this estimation.');
-      }
+      // Note: Individual item changes are already auto-saved via other functions
+      // This is just to ensure everything is saved and close gracefully
+      setError(null);
+      onClose();
     } catch (error) {
-      console.error('Error approving estimation:', error);
-      setError(error.response?.data?.message || 'Failed to approve estimation');
+      console.error('Error saving estimation:', error);
+      setError('Failed to save estimation. Please try again.');
     }
   };
 
@@ -219,7 +288,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
       const response = await axios.post(`${API_BASE_URL}/api/estimation/${estimation.id}/sections`, {
         section_name: newSectionName || 'Main Panel'
       });
-      
+
       if (response.data.success) {
         await fetchEstimationDetails();
         setNewSectionName('');
@@ -234,7 +303,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
       await axios.put(`${API_BASE_URL}/api/estimation/sections/${sectionId}`, {
         section_name: newName
       });
-      
+
       await fetchEstimationDetails();
       setEditingSection(null);
     } catch (error) {
@@ -258,18 +327,18 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
     try {
       const subsectionName = newSubsectionNames[sectionId] || '';
       console.log('Adding subsection:', { sectionId, name: subsectionName });
-      
+
       if (!subsectionName.trim()) {
         setError('Please enter a subsection name');
         return;
       }
-      
+
       const response = await axios.post(`${API_BASE_URL}/api/estimation/sections/${sectionId}/subsections`, {
         subsection_name: subsectionName.trim()
       });
-      
+
       console.log('Subsection response:', response.data);
-      
+
       if (response.data.success) {
         await fetchEstimationDetails();
         // Clear the subsection name for this specific section
@@ -289,7 +358,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
       await axios.put(`${API_BASE_URL}/api/estimation/subsections/${subsectionId}`, {
         subsection_name: newName
       });
-      
+
       await fetchEstimationDetails();
       setEditingSubsection(null);
     } catch (error) {
@@ -317,27 +386,91 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
 
     try {
       setError(null); // Clear any previous errors
-      const discountedPrice = selectedProduct.mrp * (1 - (customDiscount / 100));
+      
+      let subsectionIdToUse = addItemDialog.subsectionId;
+      
+      // Check if this is a synthetic subsection ID (starts with "default-")
+      if (String(addItemDialog.subsectionId).startsWith('default-')) {
+        console.log('Detected synthetic subsection ID, creating real subsection first');
+        
+        // Extract section ID from synthetic ID (format: "default-{sectionId}")
+        const sectionId = String(addItemDialog.subsectionId).replace('default-', '');
+        console.log('Extracted section ID from synthetic ID:', sectionId);
+        
+        // Create a real subsection first
+        const subsectionResponse = await axios.post(`${API_BASE_URL}/api/estimation/sections/${sectionId}/subsections`, {
+          subsection_name: 'General',
+          subsection_order: 1
+        });
+        
+        if (subsectionResponse.data.success) {
+          subsectionIdToUse = subsectionResponse.data.data.id;
+          console.log('Created real subsection with ID:', subsectionIdToUse);
+        } else {
+          throw new Error('Failed to create subsection');
+        }
+      } else {
+        console.log('Using real subsection ID:', subsectionIdToUse);
+      }
+
+      // Check for duplicate product in the same subsection
+      const currentSubsection = sections.find(s => 
+        s.subsections?.find(sub => sub.id == subsectionIdToUse)
+      )?.subsections?.find(sub => sub.id == subsectionIdToUse);
+      
+      const existingItem = currentSubsection?.items?.find(item => 
+        item.product_id == selectedProduct.id
+      );
+
+      const priceAfterVendorDiscount = selectedProduct.selling_price * (1 - (parseFloat(selectedProduct.vendor_discount || 0) / 100));
+
+      if (existingItem) {
+        // Update existing item - combine quantities and adjust discount
+        const newQuantity = parseInt(existingItem.quantity) + parseInt(itemQuantity);
+        const existingDiscount = parseFloat(existingItem.discount_percentage || 0);
+        const newDiscount = ((existingDiscount * parseInt(existingItem.quantity)) + (customDiscount * parseInt(itemQuantity))) / newQuantity;
+        const discountedPrice = priceAfterVendorDiscount * (1 - (newDiscount / 100));
+        const finalPrice = discountedPrice * newQuantity;
+
+        const response = await axios.put(`${API_BASE_URL}/api/estimation/items/${existingItem.id}`, {
+          quantity: newQuantity,
+          discount_percentage: newDiscount,
+          discounted_price: discountedPrice,
+          final_price: finalPrice
+        });
+
+        if (response.data.success) {
+          await fetchEstimationDetails();
+          setAddItemDialog({ open: false, subsectionId: null });
+          setSelectedProduct(null);
+          setItemQuantity(1);
+          setCustomDiscount(0);
+        }
+        return; // Exit early for duplicate case
+      }
+
+      // Add new item
+      const discountedPrice = priceAfterVendorDiscount * (1 - (customDiscount / 100));
       const finalPrice = discountedPrice * itemQuantity;
 
-      const response = await axios.post(`${API_BASE_URL}/api/estimation/subsections/${addItemDialog.subsectionId}/items`, {
+      const response = await axios.post(`${API_BASE_URL}/api/estimation/subsections/${subsectionIdToUse}/items`, {
         product_id: selectedProduct.id,
         quantity: itemQuantity,
-        mrp: selectedProduct.mrp,
+        mrp: selectedProduct.selling_price * (1 - (parseFloat(selectedProduct.vendor_discount || 0) / 100)),
         discount_percentage: customDiscount,
         discounted_price: discountedPrice,
         final_price: finalPrice
       });
-      
+
       if (response.data.success) {
         await fetchEstimationDetails();
-        
+
         // Reset form and close dialog
         setAddItemDialog({ open: false, subsectionId: null });
         setSelectedProduct(null);
         setItemQuantity(1);
         setCustomDiscount(0);
-        
+
         // Show success message (optional - could add a snackbar here)
         console.log('Item added successfully:', response.data.message);
       }
@@ -352,7 +485,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
       await axios.put(`${API_BASE_URL}/api/estimation/items/${itemId}/discount`, {
         discount_percentage: newDiscount
       });
-      
+
       await fetchEstimationDetails();
     } catch (error) {
       setError('Failed to update discount');
@@ -382,7 +515,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
           const mrp = parseFloat(item.mrp) || 0;
           const quantity = parseInt(item.quantity) || 0;
           const finalPrice = parseFloat(item.final_price) || 0;
-          
+
           totalMRP += mrp * quantity;
           totalFinalPrice += finalPrice;
           totalDiscount += (mrp * quantity) - finalPrice;
@@ -424,13 +557,13 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
               </Typography>
               {costOptimizationData && (
                 <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
-                  <Chip 
+                  <Chip
                     label={`Potential Savings: ₹${costOptimizationData.summary?.total_potential_savings || 0}`}
                     color="success"
                     variant="filled"
                     sx={{ bgcolor: 'rgba(76, 175, 80, 0.8)' }}
                   />
-                  <Chip 
+                  <Chip
                     label={`${costOptimizationData.summary?.suggestions_count || 0} Optimization Suggestions`}
                     color="info"
                     variant="filled"
@@ -440,24 +573,22 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
               )}
             </Box>
             <Box sx={{ display: 'flex', gap: 2 }}>
-              {estimation?.status !== 'approved' && (
-                <Button
-                  variant="contained"
-                  onClick={handleApproveEstimation}
-                  sx={{ 
-                    bgcolor: 'rgba(76, 175, 80, 0.9)', 
-                    '&:hover': { bgcolor: 'rgba(76, 175, 80, 1)' }
-                  }}
-                >
-                  <CheckCircleIcon sx={{ mr: 1 }} />
-                  Approve Estimation
-                </Button>
-              )}
+              <Button
+                variant="contained"
+                onClick={handleSaveAndClose}
+                sx={{
+                  bgcolor: 'rgba(76, 175, 80, 0.9)',
+                  '&:hover': { bgcolor: 'rgba(76, 175, 80, 1)' }
+                }}
+              >
+                <SaveIcon sx={{ mr: 1 }} />
+                Save and Close
+              </Button>
               <Button
                 variant="contained"
                 onClick={onClose}
-                sx={{ 
-                  bgcolor: 'rgba(255,255,255,0.2)', 
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
                 }}
               >
@@ -468,13 +599,20 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
         </CardContent>
       </Card>
 
+      {/* Approval Warning */}
+      {isApproved && (
+        <Alert severity="warning" sx={{ mb: 3, borderRadius: '12px' }}>
+          This estimation has been approved. Modifications require returning to draft status and reapproval.
+        </Alert>
+      )}
+
       {/* Error Display */}
       {error && (
         <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>
           {error}
         </Alert>
       )}
-      
+
 
       {/* Add New Section */}
       <Card sx={{ mb: 3, borderRadius: '16px' }}>
@@ -503,9 +641,9 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
       {sections.map((section, sectionIndex) => (
         <Card key={section.id} sx={{ mb: 3, borderRadius: '16px' }}>
           <Accordion defaultExpanded>
-            <AccordionSummary 
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              sx={{ 
+              sx={{
                 backgroundColor: '#e3f2fd',
                 borderRadius: '16px 16px 0 0',
                 '&.Mui-expanded': { borderRadius: '16px 16px 0 0' }
@@ -628,6 +766,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                             variant="contained"
                             size="small"
                             startIcon={<PsychologyIcon />}
+                            disabled={isApproved}
                             onClick={() => handleIntelligentProductSelection(subsection.id)}
                             sx={{ borderRadius: '8px' }}
                             color="primary"
@@ -638,7 +777,11 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                             variant="outlined"
                             size="small"
                             startIcon={<AddIcon />}
-                            onClick={() => setAddItemDialog({ open: true, subsectionId: subsection.id })}
+                            disabled={isApproved}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setAddItemDialog({ open: true, subsectionId: subsection.id });
+                            }}
                             sx={{ borderRadius: '8px' }}
                           >
                             Add Item
@@ -759,7 +902,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                                       label={item.stock_status || (item.is_stock_available ? 'Available' : 'Low Stock')}
                                       color={
                                         item.stock_status === 'Critical' ? 'error' :
-                                        item.stock_status === 'Low Stock' || !item.is_stock_available ? 'warning' : 'success'
+                                          item.stock_status === 'Low Stock' || !item.is_stock_available ? 'warning' : 'success'
                                       }
                                       size="small"
                                     />
@@ -771,9 +914,9 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                                 <TableCell>
                                   <Box display="flex" flexDirection="column" gap={0.5}>
                                     {item.warranty_period > 0 && (
-                                      <Chip 
+                                      <Chip
                                         label={`${item.warranty_period} ${item.warranty_period_type}`}
-                                        size="small" 
+                                        size="small"
                                         variant="outlined"
                                         color="primary"
                                       />
@@ -816,14 +959,14 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
         maxWidth="xl"
         fullWidth
         PaperProps={{
-          sx: { 
+          sx: {
             borderRadius: '16px',
             maxHeight: '95vh',
             m: 2
           }
         }}
       >
-        <DialogTitle sx={{ 
+        <DialogTitle sx={{
           background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
           color: 'white',
           fontWeight: 600,
@@ -843,7 +986,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
             edge="end"
             color="inherit"
             onClick={() => setAddItemDialog({ open: false, subsectionId: null })}
-            sx={{ 
+            sx={{
               color: 'white',
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
@@ -853,7 +996,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        
+
         <DialogContent sx={{ p: 4, backgroundColor: '#f8fafc' }}>
           <Grid container spacing={4}>
             {/* Product Selection Section */}
@@ -864,9 +1007,18 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                 </Typography>
                 <Autocomplete
                   options={products}
-                  getOptionLabel={(option) => `${option.name} - ${option.make || ''} ${option.model || ''}`}
+                  getOptionLabel={(option) => `${option.item_name || 'Unknown Product'} - ${option.brand || ''} ${option.model_number || ''}`}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={selectedProduct}
                   onChange={(event, newValue) => setSelectedProduct(newValue)}
+                  componentsProps={{
+                    popper: {
+                      style: {
+                        width: '50vw' // Half the viewport width
+                      },
+                      placement: 'bottom-start'
+                    }
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -883,13 +1035,16 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                       }}
                     />
                   )}
-                  renderOption={(props, option) => (
-                    <Box 
-                      component="li" 
-                      {...props} 
-                      sx={{ 
-                        flexDirection: 'column', 
-                        alignItems: 'stretch', 
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <Box
+                        component="li"
+                        key={option.id || option.item_code || option.item_name}
+                        {...otherProps}
+                      sx={{
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
                         p: 3,
                         borderBottom: '1px solid #e2e8f0',
                         minHeight: '120px',
@@ -901,10 +1056,10 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                       <Box sx={{ width: '100%' }}>
                         {/* Product Name and Status */}
                         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                          <Typography 
-                            variant="h6" 
-                            fontWeight={600} 
-                            sx={{ 
+                          <Typography
+                            variant="h6"
+                            fontWeight={600}
+                            sx={{
                               fontSize: '1.1rem',
                               color: '#1e293b',
                               lineHeight: 1.4,
@@ -913,53 +1068,53 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                               wordBreak: 'break-word'
                             }}
                           >
-                            {option.name}
+                            {option.item_name}
                           </Typography>
                           <Box display="flex" gap={1} flexWrap="wrap" flexShrink={0}>
                             {option.stock_status && (
-                              <Chip 
+                              <Chip
                                 label={option.stock_status}
                                 size="small"
                                 color={
                                   option.stock_status === 'Critical' ? 'error' :
-                                  option.stock_status === 'Low Stock' ? 'warning' : 'success'
+                                    option.stock_status === 'Low Stock' ? 'warning' : 'success'
                                 }
                                 sx={{ fontSize: '0.75rem', height: '26px' }}
                               />
                             )}
                             {option.serial_number_required && (
-                              <Chip 
-                                label="Serial Required" 
-                                size="small" 
-                                variant="outlined" 
-                                sx={{ fontSize: '0.75rem', height: '26px' }} 
+                              <Chip
+                                label="Serial Required"
+                                size="small"
+                                variant="outlined"
+                                sx={{ fontSize: '0.75rem', height: '26px' }}
                               />
                             )}
                           </Box>
                         </Box>
-                        
+
                         {/* Product Details - Full Width Layout */}
                         <Grid container spacing={3} sx={{ mb: 2 }}>
                           <Grid item xs={12} md={6}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                                <strong>Make:</strong> {option.make || 'N/A'}
+                                <strong>Brand:</strong> {option.brand || 'N/A'}
                               </Typography>
                               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                                <strong>Model:</strong> {option.model || 'N/A'}
+                                <strong>Model:</strong> {option.model_number || 'N/A'}
                               </Typography>
                               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem', wordBreak: 'break-all' }}>
-                                <strong>Product Code:</strong> {option.product_code || option.part_code || 'N/A'}
+                                <strong>Product Code:</strong> {option.item_code || option.part_number || 'N/A'}
                               </Typography>
                             </Box>
                           </Grid>
                           <Grid item xs={12} md={6}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                                <strong>MRP:</strong> ₹{parseFloat(option.mrp || 0).toLocaleString('en-IN')}
+                                <strong>Selling Price:</strong> ₹{parseFloat(option.selling_price || 0).toLocaleString('en-IN')}
                               </Typography>
                               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                                <strong>Stock:</strong> {option.total_stock || 0} {option.unit}
+                                <strong>Stock:</strong> {option.current_stock || 0} {option.primary_unit}
                               </Typography>
                               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
                                 <strong>GST:</strong> {option.gst_rate || 18}%
@@ -967,7 +1122,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                             </Box>
                           </Grid>
                         </Grid>
-                        
+
                         {/* Warranty Info */}
                         {option.warranty_period > 0 && (
                           <Typography variant="body2" color="primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
@@ -976,19 +1131,20 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                         )}
                       </Box>
                     </Box>
-                  )}
+                    );
+                  }}
                   ListboxProps={{
-                    style: { 
+                    style: {
                       maxHeight: '60vh',
                       width: '50vw', // Half the viewport width
                       borderRadius: '8px'
                     }
                   }}
                   PaperComponent={({ children, ...props }) => (
-                    <Paper 
-                      {...props} 
-                      sx={{ 
-                        borderRadius: '8px', 
+                    <Paper
+                      {...props}
+                      sx={{
+                        borderRadius: '8px',
                         mt: 1,
                         width: '50vw !important', // Half the viewport width
                         maxWidth: 'none !important',
@@ -1000,16 +1156,10 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                       {children}
                     </Paper>
                   )}
-                  PopperProps={{
-                    style: {
-                      width: '50vw' // Half the viewport width
-                    },
-                    placement: 'bottom-start'
-                  }}
                 />
               </Card>
             </Grid>
-            
+
             {/* Quantity and Discount Section */}
             <Grid item xs={12}>
               <Card sx={{ p: 3, borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -1017,15 +1167,30 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                   Quantity & Pricing
                 </Typography>
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={4}>
                     <TextField
                       label="Quantity"
                       type="number"
                       value={itemQuantity}
-                      onChange={(e) => setItemQuantity(parseInt(e.target.value) || 1)}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 1) {
+                          setItemQuantity(value);
+                        } else if (e.target.value === '') {
+                          setItemQuantity('');
+                        } else {
+                          setItemQuantity(1);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (itemQuantity === '' || itemQuantity < 1) {
+                          setItemQuantity(1);
+                        }
+                      }}
                       fullWidth
                       required
-                      inputProps={{ min: 1 }}
+                      inputProps={{ min: 1, step: 1 }}
+                      helperText="Enter a positive integer value"
                       variant="outlined"
                       size="large"
                       sx={{
@@ -1036,7 +1201,26 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                       }}
                     />
                   </Grid>
-                  
+                  <Grid item xs={12} sm={2}>
+                    <TextField
+                      label="Unit"
+                      value={selectedProduct ? (selectedProduct.primary_unit || 'NOS') : 'NOS'}
+                      fullWidth
+                      variant="outlined"
+                      size="large"
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          backgroundColor: '#f8fafc'
+                        }
+                      }}
+                    />
+                  </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       label="Custom Discount (%)"
@@ -1063,74 +1247,103 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
             {/* Price Calculation Section */}
             {selectedProduct && (
               <Grid item xs={12}>
-                <Card sx={{ 
-                  p: 4, 
-                  borderRadius: '12px', 
+                <Card sx={{
+                  p: 4,
+                  borderRadius: '12px',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                   background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
                   border: '1px solid #0ea5e9'
                 }}>
-                  <Typography 
-                    variant="h6" 
-                    gutterBottom 
-                    sx={{ 
-                      color: '#0c4a6e', 
-                      fontWeight: 600, 
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{
+                      color: '#0c4a6e',
+                      fontWeight: 600,
                       mb: 3,
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 1 
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1
                     }}
                   >
                     <AssignmentIcon fontSize="medium" />
                     Price Calculation Summary
                   </Typography>
-                  
+
                   <Grid container spacing={3}>
                     <Grid item xs={12} md={8}>
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {/* List Price */}
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                           <Typography variant="body1" sx={{ fontSize: '1rem' }}>
-                            MRP per unit:
+                            List Price per unit:
                           </Typography>
                           <Typography variant="body1" fontWeight={600} sx={{ fontSize: '1rem' }}>
-                            ₹{parseFloat(selectedProduct.mrp || 0).toLocaleString('en-IN')}
+                            ₹{parseFloat(selectedProduct.selling_price || 0).toLocaleString('en-IN')}
                           </Typography>
                         </Box>
-                        
+
+                        {/* Vendor Discount (if applicable) */}
+                        {selectedProduct.vendor_discount && parseFloat(selectedProduct.vendor_discount) > 0 && (
+                          <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1" sx={{ fontSize: '1rem', color: '#059669' }}>
+                              Vendor Discount ({parseFloat(selectedProduct.vendor_discount).toFixed(2)}%):
+                            </Typography>
+                            <Typography variant="body1" fontWeight={600} color="#059669" sx={{ fontSize: '1rem' }}>
+                              -₹{(selectedProduct.selling_price * parseFloat(selectedProduct.vendor_discount) / 100).toLocaleString('en-IN')}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Price after vendor discount */}
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1" sx={{ fontSize: '1rem' }}>
+                            {selectedProduct.vendor_discount && parseFloat(selectedProduct.vendor_discount) > 0 
+                              ? 'Price after vendor discount:' 
+                              : 'Unit Price:'}
+                          </Typography>
+                          <Typography variant="body1" fontWeight={600} sx={{ fontSize: '1rem' }}>
+                            ₹{(selectedProduct.selling_price * (1 - (parseFloat(selectedProduct.vendor_discount || 0) / 100))).toLocaleString('en-IN')}
+                          </Typography>
+                        </Box>
+
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                           <Typography variant="body1" sx={{ fontSize: '1rem' }}>
                             Quantity:
                           </Typography>
                           <Typography variant="body1" fontWeight={600} sx={{ fontSize: '1rem' }}>
-                            {itemQuantity} {selectedProduct.unit || 'nos'}
+                            {itemQuantity} {selectedProduct.primary_unit || 'nos'}
                           </Typography>
                         </Box>
-                        
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
+
+                        {/* Subtotal after vendor discount */}
+                        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1, borderTop: '1px solid #e2e8f0' }}>
                           <Typography variant="body1" sx={{ fontSize: '1rem' }}>
                             Subtotal:
                           </Typography>
                           <Typography variant="body1" fontWeight={600} sx={{ fontSize: '1rem' }}>
-                            ₹{(selectedProduct.mrp * itemQuantity).toLocaleString('en-IN')}
+                            ₹{(selectedProduct.selling_price * (1 - (parseFloat(selectedProduct.vendor_discount || 0) / 100)) * itemQuantity).toLocaleString('en-IN')}
                           </Typography>
                         </Box>
-                        
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body1" sx={{ fontSize: '1rem' }}>
-                            Discount ({customDiscount}%):
-                          </Typography>
-                          <Typography variant="body1" fontWeight={600} color="error" sx={{ fontSize: '1rem' }}>
-                            -₹{(selectedProduct.mrp * itemQuantity * customDiscount / 100).toLocaleString('en-IN')}
-                          </Typography>
-                        </Box>
+
+                        {/* Custom Discount (if applicable) */}
+                        {customDiscount > 0 && (
+                          <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1" sx={{ fontSize: '1rem', color: '#dc2626' }}>
+                              Additional Discount ({customDiscount}%):
+                            </Typography>
+                            <Typography variant="body1" fontWeight={600} color="error" sx={{ fontSize: '1rem' }}>
+                              -₹{(selectedProduct.selling_price * (1 - (parseFloat(selectedProduct.vendor_discount || 0) / 100)) * itemQuantity * customDiscount / 100).toLocaleString('en-IN')}
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
                     </Grid>
-                    
+
                     <Grid item xs={12} md={4}>
-                      <Card sx={{ 
-                        p: 3, 
-                        backgroundColor: '#1e293b', 
+                      <Card sx={{
+                        p: 3,
+                        backgroundColor: '#1e293b',
                         color: 'white',
                         borderRadius: '8px'
                       }}>
@@ -1138,7 +1351,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
                           Final Amount
                         </Typography>
                         <Typography variant="h4" fontWeight={700} sx={{ color: '#22d3ee' }}>
-                          ₹{(selectedProduct.mrp * itemQuantity * (1 - customDiscount / 100)).toLocaleString('en-IN')}
+                          ₹{(selectedProduct.selling_price * (1 - (parseFloat(selectedProduct.vendor_discount || 0) / 100)) * itemQuantity * (1 - customDiscount / 100)).toLocaleString('en-IN')}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#94a3b8', mt: 1, display: 'block' }}>
                           Including all discounts
@@ -1151,20 +1364,20 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
             )}
           </Grid>
         </DialogContent>
-        
-        <DialogActions sx={{ 
-          p: 4, 
+
+        <DialogActions sx={{
+          p: 4,
           backgroundColor: '#ffffff',
           borderTop: '1px solid #e2e8f0',
           gap: 2,
           justifyContent: 'flex-end'
         }}>
-          <Button 
+          <Button
             onClick={() => setAddItemDialog({ open: false, subsectionId: null })}
             variant="outlined"
             startIcon={<CancelIcon />}
             size="large"
-            sx={{ 
+            sx={{
               borderRadius: '8px',
               px: 3,
               py: 1.5,
@@ -1179,7 +1392,7 @@ const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
             disabled={!selectedProduct || !itemQuantity}
             startIcon={<AddIcon />}
             size="large"
-            sx={{ 
+            sx={{
               borderRadius: '8px',
               px: 4,
               py: 1.5,

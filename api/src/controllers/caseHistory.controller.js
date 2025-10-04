@@ -7,7 +7,7 @@ class CaseHistoryController {
             const { caseType, caseId } = req.params;
             
             let query = '';
-            let params = [caseId];
+            const params = [caseId];
             
             switch (caseType) {
                 case 'sales_enquiry':
@@ -184,7 +184,7 @@ class CaseHistoryController {
             const { caseType, caseId } = req.params;
             
             let query = '';
-            let params = [caseId];
+            const params = [caseId];
             
             switch (caseType) {
                 case 'sales_enquiry':
@@ -275,7 +275,7 @@ class CaseHistoryController {
             try {
                 // Update the main table status
                 let updateQuery = '';
-                let updateParams = [status, caseId];
+                const updateParams = [status, caseId];
                 
                 switch (caseType) {
                     case 'sales_enquiry':

@@ -60,7 +60,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
   const generateQuotation = async () => {
     try {
       setLoading(true);
-      
+
       const quotationPayload = {
         estimation_id: estimationId,
         client_state: clientState,
@@ -69,10 +69,10 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
       };
 
       const response = await axios.post(`${API_BASE_URL}/quotation/enhanced`, quotationPayload);
-      
+
       if (response.data.success) {
         setQuotationData(response.data.data);
-        
+
         if (response.data.data.is_low_profit) {
           alert(`Warning: Low profit margin (${response.data.data.profit_percentage.toFixed(2)}%)! Please review pricing.`);
         }
@@ -95,7 +95,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
         `${API_BASE_URL}/pdf/quotation/${quotationData.id}`,
         { responseType: 'blob' }
       );
-      
+
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -115,7 +115,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
         quotation_id: quotationData.id,
         notes: 'Auto-generated from quotation'
       });
-      
+
       if (response.data.success) {
         alert('BOM generated successfully!');
       }
@@ -145,7 +145,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
           <Typography variant="h6" gutterBottom>
             Generate Quotation from Estimation
           </Typography>
-          
+
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
               <TextField
@@ -163,7 +163,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 ))}
               </TextField>
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <TextField
                 type="number"
@@ -175,7 +175,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 helperText="Delivery lead time"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <Button
                 variant="contained"
@@ -187,7 +187,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 Generate Quotation
               </Button>
             </Grid>
-            
+
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -211,7 +211,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 <strong>Low Profit Alert!</strong>
               </Typography>
               <Typography variant="body2">
-                Current profit margin is {quotationData.profit_percentage?.toFixed(2)}%, 
+                Current profit margin is {quotationData.profit_percentage?.toFixed(2)}%,
                 which is below the recommended 10% threshold.
               </Typography>
             </Alert>
@@ -230,9 +230,9 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 Mangalore, Karnataka | Bangalore, Karnataka | Pune, Maharashtra
               </Typography>
             </Box>
-            
+
             <Divider sx={{ my: 2 }} />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <Typography variant="h6" gutterBottom>Quotation Details</Typography>
@@ -240,7 +240,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 <Typography><strong>Date:</strong> {new Date(quotationData.quotation_date).toLocaleDateString()}</Typography>
                 <Typography><strong>Lead Time:</strong> {quotationData.lead_time_days} days</Typography>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <Typography variant="h6" gutterBottom>Client Details</Typography>
                 <Typography><strong>Client:</strong> {quotationData.client_name}</Typography>
@@ -255,7 +255,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
             <Typography variant="h6" gutterBottom>
               Item Details
             </Typography>
-            
+
             <TableContainer>
               <Table>
                 <TableHead>
@@ -275,12 +275,12 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                 </TableHead>
                 <TableBody>
                   {quotationData.items?.map((item, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={`quotation-item-${item.section_name || item.product_name || 'item'}-${index}`}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
                         {item.item_image_url ? (
-                          <img 
-                            src={item.item_image_url} 
+                          <img
+                            src={item.item_image_url}
                             alt={item.section_name}
                             style={{ width: 40, height: 40, objectFit: 'cover' }}
                           />
@@ -316,14 +316,14 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
             <Typography variant="h6" gutterBottom>
               Tax Summary
             </Typography>
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={8}>
                 <Box sx={{ textAlign: 'right' }}>
                   <Typography variant="body1">
                     <strong>Subtotal: ₹{quotationData.subtotal?.toLocaleString()}</strong>
                   </Typography>
-                  
+
                   {quotationData.is_interstate ? (
                     <Typography variant="body1">
                       IGST ({quotationData.igst_rate}%): ₹{quotationData.total_igst?.toLocaleString()}
@@ -338,19 +338,19 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
                       </Typography>
                     </>
                   )}
-                  
+
                   <Typography variant="body1">
                     <strong>Total Tax: ₹{quotationData.total_tax?.toLocaleString()}</strong>
                   </Typography>
-                  
+
                   <Divider sx={{ my: 1 }} />
-                  
+
                   <Typography variant="h6" color="primary">
                     <strong>Grand Total: ₹{quotationData.grand_total?.toLocaleString()}</strong>
                   </Typography>
                 </Box>
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <Card>
                   <CardContent>
@@ -381,7 +381,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
             >
               Download Quotation PDF
             </Button>
-            
+
             <Button
               variant="outlined"
               startIcon={<DownloadIcon />}
@@ -389,7 +389,7 @@ const QuotationEnhanced = ({ estimationId, onQuotationCreated }) => {
             >
               Generate BOM
             </Button>
-            
+
             <Button
               variant="contained"
               color="success"

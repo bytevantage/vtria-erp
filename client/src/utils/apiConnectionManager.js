@@ -1,17 +1,13 @@
+import { logger } from './logger.js';
+
 /**
  * API Connection Manager
  * Handles dynamic API URL detection and connection retry logic
  */
 class ApiConnectionManager {
   constructor() {
-    this.baseUrls = [
-      'http://localhost:3001',
-      'http://localhost:3002', 
-      'http://localhost:3003',
-      'http://localhost:3004',
-      'http://localhost:3005',
-      'http://localhost:5000',
-    ];
+    // Always use proxy-compatible URLs since setupProxy.js handles routing
+    this.baseUrls = ['']; // Use relative URLs (proxy will handle routing to API)
     this.currentBaseUrl = null;
     this.maxRetries = 3;
     this.retryDelay = 1000;
@@ -28,7 +24,9 @@ class ApiConnectionManager {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-      const response = await fetch(`${url}/health`, {
+      // Use proxy-compatible health endpoint
+      const healthUrl = url === '' ? '/health' : `${url}/health`;
+      const response = await fetch(healthUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +72,7 @@ class ApiConnectionManager {
 
     if (activeUrl) {
       this.currentBaseUrl = activeUrl.url;
-      console.log(`✓ API connection established: ${activeUrl.url}`);
+      logger.log(`✓ API connection established: ${activeUrl.url}`);
       return activeUrl.url;
     }
 
@@ -112,14 +110,14 @@ class ApiConnectionManager {
 
         // Server error, try again
         lastError = new Error(`Server error: ${response.status}`);
-        
+
       } catch (error) {
         console.warn(`API request attempt ${attempt} failed:`, error.message);
         lastError = error;
-        
+
         // Reset current URL if connection failed
         this.currentBaseUrl = null;
-        
+
         // Wait before retry (except on last attempt)
         if (attempt < this.maxRetries) {
           await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt));
@@ -143,11 +141,11 @@ class ApiConnectionManager {
       if (this.currentBaseUrl) {
         const isHealthy = await this.testConnection(this.currentBaseUrl);
         if (!isHealthy) {
-          console.warn('⚠️ API connection lost, will rediscover on next request');
+          logger.warn('⚠️ API connection lost, will rediscover on next request');
           this.currentBaseUrl = null;
         }
       }
-    }, 30000); // Check every 30 seconds
+    }, 120000); // Check every 2 minutes (reduced from 30s for better performance)
   }
 
   /**
@@ -169,7 +167,7 @@ class ApiConnectionManager {
       const baseUrl = await this.findActiveApiUrl();
       const response = await this.fetch('/health');
       const data = await response.json();
-      
+
       return {
         connected: true,
         url: baseUrl,

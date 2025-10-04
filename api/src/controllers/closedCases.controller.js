@@ -107,7 +107,7 @@ exports.getCaseHistory = async (req, res) => {
         // Format timeline for frontend
         const formattedTimeline = timeline.map(event => {
             let title = '';
-            let description = event.notes;
+            const description = event.notes;
             let type = 'general';
             
             switch (event.status) {
@@ -153,7 +153,7 @@ exports.getCaseHistory = async (req, res) => {
                 type,
                 date: event.created_at,
                 created_by: event.created_by_name,
-                reference_id: event.reference_type + '_' + event.reference_id,
+                reference_id: `${event.reference_type}_${event.reference_id}`,
                 amount: null // Will be populated from related records if needed
             };
         });

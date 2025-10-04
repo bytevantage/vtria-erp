@@ -282,7 +282,7 @@ exports.generateEstimationPDF = async (req, res) => {
 
 exports.generateBomPDF = async (req, res) => {
     try {
-        const { bomId } = req.params;
+        const { bomId } = req.params; // This is actually the estimation ID
         const outputPath = path.join(__dirname, '../../documents/boms', `bom_${bomId}.pdf`);
 
         // Ensure directory exists
@@ -291,34 +291,84 @@ exports.generateBomPDF = async (req, res) => {
             fs.mkdirSync(dir, { recursive: true });
         }
 
-        // Get BOM data
+        // Generate proper BOM document ID
+        const { generateDocumentId, DOCUMENT_TYPES } = require('../utils/documentIdGenerator');
+        const bomDocumentId = await generateDocumentId(DOCUMENT_TYPES.BILL_OF_MATERIALS);
+
+        // Get database connection
+        const db = require('../config/database');
+
+        // Fetch actual estimation data
+        const [estimationResult] = await db.execute(`
+            SELECT 
+                e.*,
+                se.project_name,
+                c.company_name as client_name,
+                cases.case_number
+            FROM estimations e
+            LEFT JOIN sales_enquiries se ON e.enquiry_id = se.id
+            LEFT JOIN clients c ON se.client_id = c.id  
+            LEFT JOIN cases ON e.case_id = cases.id
+            WHERE e.id = ? AND e.deleted_at IS NULL
+        `, [bomId]);
+
+        if (estimationResult.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Estimation not found'
+            });
+        }
+
+        const estimation = estimationResult[0];
+
+        // Fetch estimation items
+        const [itemsResult] = await db.execute(`
+            SELECT 
+                ei.*,
+                p.name as product_name,
+                p.part_code as item_code,
+                es.heading as section_name,
+                ess.subsection_name
+            FROM estimation_items ei
+            LEFT JOIN products p ON ei.product_id = p.id
+            LEFT JOIN estimation_sections es ON ei.section_id = es.id
+            LEFT JOIN estimation_subsections ess ON ei.subsection_id = ess.id
+            WHERE ei.estimation_id = ?
+            ORDER BY es.heading, ess.subsection_name, ei.id
+        `, [bomId]);
+
+        // Format materials for BOM
+        const materials = itemsResult.map(item => ({
+            item_code: item.item_code || `ITEM-${item.id}`,
+            product_name: item.product_name || 'Custom Item',
+            description: `${item.section_name || 'General'} - ${item.subsection_name || 'Standard'}`.trim(' -'),
+            quantity: parseFloat(item.quantity) || 1,
+            unit: 'Nos', // Default unit since products table might not have unit info
+            section: item.section_name,
+            subsection: item.subsection_name,
+            mrp: parseFloat(item.mrp) || 0,
+            final_price: parseFloat(item.final_price) || 0
+        }));
+
+        // Get BOM data with actual estimation information
         const bomData = {
-            bom_id: `VESPL/BOM/2526/${bomId}`,
-            project_name: 'Sample Project',
-            materials: [
-                {
-                    item_code: 'MAT001',
-                    product_name: 'Copper Wire',
-                    description: '10mm copper wire',
-                    quantity: 100,
-                    unit: 'Mtrs'
-                },
-                {
-                    item_code: 'MAT002',
-                    product_name: 'Control Relay',
-                    description: '24V control relay',
-                    quantity: 5,
-                    unit: 'Nos'
-                }
-            ]
+            bom_id: bomDocumentId,
+            estimation_id: estimation.estimation_id,
+            project_name: estimation.project_name || 'Unknown Project',
+            client_name: estimation.client_name || 'Unknown Client',
+            case_number: estimation.case_number || 'N/A',
+            materials: materials
         };
 
         await documentGenerator.generatePDF(bomData, 'bom', outputPath);
 
+        // Return the document ID along with file path for proper filename
         res.json({
             success: true,
             message: 'BOM PDF generated successfully',
-            file_path: outputPath
+            file_path: outputPath,
+            document_id: bomDocumentId,
+            filename: `${bomDocumentId.replace(/\//g, '_')}.pdf`
         });
 
     } catch (error) {
@@ -326,6 +376,48 @@ exports.generateBomPDF = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error generating BOM PDF',
+            error: error.message
+        });
+    }
+};
+
+exports.downloadDocument = async (req, res) => {
+    try {
+        const { category, fileName } = req.params;
+        const filePath = path.join(__dirname, '../../documents', category, fileName);
+
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'File not found'
+            });
+        }
+
+        // Set headers for PDF download - this forces download instead of browser viewing
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.setHeader('Cache-Control', 'no-cache');
+
+        // Stream the file
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+
+        fileStream.on('error', (error) => {
+            console.error('Error streaming file:', error);
+            if (!res.headersSent) {
+                res.status(500).json({
+                    success: false,
+                    message: 'Error downloading file'
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error('Error downloading document:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error downloading document',
             error: error.message
         });
     }

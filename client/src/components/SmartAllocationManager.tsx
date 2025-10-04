@@ -8,13 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { 
-  TrendingUp, 
-  Package, 
-  Calculator, 
-  Settings, 
-  BarChart3, 
-  Clock, 
+import {
+  TrendingUp,
+  Package,
+  Calculator,
+  Settings,
+  BarChart3,
+  Clock,
   Target,
   DollarSign,
   Truck,
@@ -183,7 +183,7 @@ const SmartAllocationManager: React.FC = () => {
                   <label className="text-sm font-medium">Product</label>
                   <Select
                     value={allocationRequest.product_id.toString()}
-                    onValueChange={(value) => 
+                    onValueChange={(value) =>
                       setAllocationRequest(prev => ({ ...prev, product_id: parseInt(value) }))
                     }
                   >
@@ -205,10 +205,10 @@ const SmartAllocationManager: React.FC = () => {
                   <Input
                     type="number"
                     value={allocationRequest.quantity_needed}
-                    onChange={(e) => 
-                      setAllocationRequest(prev => ({ 
-                        ...prev, 
-                        quantity_needed: parseInt(e.target.value) 
+                    onChange={(e) =>
+                      setAllocationRequest(prev => ({
+                        ...prev,
+                        quantity_needed: parseInt(e.target.value)
                       }))
                     }
                     min="1"
@@ -219,7 +219,7 @@ const SmartAllocationManager: React.FC = () => {
                   <label className="text-sm font-medium">Business Context</label>
                   <Select
                     value={allocationRequest.business_context}
-                    onValueChange={(value: 'estimation' | 'manufacturing' | 'sales') => 
+                    onValueChange={(value: 'estimation' | 'manufacturing' | 'sales') =>
                       setAllocationRequest(prev => ({ ...prev, business_context: value }))
                     }
                   >
@@ -253,10 +253,10 @@ const SmartAllocationManager: React.FC = () => {
                   <label className="text-sm font-medium">Customer Tier (Optional)</label>
                   <Select
                     value={allocationRequest.customer_tier || ''}
-                    onValueChange={(value: 'vip' | 'standard' | 'new' | '') => 
-                      setAllocationRequest(prev => ({ 
-                        ...prev, 
-                        customer_tier: value || undefined 
+                    onValueChange={(value: 'vip' | 'standard' | 'new' | '') =>
+                      setAllocationRequest(prev => ({
+                        ...prev,
+                        customer_tier: value || undefined
                       }))
                     }
                   >
@@ -327,7 +327,7 @@ const SmartAllocationManager: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                       {preview.allocation_items.map((item, index) => (
-                        <TableRow key={index}>
+                        <TableRow key={`allocation-item-${item.batch_id}-${index}`}>
                           <TableCell>#{item.batch_id}</TableCell>
                           <TableCell>{item.quantity_allocated}</TableCell>
                           <TableCell>₹{item.landed_cost_per_unit.toFixed(2)}</TableCell>

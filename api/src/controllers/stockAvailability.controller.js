@@ -51,7 +51,7 @@ class StockAvailabilityController {
                 WHERE l.status = 'active'
             `;
 
-            let stockParams = [productId, productId];
+            const stockParams = [productId, productId];
 
             if (locationId) {
                 stockQuery += ' AND l.id = ?';
@@ -169,7 +169,7 @@ class StockAvailabilityController {
                         WHERE s.product_id = ?
                     `;
 
-                    let params = [productId, productId];
+                    const params = [productId, productId];
 
                     if (locationId) {
                         stockQuery += ' AND s.location_id = ?';
@@ -223,7 +223,7 @@ class StockAvailabilityController {
         try {
             const { locationId } = req.query;
 
-            let query = `
+            const query = `
                 SELECT 
                     p.id,
                     p.name,

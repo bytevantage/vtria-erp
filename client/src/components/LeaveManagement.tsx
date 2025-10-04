@@ -110,7 +110,8 @@ const LeaveManagement: React.FC = () => {
     is_half_day: false,
     reason: '',
     emergency_contact_during_leave: '',
-    contact_phone: ''
+    contact_phone: '',
+    handover_notes: ''
   });
 
   useEffect(() => {
@@ -118,6 +119,20 @@ const LeaveManagement: React.FC = () => {
     fetchLeaveTypes();
     fetchEmployees();
   }, [statusFilter, employeeFilter]);
+
+  const resetForm = () => {
+    setFormData({
+      employee_id: '',
+      leave_type_id: '',
+      start_date: '',
+      end_date: '',
+      is_half_day: false,
+      reason: '',
+      emergency_contact_during_leave: '',
+      contact_phone: '',
+      handover_notes: ''
+    });
+  };
 
   const fetchLeaveApplications = async () => {
     setLoading(true);
@@ -127,7 +142,7 @@ const LeaveManagement: React.FC = () => {
         ...(employeeFilter && { employee_id: employeeFilter })
       });
 
-      const response = await fetch(`/api/employees/leave/applications?${params}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -139,36 +154,7 @@ const LeaveManagement: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching leave applications:', error);
-      // Mock data for demo
-      setLeaveApplications([
-        {
-          id: 1,
-          application_id: 'LA/2025/0001',
-          employee_name: 'John Doe',
-          employee_id: 'EMP/2024/001',
-          leave_type_name: 'Annual Leave',
-          start_date: '2025-09-20',
-          end_date: '2025-09-22',
-          total_days: 3,
-          reason: 'Family vacation',
-          status: 'submitted',
-          applied_date: '2025-09-10T10:30:00.000Z'
-        },
-        {
-          id: 2,
-          application_id: 'LA/2025/0002',
-          employee_name: 'Jane Smith',
-          employee_id: 'EMP/2024/002',
-          leave_type_name: 'Sick Leave',
-          start_date: '2025-09-15',
-          end_date: '2025-09-16',
-          total_days: 2,
-          reason: 'Fever and cold',
-          status: 'approved',
-          applied_date: '2025-09-14T09:00:00.000Z',
-          approved_by_name: 'HR Manager'
-        }
-      ]);
+      setLeaveApplications([]);
     } finally {
       setLoading(false);
     }
@@ -176,7 +162,7 @@ const LeaveManagement: React.FC = () => {
 
   const fetchLeaveTypes = async () => {
     try {
-      const response = await fetch('/api/employees/master/leave-types', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/types`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -184,17 +170,13 @@ const LeaveManagement: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setLeaveTypes(result.data);
+        setLeaveTypes(result.data || []);
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error fetching leave types:', error);
-      // Mock data for demo
-      setLeaveTypes([
-        { id: 1, leave_type_name: 'Annual Leave', leave_code: 'AL', max_days_per_year: 21, is_paid: true },
-        { id: 2, leave_type_name: 'Sick Leave', leave_code: 'SL', max_days_per_year: 12, is_paid: true },
-        { id: 3, leave_type_name: 'Work From Home', leave_code: 'WFH', max_days_per_year: 24, is_paid: true },
-        { id: 4, leave_type_name: 'Emergency Leave', leave_code: 'EL', max_days_per_year: 5, is_paid: true }
-      ]);
+      setLeaveTypes([]);
     }
   };
 
@@ -208,21 +190,19 @@ const LeaveManagement: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setEmployees(result.data);
+        setEmployees(result.data || []);
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error fetching employees:', error);
-      // Mock data for demo
-      setEmployees([
-        { id: 1, employee_id: 'EMP/2024/001', first_name: 'John', last_name: 'Doe' },
-        { id: 2, employee_id: 'EMP/2024/002', first_name: 'Jane', last_name: 'Smith' }
-      ]);
+      setEmployees([]);
     }
   };
 
   const fetchLeaveBalances = async (employeeId: string) => {
     try {
-      const response = await fetch(`/api/employees/${employeeId}/leave-balances`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/balance/${employeeId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -234,27 +214,27 @@ const LeaveManagement: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching leave balances:', error);
-      // Mock data for demo
-      setLeaveBalances([
-        { id: 1, leave_type_name: 'Annual Leave', leave_code: 'AL', entitled_days: 21, used_days: 8, available_balance: 13, is_paid: true },
-        { id: 2, leave_type_name: 'Sick Leave', leave_code: 'SL', entitled_days: 12, used_days: 3, available_balance: 9, is_paid: true },
-        { id: 3, leave_type_name: 'Work From Home', leave_code: 'WFH', entitled_days: 24, used_days: 12, available_balance: 12, is_paid: true }
-      ]);
+      setLeaveBalances([]);
     }
   };
 
   const handleApplyLeave = async () => {
     try {
-      const response = await fetch('/api/employees/leave/apply', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify({
-          ...formData,
           employee_id: parseInt(formData.employee_id),
-          leave_type_id: parseInt(formData.leave_type_id)
+          leave_type_id: parseInt(formData.leave_type_id),
+          start_date: formData.start_date,
+          end_date: formData.end_date,
+          reason: formData.reason,
+          emergency_contact: formData.emergency_contact_during_leave,
+          handover_notes: formData.handover_notes,
+          is_half_day: formData.is_half_day
         })
       });
 
@@ -274,7 +254,7 @@ const LeaveManagement: React.FC = () => {
 
   const handleProcessApplication = async (applicationId: number, action: 'approve' | 'reject', comments?: string) => {
     try {
-      const response = await fetch(`/api/employees/leave/applications/${applicationId}/process`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications/${applicationId}/process`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -293,19 +273,6 @@ const LeaveManagement: React.FC = () => {
       console.error('Error processing application:', error);
       alert('Failed to process application');
     }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      employee_id: '',
-      leave_type_id: '',
-      start_date: '',
-      end_date: '',
-      is_half_day: false,
-      reason: '',
-      emergency_contact_during_leave: '',
-      contact_phone: ''
-    });
   };
 
   const getStatusColor = (status: string) => {
@@ -366,9 +333,9 @@ const LeaveManagement: React.FC = () => {
       </Box>
 
       {/* Tabs */}
-      <Tabs 
-        value={tabValue} 
-        onChange={(_, newValue) => setTabValue(newValue)} 
+      <Tabs
+        value={tabValue}
+        onChange={(_, newValue) => setTabValue(newValue)}
         sx={{ mb: 3 }}
       >
         <Tab label="Leave Applications" />
@@ -492,11 +459,11 @@ const LeaveManagement: React.FC = () => {
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Typography 
-                              variant="body2" 
-                              sx={{ 
-                                maxWidth: 200, 
-                                overflow: 'hidden', 
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                maxWidth: 200,
+                                overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap'
                               }}
@@ -584,7 +551,7 @@ const LeaveManagement: React.FC = () => {
                         {balance.leave_type_name}
                       </Typography>
                     </Box>
-                    
+
                     <Box sx={{ mb: 2 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant="body2">Available</Typography>
@@ -592,8 +559,8 @@ const LeaveManagement: React.FC = () => {
                           {balance.available_balance}
                         </Typography>
                       </Box>
-                      <LinearProgress 
-                        variant="determinate" 
+                      <LinearProgress
+                        variant="determinate"
                         value={(balance.available_balance / balance.entitled_days) * 100}
                         sx={{ height: 8, borderRadius: 4 }}
                       />
@@ -609,9 +576,9 @@ const LeaveManagement: React.FC = () => {
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="body2" color="text.secondary">Type:</Typography>
-                      <Chip 
-                        label={balance.is_paid ? 'Paid' : 'Unpaid'} 
-                        size="small" 
+                      <Chip
+                        label={balance.is_paid ? 'Paid' : 'Unpaid'}
+                        size="small"
                         color={balance.is_paid ? 'success' : 'default'}
                       />
                     </Box>
@@ -634,11 +601,11 @@ const LeaveManagement: React.FC = () => {
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Employee</InputLabel>
+              <FormControl fullWidth required>
+                <InputLabel>Employee *</InputLabel>
                 <Select
                   value={formData.employee_id}
-                  label="Employee"
+                  label="Employee *"
                   onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
                 >
                   {employees.map((emp) => (
@@ -650,16 +617,16 @@ const LeaveManagement: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Leave Type</InputLabel>
+              <FormControl fullWidth required>
+                <InputLabel>Leave Type *</InputLabel>
                 <Select
                   value={formData.leave_type_id}
-                  label="Leave Type"
+                  label="Leave Type *"
                   onChange={(e) => setFormData({ ...formData, leave_type_id: e.target.value })}
                 >
                   {leaveTypes.map((type) => (
                     <MenuItem key={type.id} value={type.id.toString()}>
-                      {type.leave_type_name} ({type.leave_code})
+                      {type.leave_type_name}{type.leave_code ? ` (${type.leave_code})` : ''}
                     </MenuItem>
                   ))}
                 </Select>
@@ -668,31 +635,37 @@ const LeaveManagement: React.FC = () => {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Start Date"
+                label="Start Date *"
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                 InputLabelProps={{ shrink: true }}
+                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="End Date"
+                label="End Date *"
                 type="date"
                 value={formData.end_date}
                 onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                 InputLabelProps={{ shrink: true }}
+                required
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Reason"
+                label="Reason *"
                 multiline
                 rows={3}
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                required
+                error={formData.reason.length > 0 && formData.reason.trim().length === 0}
+                helperText={formData.reason.length > 0 && formData.reason.trim().length === 0 ? "Reason cannot be empty" : "Please provide a detailed reason for your leave"}
+                placeholder="Provide a detailed reason for your leave request..."
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -711,7 +684,18 @@ const LeaveManagement: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
               />
             </Grid>
-            
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Handover Notes"
+                multiline
+                rows={2}
+                value={formData.handover_notes || ''}
+                onChange={(e) => setFormData({ ...formData, handover_notes: e.target.value })}
+                placeholder="Provide any handover instructions or notes for your absence..."
+              />
+            </Grid>
+
             {calculateLeaveDays() > 0 && (
               <Grid item xs={12}>
                 <Alert severity="info">
@@ -722,13 +706,31 @@ const LeaveManagement: React.FC = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={() => { setOpenDialog(false); resetForm(); }}>Cancel</Button>
           <Button
             onClick={handleApplyLeave}
             variant="contained"
-            disabled={!formData.employee_id || !formData.leave_type_id || !formData.start_date || !formData.end_date || !formData.reason}
+            disabled={
+              !formData.employee_id?.toString().trim() ||
+              !formData.leave_type_id?.toString().trim() ||
+              !formData.start_date?.trim() ||
+              !formData.end_date?.trim() ||
+              !formData.reason?.trim() ||
+              (formData.start_date && formData.end_date && new Date(formData.start_date) > new Date(formData.end_date)) ||
+              loading
+            }
+            title={
+              !formData.employee_id ? 'Please select an employee' :
+                !formData.leave_type_id ? 'Please select a leave type' :
+                  !formData.start_date ? 'Please select start date' :
+                    !formData.end_date ? 'Please select end date' :
+                      (formData.start_date && formData.end_date && new Date(formData.start_date) > new Date(formData.end_date)) ? 'End date must be after start date' :
+                        !formData.reason?.trim() ? 'Please provide a reason' :
+                          loading ? 'Submitting application...' :
+                            'Submit your leave application'
+            }
           >
-            Submit Application
+            {loading ? 'Submitting...' : 'Submit Application'}
           </Button>
         </DialogActions>
       </Dialog>

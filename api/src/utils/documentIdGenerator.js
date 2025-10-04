@@ -9,14 +9,14 @@ const db = require('../config/database');
 async function generateDocumentId(documentType) {
     try {
         const currentYear = new Date().getFullYear();
-        const financialYear = currentYear % 100 + '' + ((currentYear + 1) % 100);
-        
+        const financialYear = `${currentYear % 100}${(currentYear + 1) % 100}`;
+
         // Get or create sequence for current financial year
         const [sequences] = await db.execute(
             'SELECT last_sequence FROM document_sequences WHERE document_type = ? AND financial_year = ?',
             [documentType, financialYear]
         );
-        
+
         let nextSequence = 1;
         if (sequences.length > 0) {
             nextSequence = sequences[0].last_sequence + 1;
@@ -32,7 +32,7 @@ async function generateDocumentId(documentType) {
                 [documentType, financialYear, nextSequence]
             );
         }
-        
+
         return `VESPL/${documentType}/${financialYear}/${nextSequence.toString().padStart(3, '0')}`;
     } catch (error) {
         console.error(`Error generating ${documentType} ID:`, error);
@@ -46,7 +46,7 @@ async function generateDocumentId(documentType) {
 const DOCUMENT_TYPES = {
     ENQUIRY: 'EQ',
     CASE: 'C',
-    ESTIMATION: 'ET', 
+    ESTIMATION: 'ET',
     QUOTATION: 'Q',
     SALES_ORDER: 'SO',
     GOODS_RECEIVED_NOTE: 'GRN',
@@ -55,7 +55,8 @@ const DOCUMENT_TYPES = {
     PROFORMA_INVOICE: 'PI',
     DELIVERY_CHALLAN: 'DC',
     PURCHASE_REQUISITION: 'PR',
-    BILL_OF_MATERIALS: 'BOM'
+    BILL_OF_MATERIALS: 'BOM',
+    ADVANCE_PAYMENT: 'ADV'
 };
 
 module.exports = {

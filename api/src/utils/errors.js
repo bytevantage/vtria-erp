@@ -38,11 +38,26 @@ class DatabaseError extends BaseError {
     }
 }
 
+class BadRequestError extends BaseError {
+    constructor(message = 'Bad request', details = null) {
+        super(message, 400, 'BAD_REQUEST');
+        this.details = details;
+    }
+}
+
+class InternalServerError extends BaseError {
+    constructor(message = 'Internal server error') {
+        super(message, 500, 'INTERNAL_SERVER_ERROR');
+    }
+}
+
 module.exports = {
     BaseError,
     NotFoundError,
     ValidationError,
     UnauthorizedError,
     ConflictError,
-    DatabaseError
+    DatabaseError,
+    BadRequestError,
+    InternalServerError
 };

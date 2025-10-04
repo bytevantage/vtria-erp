@@ -275,7 +275,7 @@ class EnhancedCostingController {
             const { allocation_method = 'by_value' } = req.body;
             
             // Call stored procedure for cost allocation
-            await db.execute(`CALL AllocatePurchaseOrderCosts(?, ?)`, [
+            await db.execute('CALL AllocatePurchaseOrderCosts(?, ?)', [
                 purchase_order_id,
                 allocation_method
             ]);
@@ -321,7 +321,7 @@ class EnhancedCostingController {
                 group_by = 'product' 
             } = req.query;
             
-            let whereConditions = ['ib.status = "active"'];
+            const whereConditions = ['ib.status = "active"'];
             const params = [];
             
             if (product_id && product_id !== '0') {

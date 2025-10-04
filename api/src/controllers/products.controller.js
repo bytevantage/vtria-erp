@@ -112,7 +112,7 @@ exports.getAllProducts = async (req, res) => {
         `);
         
         // Enhance products with best vendor pricing
-        for (let product of rows) {
+        for (const product of rows) {
             const bestPrice = await this.getBestVendorPrice(product.id);
             if (bestPrice) {
                 product.best_vendor = bestPrice.vendor_name;

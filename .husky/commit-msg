@@ -2,19 +2,32 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # VTRIA ERP Commit Message Validation
-# Enforces conventional commit format: type(scope): description
+# Enforces conventional commit format: type(scope): subject
+# Optionally followed by a blank line and a detailed description
 
-commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .{1,50}'
+echo "🔍 Validating commit message..."
 
-if ! grep -qE "$commit_regex" "$1"; then
+# Maximum line lengths
+SUBJECT_LINE_MAX_LENGTH=72
+BODY_LINE_MAX_LENGTH=100
+
+# Commit message from the file provided as first argument
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Extract the first line (subject)
+SUBJECT_LINE=$(echo "$COMMIT_MSG" | head -n1)
+
+# Validate subject line format
+if ! echo "$SUBJECT_LINE" | grep -qE '^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert|wip)(\([a-z0-9-]+\))?: .{1,50}$'; then
     echo "❌ Invalid commit message format!"
     echo ""
     echo "Commit message must follow the format:"
-    echo "type(scope): description"
+    echo "type(scope): subject"
     echo ""
-    echo "Types:"
-    echo "  feat:     A new feature"
-    echo "  fix:      A bug fix"
+    echo "Where type must be one of:"
+    echo "  feat:     A new feature (visible in changelog)"
+    echo "  fix:      A bug fix (visible in changelog)"
     echo "  docs:     Documentation only changes"
     echo "  style:    Changes that do not affect code meaning (formatting, etc.)"
     echo "  refactor: A code change that neither fixes a bug nor adds a feature"
@@ -24,21 +37,56 @@ if ! grep -qE "$commit_regex" "$1"; then
     echo "  ci:       Changes to CI configuration files and scripts"
     echo "  build:    Changes that affect the build system or dependencies"
     echo "  revert:   Reverts a previous commit"
+    echo "  wip:      Work in progress (for draft PRs)"
+    echo ""
+    echo "Scope is optional but should be lowercase and may include hyphens"
+    echo "Subject should be in imperative mood and not end with a period"
     echo ""
     echo "Examples:"
-    echo "  feat(auth): add user authentication"
+    echo "  feat(auth): add JWT authentication"
     echo "  fix(api): resolve database connection timeout"
     echo "  docs(readme): update installation instructions"
-    echo "  style: format code with prettier"
-    echo ""
-    echo "Your commit message:"
-    cat "$1"
-    echo ""
+    echo "  chore(deps): update dependencies"
     exit 1
 fi
 
-# Check commit message length
-commit_message=$(cat "$1")
+# Check subject line length
+if [ ${#SUBJECT_LINE} -gt $SUBJECT_LINE_MAX_LENGTH ]; then
+    echo "❌ Subject line exceeds $SUBJECT_LINE_MAX_LENGTH characters"
+    echo "   Keep it concise and under $SUBJECT_LINE_MAX_LENGTH characters"
+    exit 1
+fi
+
+# If there's a body, validate line lengths
+if [ $(echo "$COMMIT_MSG" | wc -l) -gt 1 ]; then
+    # Skip the first line (subject) and check the rest
+    BODY_LINES=$(echo "$COMMIT_MSG" | tail -n +2)
+    
+    # Check for missing blank line after subject
+    if ! echo "$COMMIT_MSG" | head -n2 | tail -n1 | grep -q '^$'; then
+        echo "❌ Missing blank line after subject"
+        echo "   Add a blank line between subject and body"
+        exit 1
+    fi
+    
+    # Check body line lengths
+    IFS=$'\n'
+    LINE_NUM=2 # Start from line 2 (after subject and blank line)
+    for line in $BODY_LINES; do
+        # Skip blank lines and lines that start with # (comments)
+        if [ -n "$line" ] && ! echo "$line" | grep -q '^#'; then
+            if [ ${#line} -gt $BODY_LINE_MAX_LENGTH ]; then
+                echo "❌ Line $LINE_NUM exceeds $BODY_LINE_MAX_LENGTH characters"
+                echo "   $line"
+                exit 1
+            fi
+        fi
+        LINE_NUM=$((LINE_NUM + 1))
+    done
+    unset IFS
+fi
+
+echo "✅ Commit message is valid"
 if [ ${#commit_message} -gt 72 ]; then
     echo "⚠️  Commit message is longer than 72 characters. Consider shortening."
 fi

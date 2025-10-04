@@ -1,1 +1,25 @@
-nohup: PORT=3001: No such file or directory
+
+> api@1.0.0 start
+> node src/server.js
+
+[dotenv@17.2.2] injecting env (45) from .env -- tip: ⚙️  override existing env vars with { override: true }
+ERROR: Failed to initialize email transporter:
+[dotenv@17.2.2] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+Rate limiting disabled due to missing dependencies
+Redis disabled - using in-memory cache fallback
+
+============================================================
+🚀 VTRIA ERP API Server Started Successfully
+============================================================
+📡 Server running on: http://localhost:3001
+🏥 Health check: http://localhost:3001/health
+📚 API Documentation: http://localhost:3001/api-docs
+🗄️  Database: vtria_erp@localhost
+🌍 Environment: development
+============================================================
+
+INFO: SLA Scheduler and Notification Service disabled for testing
+❌ Port 3001 is already in use
+Database connected as id 1977
+Database connection successful
+SIGTERM received, shutting down gracefully

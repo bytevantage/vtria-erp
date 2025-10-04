@@ -22,8 +22,8 @@ services:
       - DB_NAME=vtria_erp
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=dev_secret_key
-      - BYPASS_AUTH=true
+      - JWT_SECRET=dev_secret_key_change_in_production
+      - BYPASS_AUTH=false
     depends_on:
       db:
         condition: service_healthy
@@ -41,7 +41,7 @@ services:
       - /usr/src/app/node_modules
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - REACT_APP_API_URL=http://localhost:3001
+      - DOCKER_ENV=true
     depends_on:
       - api
 
@@ -58,7 +58,7 @@ services:
       - MYSQL_USER=vtria_user
       - MYSQL_PASSWORD=dev_password
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=dev_password"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=dev_password" ]
       interval: 5s
       timeout: 5s
       retries: 5

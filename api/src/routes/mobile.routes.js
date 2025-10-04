@@ -184,7 +184,7 @@ router.get('/notifications/:userId', async (req, res) => {
     const params = [userId];
     
     if (unreadOnly === 'true') {
-      query += ` AND is_read = FALSE`;
+      query += ' AND is_read = FALSE';
     }
     
     query += ` ORDER BY created_at DESC LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;

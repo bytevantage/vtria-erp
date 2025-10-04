@@ -273,7 +273,7 @@ class SmartAllocationController {
 
     // Generate allocation recommendation
     generateAllocationRecommendation(preview, comparisons, requestedType) {
-        let recommendation = {
+        const recommendation = {
             recommended_strategy: requestedType,
             confidence_score: 75,
             reasoning: [],
@@ -352,7 +352,7 @@ class SmartAllocationController {
         try {
             const { strategy_type, is_active = true } = req.query;
 
-            let whereConditions = [];
+            const whereConditions = [];
             const params = [];
 
             if (strategy_type) {
@@ -408,7 +408,7 @@ class SmartAllocationController {
                 limit = 50
             } = req.query;
 
-            let whereConditions = [];
+            const whereConditions = [];
             const params = [];
 
             if (allocation_type) {

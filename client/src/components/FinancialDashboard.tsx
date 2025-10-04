@@ -109,47 +109,8 @@ const FinancialDashboard: React.FC = () => {
   };
 
   const fetchKPIData = async () => {
-    // In a real implementation, you would fetch this from your backend
-    // For now, we'll use mock data
-    setKpiData([
-      {
-        label: 'Total Revenue (This Month)',
-        value: 2500000,
-        formatted_value: '₹25,00,000',
-        trend: 12.5,
-        trend_direction: 'up',
-        color: 'success'
-      },
-      {
-        label: 'Outstanding Amount',
-        value: 1200000,
-        formatted_value: '₹12,00,000',
-        trend: -8.2,
-        trend_direction: 'down',
-        color: 'warning'
-      },
-      {
-        label: 'Collection Efficiency',
-        value: 87.5,
-        formatted_value: '87.5%',
-        trend: 3.1,
-        trend_direction: 'up',
-        color: 'primary'
-      },
-      {
-        label: 'Overdue Amount',
-        value: 350000,
-        formatted_value: '₹3,50,000',
-        trend: 15.8,
-        trend_direction: 'up',
-        color: 'error'
-      }
-    ]);
-  };
-
-  const fetchOutstandingData = async () => {
     try {
-      const response = await fetch('/api/financial/reports/outstanding', {
+      const response = await fetch(`/api/financial/dashboard/kpis?period=${selectedPeriod}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -157,16 +118,42 @@ const FinancialDashboard: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setOutstandingData(result.data.slice(0, 10)); // Top 10
+        setKpiData(result.data || []);
+      } else {
+        console.error('Failed to fetch KPI data:', response.status);
+        setKpiData([]);
+      }
+    } catch (error) {
+      console.error('Error fetching KPI data:', error);
+      setKpiData([]);
+    }
+  };
+
+  const fetchOutstandingData = async () => {
+    try {
+      const response = await fetch('/api/financial/customer-outstanding', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setOutstandingData(result.data ? result.data.slice(0, 10) : []); // Top 10
+      } else {
+        console.error('Failed to fetch outstanding data:', response.status);
+        setOutstandingData([]);
       }
     } catch (error) {
       console.error('Error fetching outstanding data:', error);
+      setOutstandingData([]);
     }
   };
 
   const fetchSalesSummary = async () => {
     try {
-      const response = await fetch('/api/financial/reports/sales-summary?month_count=6', {
+      // Since sales-summary endpoint doesn't exist, use invoices data to calculate sales summary
+      const response = await fetch('/api/financial/invoices?limit=100', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -174,17 +161,24 @@ const FinancialDashboard: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setSalesSummary(result.data);
+        // Process invoice data into sales summary format
+        const invoices = result.data || [];
+        const salesByMonth = processSalesSummary(invoices);
+        setSalesSummary(salesByMonth);
+      } else {
+        console.error('Failed to fetch sales data:', response.status);
+        setSalesSummary([]);
       }
     } catch (error) {
       console.error('Error fetching sales summary:', error);
+      setSalesSummary([]);
     }
   };
 
   const fetchGSTSummary = async () => {
     try {
-      const currentYear = new Date().getFullYear();
-      const response = await fetch(`/api/financial/reports/gst-summary?year=${currentYear}`, {
+      // Since GST summary endpoint doesn't exist, use invoice data to calculate GST summary
+      const response = await fetch('/api/financial/invoices?limit=100', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -192,10 +186,17 @@ const FinancialDashboard: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setGstSummary(result.data.slice(0, 3)); // Last 3 months
+        // Process invoice data into GST summary format
+        const invoices = result.data || [];
+        const gstByMonth = processGSTSummary(invoices);
+        setGstSummary(gstByMonth);
+      } else {
+        console.error('Failed to fetch GST data:', response.status);
+        setGstSummary([]);
       }
     } catch (error) {
       console.error('Error fetching GST summary:', error);
+      setGstSummary([]);
     }
   };
 
@@ -216,8 +217,92 @@ const FinancialDashboard: React.FC = () => {
 
   const getMonthName = (month: number) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
+  };
+
+  const processSalesSummary = (invoices: any[]) => {
+    const summaryMap = new Map();
+
+    invoices.forEach(invoice => {
+      const date = new Date(invoice.invoice_date);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const key = `${year}-${month.toString().padStart(2, '0')}`;
+
+      if (!summaryMap.has(key)) {
+        summaryMap.set(key, {
+          year,
+          month,
+          year_month: key,
+          total_invoices: 0,
+          total_subtotal: 0,
+          total_tax: 0,
+          total_amount: 0,
+          total_collected: 0,
+          total_outstanding: 0,
+          collection_percentage: 0
+        });
+      }
+
+      const summary = summaryMap.get(key);
+      summary.total_invoices++;
+      summary.total_subtotal += parseFloat(invoice.subtotal || 0);
+      summary.total_tax += parseFloat(invoice.tax_amount || 0);
+      summary.total_amount += parseFloat(invoice.total_amount || 0);
+      summary.total_collected += parseFloat(invoice.total_amount || 0) - parseFloat(invoice.balance_amount || 0);
+      summary.total_outstanding += parseFloat(invoice.balance_amount || 0);
+    });
+
+    // Calculate collection percentages and return last 6 months
+    const results = Array.from(summaryMap.values()).map(summary => ({
+      ...summary,
+      collection_percentage: summary.total_amount > 0 ? (summary.total_collected / summary.total_amount) * 100 : 0
+    })).sort((a, b) => b.year_month.localeCompare(a.year_month)).slice(0, 6);
+
+    return results;
+  };
+
+  const processGSTSummary = (invoices: any[]) => {
+    const gstMap = new Map();
+
+    invoices.forEach(invoice => {
+      const date = new Date(invoice.invoice_date);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const key = `${year}-${month.toString().padStart(2, '0')}`;
+
+      if (!gstMap.has(key)) {
+        gstMap.set(key, {
+          year,
+          month,
+          year_month: key,
+          taxable_value: 0,
+          total_cgst: 0,
+          total_sgst: 0,
+          total_igst: 0,
+          total_cess: 0,
+          total_gst: 0,
+          total_invoices: 0
+        });
+      }
+
+      const gstSummary = gstMap.get(key);
+      gstSummary.total_invoices++;
+      gstSummary.taxable_value += parseFloat(invoice.subtotal || 0);
+      const taxAmount = parseFloat(invoice.tax_amount || 0);
+      // Assuming equal split between CGST and SGST for now
+      gstSummary.total_cgst += taxAmount / 2;
+      gstSummary.total_sgst += taxAmount / 2;
+      gstSummary.total_gst += taxAmount;
+    });
+
+    // Return last 3 months
+    const results = Array.from(gstMap.values())
+      .sort((a, b) => b.year_month.localeCompare(a.year_month))
+      .slice(0, 3);
+
+    return results;
   };
 
   const getTrendIcon = (direction?: string) => {
@@ -405,28 +490,67 @@ const FinancialDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Alerts */}
+          {/* Financial Alerts - Dynamic */}
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Financial Alerts
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Alert severity="warning" size="small">
-                  <Typography variant="body2">
-                    15 invoices are overdue (₹5,45,000)
-                  </Typography>
-                </Alert>
-                <Alert severity="info" size="small">
-                  <Typography variant="body2">
-                    GST return due in 3 days
-                  </Typography>
-                </Alert>
-                <Alert severity="error" size="small">
-                  <Typography variant="body2">
-                    2 customers exceeded credit limit
-                  </Typography>
-                </Alert>
+                {/* Credit Limit Alerts - Based on Real Data */}
+                {outstandingData.filter(customer =>
+                  customer.risk_category === 'high' || customer.risk_category === 'blocked'
+                ).length > 0 && (
+                    <Alert severity="error" size="small">
+                      <Typography variant="body2">
+                        {outstandingData.filter(customer =>
+                          customer.risk_category === 'high' || customer.risk_category === 'blocked'
+                        ).length} customer{outstandingData.filter(customer =>
+                          customer.risk_category === 'high' || customer.risk_category === 'blocked'
+                        ).length > 1 ? 's' : ''} exceeded credit limit
+                      </Typography>
+                    </Alert>
+                  )}
+
+                {/* High Outstanding Alert */}
+                {outstandingData.filter(customer =>
+                  customer.current_outstanding > customer.credit_limit * 0.8
+                ).length > 0 && (
+                    <Alert severity="warning" size="small">
+                      <Typography variant="body2">
+                        {outstandingData.filter(customer =>
+                          customer.current_outstanding > customer.credit_limit * 0.8
+                        ).length} customer{outstandingData.filter(customer =>
+                          customer.current_outstanding > customer.credit_limit * 0.8
+                        ).length > 1 ? 's' : ''} approaching credit limit
+                      </Typography>
+                    </Alert>
+                  )}
+
+                {/* Collection Performance Alert */}
+                {salesSummary.length > 0 && salesSummary[0]?.collection_percentage < 70 && (
+                  <Alert severity="info" size="small">
+                    <Typography variant="body2">
+                      Current month collection rate: {salesSummary[0]?.collection_percentage.toFixed(1)}%
+                      (Target: 70%+)
+                    </Typography>
+                  </Alert>
+                )}
+
+                {/* No Alerts State */}
+                {outstandingData.filter(customer =>
+                  customer.risk_category === 'high' || customer.risk_category === 'blocked'
+                ).length === 0 &&
+                  outstandingData.filter(customer =>
+                    customer.current_outstanding > customer.credit_limit * 0.8
+                  ).length === 0 &&
+                  (salesSummary.length === 0 || salesSummary[0]?.collection_percentage >= 70) && (
+                    <Alert severity="success" size="small">
+                      <Typography variant="body2">
+                        All financial metrics within acceptable limits
+                      </Typography>
+                    </Alert>
+                  )}
               </Box>
             </CardContent>
           </Card>
@@ -466,8 +590,8 @@ const FinancialDashboard: React.FC = () => {
                         <TableCell align="right">
                           <Chip
                             label={`${summary.collection_percentage}%`}
-                            color={summary.collection_percentage >= 80 ? 'success' : 
-                                   summary.collection_percentage >= 60 ? 'warning' : 'error'}
+                            color={summary.collection_percentage >= 80 ? 'success' :
+                              summary.collection_percentage >= 60 ? 'warning' : 'error'}
                             size="small"
                           />
                         </TableCell>

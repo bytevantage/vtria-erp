@@ -1,4 +1,5 @@
 const moment = require('moment');
+const db = require('../config/database');
 
 class ManufacturingWorkflowController {
     // Get manufacturing jobs with technician assignments
@@ -44,7 +45,7 @@ class ManufacturingWorkflowController {
                 ORDER BY mj.priority DESC, mj.start_date ASC
             `;
             
-            const [rows] = await req.db.execute(query, params);
+            const [rows] = await db.execute(query, params);
             
             res.json({
                 success: true,
@@ -79,7 +80,7 @@ class ManufacturingWorkflowController {
                 WHERE mj.id = ?
             `;
             
-            const [jobRows] = await req.db.execute(jobQuery, [jobId]);
+            const [jobRows] = await db.execute(jobQuery, [jobId]);
             
             if (jobRows.length === 0) {
                 return res.status(404).json({ error: 'Manufacturing job not found' });
@@ -96,7 +97,7 @@ class ManufacturingWorkflowController {
                 ORDER BY mjt.sequence_order, mjt.id
             `;
             
-            const [taskRows] = await req.db.execute(tasksQuery, [jobId]);
+            const [taskRows] = await db.execute(tasksQuery, [jobId]);
             
             // Get material requirements
             const materialsQuery = `
@@ -118,7 +119,7 @@ class ManufacturingWorkflowController {
                 ORDER BY mjm.id
             `;
             
-            const [materialRows] = await req.db.execute(materialsQuery, [1, jobId]); // Default location
+            const [materialRows] = await db.execute(materialsQuery, [1, jobId]); // Default location
             
             // Get work logs
             const workLogsQuery = `
@@ -131,7 +132,7 @@ class ManufacturingWorkflowController {
                 ORDER BY mwl.log_date DESC, mwl.id DESC
             `;
             
-            const [workLogRows] = await req.db.execute(workLogsQuery, [jobId]);
+            const [workLogRows] = await db.execute(workLogsQuery, [jobId]);
             
             res.json({
                 success: true,
@@ -165,13 +166,13 @@ class ManufacturingWorkflowController {
                 materials = []
             } = req.body;
             
-            const user_id = req.user?.id || 1;
+            const user_id = req.user.id;
             
             // Generate job number
-            const jobNumber = await this.generateJobNumber(req.db);
+            const jobNumber = await this.generateJobNumber(db);
             
             // Start transaction
-            await req.db.beginTransaction();
+            await db.beginTransaction();
             
             try {
                 // Create manufacturing job
@@ -183,7 +184,7 @@ class ManufacturingWorkflowController {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())
                 `;
                 
-                const [jobResult] = await req.db.execute(jobQuery, [
+                const [jobResult] = await db.execute(jobQuery, [
                     jobNumber,
                     sales_order_id,
                     job_title,
@@ -208,7 +209,7 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?, ?, ?, ?, 'pending')
                     `;
                     
-                    await req.db.execute(taskQuery, [
+                    await db.execute(taskQuery, [
                         jobId,
                         task.task_name,
                         task.description || null,
@@ -226,7 +227,7 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?, 0, ?)
                     `;
                     
-                    await req.db.execute(materialQuery, [
+                    await db.execute(materialQuery, [
                         jobId,
                         material.product_id,
                         material.required_quantity,
@@ -234,7 +235,7 @@ class ManufacturingWorkflowController {
                     ]);
                 }
                 
-                await req.db.commit();
+                await db.commit();
                 
                 res.json({
                     success: true,
@@ -244,7 +245,7 @@ class ManufacturingWorkflowController {
                 });
                 
             } catch (error) {
-                await req.db.rollback();
+                await db.rollback();
                 throw error;
             }
             
@@ -259,7 +260,7 @@ class ManufacturingWorkflowController {
         try {
             const { taskId } = req.params;
             const { status, notes, actual_hours } = req.body;
-            const user_id = req.user?.id || 1;
+            const user_id = req.user.id;
             
             const query = `
                 UPDATE manufacturing_job_tasks 
@@ -272,7 +273,7 @@ class ManufacturingWorkflowController {
                 WHERE id = ?
             `;
             
-            const [result] = await req.db.execute(query, [
+            const [result] = await db.execute(query, [
                 status,
                 notes || null,
                 actual_hours || null,
@@ -287,7 +288,7 @@ class ManufacturingWorkflowController {
             }
             
             // Update job progress
-            await this.updateJobProgress(req.db, taskId);
+            await this.updateJobProgress(db, taskId);
             
             res.json({
                 success: true,
@@ -313,10 +314,10 @@ class ManufacturingWorkflowController {
                 photos = []
             } = req.body;
             
-            const technician_id = req.user?.id || 1;
+            const technician_id = req.user.id;
             
             // Start transaction
-            await req.db.beginTransaction();
+            await db.beginTransaction();
             
             try {
                 // Add work log entry
@@ -327,7 +328,7 @@ class ManufacturingWorkflowController {
                     VALUES (?, ?, ?, ?, ?, ?, NOW())
                 `;
                 
-                const [logResult] = await req.db.execute(logQuery, [
+                const [logResult] = await db.execute(logQuery, [
                     jobId,
                     task_id || null,
                     technician_id,
@@ -346,7 +347,7 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?, ?)
                     `;
                     
-                    await req.db.execute(materialQuery, [
+                    await db.execute(materialQuery, [
                         logId,
                         material.product_id,
                         material.quantity_used,
@@ -360,7 +361,7 @@ class ManufacturingWorkflowController {
                         WHERE product_id = ? AND location_id = 1 AND quantity >= ?
                     `;
                     
-                    await req.db.execute(stockQuery, [
+                    await db.execute(stockQuery, [
                         material.quantity_used,
                         material.product_id,
                         material.quantity_used
@@ -375,14 +376,14 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?)
                     `;
                     
-                    await req.db.execute(photoQuery, [
+                    await db.execute(photoQuery, [
                         logId,
                         photo.photo_path,
                         photo.description || null
                     ]);
                 }
                 
-                await req.db.commit();
+                await db.commit();
                 
                 res.json({
                     success: true,
@@ -391,7 +392,7 @@ class ManufacturingWorkflowController {
                 });
                 
             } catch (error) {
-                await req.db.rollback();
+                await db.rollback();
                 throw error;
             }
             
@@ -423,7 +424,7 @@ class ManufacturingWorkflowController {
                 ORDER BY mj.priority DESC, mj.due_date ASC
             `;
             
-            const [jobRows] = await req.db.execute(jobsQuery, [technician_id]);
+            const [jobRows] = await db.execute(jobsQuery, [technician_id]);
             
             // Get pending tasks
             const tasksQuery = `
@@ -442,7 +443,7 @@ class ManufacturingWorkflowController {
                 LIMIT 10
             `;
             
-            const [taskRows] = await req.db.execute(tasksQuery, [technician_id]);
+            const [taskRows] = await db.execute(tasksQuery, [technician_id]);
             
             // Get today's work logs
             const workLogsQuery = `
@@ -456,7 +457,7 @@ class ManufacturingWorkflowController {
                 ORDER BY mwl.log_date DESC
             `;
             
-            const [workLogRows] = await req.db.execute(workLogsQuery, [technician_id]);
+            const [workLogRows] = await db.execute(workLogsQuery, [technician_id]);
             
             res.json({
                 success: true,

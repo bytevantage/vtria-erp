@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiConnectionManager from '../utils/apiConnectionManager';
+import { logger } from '../utils/logger';
 
 /**
  * React hook for API connection management
@@ -42,13 +43,13 @@ export const useApiConnection = () => {
   // Retry connection
   const retryConnection = useCallback(async () => {
     if (isRetrying) return;
-    
+
     setIsRetrying(true);
     try {
       await apiConnectionManager.forceReconnect();
       await checkConnection();
     } catch (error) {
-      console.error('Retry connection failed:', error);
+      logger.error('Retry connection failed:', error);
     } finally {
       setIsRetrying(false);
     }
@@ -62,12 +63,12 @@ export const useApiConnection = () => {
   // Enhanced fetch that returns parsed JSON
   const apiCall = useCallback(async (endpoint, options = {}) => {
     const response = await apiRequest(endpoint, options);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
-    
+
     return await response.json();
   }, [apiRequest]);
 
@@ -78,23 +79,23 @@ export const useApiConnection = () => {
 
   // Periodic connection health check
   useEffect(() => {
-    const interval = setInterval(checkConnection, 60000); // Check every minute
+    const interval = setInterval(checkConnection, 300000); // Check every 5 minutes (reduced from 1 minute for better performance)
     return () => clearInterval(interval);
   }, [checkConnection]);
 
   return {
     // Connection status
     ...connectionStatus,
-    
+
     // Actions
     checkConnection,
     retryConnection,
     isRetrying,
-    
+
     // API methods
     apiRequest,
     apiCall,
-    
+
     // Utility methods
     isOnline: connectionStatus.connected && !connectionStatus.loading,
     hasError: !!connectionStatus.error,

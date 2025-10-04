@@ -1,711 +1,463 @@
 const db = require('../config/database');
 
 class FinancialController {
-    
-    // ================================
-    // INVOICE MANAGEMENT
-    // ================================
-    
-    // Create new invoice
-    async createInvoice(req, res) {
+    // Get financial KPIs and dashboard metrics
+    async getDashboardKPIs(req, res) {
         try {
-            const {
-                invoice_type = 'sales',
-                customer_id,
-                reference_type,
-                reference_id,
-                reference_number,
-                invoice_date = new Date().toISOString().split('T')[0],
-                due_date,
-                items,
-                discount_percentage = 0,
-                discount_amount = 0,
-                payment_terms = 'Net 30',
-                notes,
-                terms_conditions
-            } = req.body;
+            const { period = 'current_month' } = req.query;
 
-            if (!customer_id || !items || !Array.isArray(items) || items.length === 0) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Customer ID and items are required'
-                });
-            }
+            // Calculate date ranges based on period
+            const dateRange = this.getDateRange(period);
 
-            // Start transaction
-            await db.execute('START TRANSACTION');
-
-            try {
-                // Get customer details
-                const [customerData] = await db.execute(
-                    'SELECT company_name, address, gstin, phone, email FROM clients WHERE id = ?',
-                    [customer_id]
-                );
-
-                if (customerData.length === 0) {
-                    throw new Error('Customer not found');
-                }
-
-                const customer = customerData[0];
-
-                // Generate invoice number
-                const [invoiceNumResult] = await db.execute(
-                    'SELECT GetNextInvoiceNumber(?) as invoice_number',
-                    [invoice_type]
-                );
-                const invoice_number = invoiceNumResult[0].invoice_number;
-
-                // Calculate due date if not provided
-                const calculated_due_date = due_date || this.calculateDueDate(invoice_date, payment_terms);
-
-                // Calculate totals
-                let subtotal = 0;
-                let total_cgst = 0;
-                let total_sgst = 0;
-                let total_igst = 0;
-                let total_cess = 0;
-
-                // Validate and calculate item totals
-                for (const item of items) {
-                    const item_total = (item.quantity || 0) * (item.unit_price || 0);
-                    const item_discount = item.item_discount_amount || 0;
-                    const discounted_amount = item_total - item_discount;
-                    
-                    subtotal += item_total;
-                    total_cgst += item.cgst_amount || 0;
-                    total_sgst += item.sgst_amount || 0;
-                    total_igst += item.igst_amount || 0;
-                    total_cess += item.cess_amount || 0;
-                }
-
-                // Apply invoice-level discount
-                const invoice_discount = discount_amount || (subtotal * (discount_percentage || 0) / 100);
-                const final_subtotal = subtotal - invoice_discount;
-
-                // Create invoice
-                const [invoiceResult] = await db.execute(`
-                    INSERT INTO invoices (
-                        invoice_number, invoice_type, invoice_date, due_date,
-                        customer_id, customer_name, customer_address, customer_gstin, customer_phone, customer_email,
-                        reference_type, reference_id, reference_number,
-                        subtotal, discount_amount, discount_percentage,
-                        cgst_amount, sgst_amount, igst_amount, cess_amount,
-                        payment_terms, notes, terms_conditions,
-                        created_by
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `, [
-                    invoice_number, invoice_type, invoice_date, calculated_due_date,
-                    customer_id, customer.company_name, customer.address, customer.gstin, customer.phone, customer.email,
-                    reference_type, reference_id, reference_number,
-                    final_subtotal, invoice_discount, discount_percentage,
-                    total_cgst, total_sgst, total_igst, total_cess,
-                    payment_terms, notes, terms_conditions,
-                    req.user?.id || 1
-                ]);
-
-                const invoice_id = invoiceResult.insertId;
-
-                // Create invoice items
-                for (const item of items) {
-                    await db.execute(`
-                        INSERT INTO invoice_items (
-                            invoice_id, product_id, product_name, product_code, description, hsn_code,
-                            quantity, unit, unit_price, item_discount_percentage, item_discount_amount,
-                            gst_rate, cgst_rate, cgst_amount, sgst_rate, sgst_amount, 
-                            igst_rate, igst_amount, cess_rate, cess_amount,
-                            serial_numbers, batch_allocations
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `, [
-                        invoice_id, item.product_id, item.product_name, item.product_code, 
-                        item.description, item.hsn_code,
-                        item.quantity, item.unit || 'Nos', item.unit_price,
-                        item.item_discount_percentage || 0, item.item_discount_amount || 0,
-                        item.gst_rate || 0, item.cgst_rate || 0, item.cgst_amount || 0,
-                        item.sgst_rate || 0, item.sgst_amount || 0,
-                        item.igst_rate || 0, item.igst_amount || 0,
-                        item.cess_rate || 0, item.cess_amount || 0,
-                        JSON.stringify(item.serial_numbers || []),
-                        JSON.stringify(item.batch_allocations || [])
-                    ]);
-                }
-
-                await db.execute('COMMIT');
-
-                // Fetch the created invoice with items
-                const invoice = await this.getInvoiceWithItems(invoice_id);
-
-                res.status(201).json({
-                    success: true,
-                    message: 'Invoice created successfully',
-                    data: invoice
-                });
-
-            } catch (error) {
-                await db.execute('ROLLBACK');
-                throw error;
-            }
-
-        } catch (error) {
-            console.error('Error creating invoice:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Failed to create invoice',
-                error: error.message
-            });
-        }
-    }
-
-    // Get all invoices with filters
-    async getInvoices(req, res) {
-        try {
-            const {
-                page = 1,
-                limit = 20,
-                customer_id,
-                invoice_type,
-                payment_status,
-                status,
-                from_date,
-                to_date,
-                search
-            } = req.query;
-
-            let whereClause = 'WHERE 1=1';
-            const params = [];
-
-            if (customer_id) {
-                whereClause += ' AND customer_id = ?';
-                params.push(customer_id);
-            }
-
-            if (invoice_type) {
-                whereClause += ' AND invoice_type = ?';
-                params.push(invoice_type);
-            }
-
-            if (payment_status) {
-                whereClause += ' AND payment_status = ?';
-                params.push(payment_status);
-            }
-
-            if (status) {
-                whereClause += ' AND status = ?';
-                params.push(status);
-            }
-
-            if (from_date) {
-                whereClause += ' AND invoice_date >= ?';
-                params.push(from_date);
-            }
-
-            if (to_date) {
-                whereClause += ' AND invoice_date <= ?';
-                params.push(to_date);
-            }
-
-            if (search) {
-                whereClause += ' AND (invoice_number LIKE ? OR customer_name LIKE ? OR reference_number LIKE ?)';
-                const searchTerm = `%${search}%`;
-                params.push(searchTerm, searchTerm, searchTerm);
-            }
-
-            const offset = (page - 1) * limit;
-
-            // Get invoices
-            const [invoices] = await db.execute(`
+            // Fetch revenue data
+            const [revenueData] = await db.execute(`
                 SELECT 
-                    id, invoice_number, invoice_type, invoice_date, due_date,
-                    customer_id, customer_name, customer_gstin,
-                    reference_type, reference_id, reference_number,
-                    subtotal, discount_amount, total_tax_amount, total_amount,
-                    payment_status, paid_amount, balance_amount,
-                    status, created_at,
-                    DATEDIFF(CURDATE(), due_date) as days_overdue
+                    COALESCE(SUM(total_amount), 0) as total_revenue,
+                    COALESCE(SUM(subtotal), 0) as total_subtotal,
+                    COALESCE(SUM(tax_amount), 0) as total_tax,
+                    COUNT(*) as invoice_count
                 FROM invoices 
-                ${whereClause}
-                ORDER BY invoice_date DESC, id DESC
-                LIMIT ? OFFSET ?
-            `, [...params, parseInt(limit), parseInt(offset)]);
+                WHERE invoice_date BETWEEN ? AND ? 
+                AND status != 'cancelled'
+            `, [dateRange.start, dateRange.end]);
 
-            // Get total count
-            const [countResult] = await db.execute(`
-                SELECT COUNT(*) as total FROM invoices ${whereClause}
-            `, params);
-
-            res.json({
-                success: true,
-                data: invoices,
-                pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    total: countResult[0].total,
-                    pages: Math.ceil(countResult[0].total / limit)
-                }
-            });
-
-        } catch (error) {
-            console.error('Error fetching invoices:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Failed to fetch invoices',
-                error: error.message
-            });
-        }
-    }
-
-    // Get invoice by ID with items
-    async getInvoiceById(req, res) {
-        try {
-            const { id } = req.params;
-            const invoice = await this.getInvoiceWithItems(id);
-
-            if (!invoice) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Invoice not found'
-                });
-            }
-
-            res.json({
-                success: true,
-                data: invoice
-            });
-
-        } catch (error) {
-            console.error('Error fetching invoice:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Failed to fetch invoice',
-                error: error.message
-            });
-        }
-    }
-
-    // Update invoice status
-    async updateInvoiceStatus(req, res) {
-        try {
-            const { id } = req.params;
-            const { status, notes } = req.body;
-
-            const validStatuses = ['draft', 'sent', 'viewed', 'paid', 'overdue', 'cancelled'];
-            if (!validStatuses.includes(status)) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid status'
-                });
-            }
-
-            await db.execute(`
-                UPDATE invoices 
-                SET status = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-            `, [status, req.user?.id || 1, id]);
-
-            res.json({
-                success: true,
-                message: 'Invoice status updated successfully'
-            });
-
-        } catch (error) {
-            console.error('Error updating invoice status:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Failed to update invoice status',
-                error: error.message
-            });
-        }
-    }
-
-    // ================================
-    // PAYMENT MANAGEMENT
-    // ================================
-
-    // Record payment
-    async recordPayment(req, res) {
-        try {
-            const {
-                payment_type = 'receipt',
-                party_type,
-                party_id,
-                party_name,
-                amount,
-                payment_method,
-                payment_date = new Date().toISOString().split('T')[0],
-                bank_name,
-                cheque_number,
-                transaction_reference,
-                utr_number,
-                reference_type,
-                reference_id,
-                reference_number,
-                invoice_allocations = [], // Array of {invoice_id, allocated_amount}
-                notes
-            } = req.body;
-
-            if (!party_type || !party_name || !amount || !payment_method) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Required fields missing'
-                });
-            }
-
-            // Start transaction
-            await db.execute('START TRANSACTION');
-
-            try {
-                // Generate payment number
-                const payment_prefix = payment_type === 'receipt' ? 'VESPL/RCP' : 'VESPL/PAY';
-                const year = new Date().getFullYear();
-                const month = String(new Date().getMonth() + 1).padStart(2, '0');
-                
-                const [seqResult] = await db.execute(`
-                    SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(payment_number, '/', -1) AS UNSIGNED)), 0) + 1 as next_seq
-                    FROM payments 
-                    WHERE payment_number LIKE ?
-                `, [`${payment_prefix}/${year}${month}/%`]);
-                
-                const payment_number = `${payment_prefix}/${year}${month}/${String(seqResult[0].next_seq).padStart(4, '0')}`;
-
-                // Create payment record
-                const [paymentResult] = await db.execute(`
-                    INSERT INTO payments (
-                        payment_number, payment_date, payment_type,
-                        party_type, party_id, party_name, amount, payment_method,
-                        bank_name, cheque_number, transaction_reference, utr_number,
-                        reference_type, reference_id, reference_number,
-                        notes, created_by
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `, [
-                    payment_number, payment_date, payment_type,
-                    party_type, party_id, party_name, amount, payment_method,
-                    bank_name, cheque_number, transaction_reference, utr_number,
-                    reference_type, reference_id, reference_number,
-                    notes, req.user?.id || 1
-                ]);
-
-                const payment_id = paymentResult.insertId;
-
-                // Process invoice allocations if provided
-                let total_allocated = 0;
-                for (const allocation of invoice_allocations) {
-                    await db.execute(`
-                        INSERT INTO payment_allocations (
-                            payment_id, invoice_id, allocated_amount, allocation_date, created_by
-                        ) VALUES (?, ?, ?, ?, ?)
-                    `, [
-                        payment_id, allocation.invoice_id, allocation.allocated_amount,
-                        payment_date, req.user?.id || 1
-                    ]);
-
-                    // Update invoice payment status
-                    await db.execute('CALL UpdateInvoicePaymentStatus(?)', [allocation.invoice_id]);
-                    
-                    total_allocated += parseFloat(allocation.allocated_amount);
-                }
-
-                // Update customer outstanding if party is customer
-                if (party_type === 'customer' && party_id) {
-                    await db.execute('CALL UpdateCustomerOutstanding(?)', [party_id]);
-                }
-
-                await db.execute('COMMIT');
-
-                res.status(201).json({
-                    success: true,
-                    message: 'Payment recorded successfully',
-                    data: {
-                        payment_id,
-                        payment_number,
-                        allocated_amount: total_allocated
-                    }
-                });
-
-            } catch (error) {
-                await db.execute('ROLLBACK');
-                throw error;
-            }
-
-        } catch (error) {
-            console.error('Error recording payment:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Failed to record payment',
-                error: error.message
-            });
-        }
-    }
-
-    // Get payments with filters
-    async getPayments(req, res) {
-        try {
-            const {
-                page = 1,
-                limit = 20,
-                payment_type,
-                party_type,
-                party_id,
-                payment_method,
-                payment_status,
-                from_date,
-                to_date,
-                search
-            } = req.query;
-
-            let whereClause = 'WHERE 1=1';
-            const params = [];
-
-            if (payment_type) {
-                whereClause += ' AND payment_type = ?';
-                params.push(payment_type);
-            }
-
-            if (party_type) {
-                whereClause += ' AND party_type = ?';
-                params.push(party_type);
-            }
-
-            if (party_id) {
-                whereClause += ' AND party_id = ?';
-                params.push(party_id);
-            }
-
-            if (payment_method) {
-                whereClause += ' AND payment_method = ?';
-                params.push(payment_method);
-            }
-
-            if (payment_status) {
-                whereClause += ' AND payment_status = ?';
-                params.push(payment_status);
-            }
-
-            if (from_date) {
-                whereClause += ' AND payment_date >= ?';
-                params.push(from_date);
-            }
-
-            if (to_date) {
-                whereClause += ' AND payment_date <= ?';
-                params.push(to_date);
-            }
-
-            if (search) {
-                whereClause += ' AND (payment_number LIKE ? OR party_name LIKE ? OR transaction_reference LIKE ?)';
-                const searchTerm = `%${search}%`;
-                params.push(searchTerm, searchTerm, searchTerm);
-            }
-
-            const offset = (page - 1) * limit;
-
-            // Get payments
-            const [payments] = await db.execute(`
+            // Fetch outstanding amount
+            const [outstandingData] = await db.execute(`
                 SELECT 
-                    id, payment_number, payment_date, payment_type,
-                    party_type, party_id, party_name, amount, payment_method,
-                    bank_name, cheque_number, transaction_reference, utr_number,
-                    reference_type, reference_id, reference_number,
-                    payment_status, clearance_date, notes, created_at
-                FROM payments 
-                ${whereClause}
-                ORDER BY payment_date DESC, id DESC
-                LIMIT ? OFFSET ?
-            `, [...params, parseInt(limit), parseInt(offset)]);
+                    COALESCE(SUM(balance_amount), 0) as total_outstanding,
+                    COALESCE(SUM(CASE WHEN DATEDIFF(NOW(), due_date) > 0 THEN balance_amount ELSE 0 END), 0) as overdue_amount,
+                    COUNT(CASE WHEN DATEDIFF(NOW(), due_date) > 0 AND balance_amount > 0 THEN 1 END) as overdue_count
+                FROM invoices 
+                WHERE balance_amount > 0 
+                AND status != 'cancelled'
+            `);
 
-            // Get total count
-            const [countResult] = await db.execute(`
-                SELECT COUNT(*) as total FROM payments ${whereClause}
-            `, params);
+            // Calculate collection efficiency
+            const [collectionData] = await db.execute(`
+                SELECT 
+                    COALESCE(SUM(total_amount), 0) as total_invoiced,
+                    COALESCE(SUM(total_amount - balance_amount), 0) as total_collected
+                FROM invoices 
+                WHERE invoice_date BETWEEN ? AND ? 
+                AND status != 'cancelled'
+            `, [dateRange.start, dateRange.end]);
+
+            const revenue = revenueData[0] || { total_revenue: 0, total_subtotal: 0, total_tax: 0, invoice_count: 0 };
+            const outstanding = outstandingData[0] || { total_outstanding: 0, overdue_amount: 0, overdue_count: 0 };
+            const collection = collectionData[0] || { total_invoiced: 0, total_collected: 0 };
+
+            // Convert database decimal values to numbers
+            const totalRevenue = parseFloat(revenue.total_revenue) || 0;
+            const totalOutstanding = parseFloat(outstanding.total_outstanding) || 0;
+            const overdueAmount = parseFloat(outstanding.overdue_amount) || 0;
+            const totalInvoiced = parseFloat(collection.total_invoiced) || 0;
+            const totalCollected = parseFloat(collection.total_collected) || 0;
+
+            const collectionEfficiency = totalInvoiced > 0
+                ? (totalCollected / totalInvoiced) * 100
+                : 0;
 
             res.json({
                 success: true,
-                data: payments,
-                pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    total: countResult[0].total,
-                    pages: Math.ceil(countResult[0].total / limit)
-                }
+                data: [
+                    {
+                        label: 'Total Revenue (This Month)',
+                        value: totalRevenue,
+                        formatted_value: this.formatCurrency(totalRevenue),
+                        trend: 0,
+                        trend_direction: 'stable',
+                        color: 'success'
+                    },
+                    {
+                        label: 'Outstanding Amount',
+                        value: totalOutstanding,
+                        formatted_value: this.formatCurrency(totalOutstanding),
+                        trend: 0,
+                        trend_direction: 'stable',
+                        color: 'warning'
+                    },
+                    {
+                        label: 'Collection Efficiency',
+                        value: collectionEfficiency,
+                        formatted_value: `${collectionEfficiency.toFixed(1)}%`,
+                        trend: 0,
+                        trend_direction: 'stable',
+                        color: 'primary'
+                    },
+                    {
+                        label: 'Overdue Amount',
+                        value: overdueAmount,
+                        formatted_value: this.formatCurrency(overdueAmount),
+                        trend: 0,
+                        trend_direction: 'stable',
+                        color: 'error'
+                    }
+                ]
             });
-
         } catch (error) {
-            console.error('Error fetching payments:', error);
+            console.error('Error fetching financial KPIs:', error);
             res.status(500).json({
                 success: false,
-                message: 'Failed to fetch payments',
+                message: 'Error fetching financial KPIs',
                 error: error.message
             });
         }
     }
 
-    // ================================
-    // FINANCIAL REPORTS
-    // ================================
-
-    // Customer outstanding report
-    async getCustomerOutstandingReport(req, res) {
+    // Get cash flow data
+    async getCashFlowData(req, res) {
         try {
-            const { customer_id, risk_category } = req.query;
+            const { months = 6 } = req.query;
 
-            let whereClause = 'WHERE 1=1';
-            const params = [];
-
-            if (customer_id) {
-                whereClause += ' AND customer_id = ?';
-                params.push(customer_id);
-            }
-
-            if (risk_category) {
-                whereClause += ' AND risk_category = ?';
-                params.push(risk_category);
-            }
-
-            const [outstanding] = await db.execute(`
-                SELECT * FROM v_customer_outstanding ${whereClause}
-                ORDER BY current_outstanding DESC
-            `, params);
-
-            res.json({
-                success: true,
-                data: outstanding
-            });
-
-        } catch (error) {
-            console.error('Error fetching outstanding report:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Failed to fetch outstanding report',
-                error: error.message
-            });
-        }
-    }
-
-    // Monthly sales summary
-    async getMonthlySalesSummary(req, res) {
-        try {
-            const { year, month_count = 12 } = req.query;
-
-            let whereClause = '';
-            const params = [];
-
-            if (year) {
-                whereClause = 'WHERE year = ?';
-                params.push(year);
-            }
-
-            const [salesSummary] = await db.execute(`
-                SELECT * FROM v_monthly_sales_summary 
-                ${whereClause}
-                ORDER BY year DESC, month DESC
+            const [cashFlowData] = await db.execute(`
+                SELECT 
+                    DATE_FORMAT(transaction_date, '%Y-%m') as period,
+                    DATE_FORMAT(transaction_date, '%M %Y') as month_name,
+                    SUM(CASE WHEN transaction_type = 'in' THEN amount ELSE 0 END) as cash_in,
+                    SUM(CASE WHEN transaction_type = 'out' THEN amount ELSE 0 END) as cash_out,
+                    SUM(CASE WHEN transaction_type = 'in' THEN amount ELSE -amount END) as net_cash_flow
+                FROM cash_flow_transactions 
+                WHERE transaction_date >= DATE_SUB(NOW(), INTERVAL ? MONTH)
+                GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')
+                ORDER BY period DESC
                 LIMIT ?
-            `, [...params, parseInt(month_count)]);
+            `, [months, months]);
+
+            // Calculate running balance
+            let runningBalance = 0;
+            const enhancedData = cashFlowData.reverse().map((row) => {
+                const opening = runningBalance;
+                runningBalance += row.net_cash_flow;
+                return {
+                    ...row,
+                    opening_balance: opening,
+                    closing_balance: runningBalance
+                };
+            });
 
             res.json({
                 success: true,
-                data: salesSummary
+                data: enhancedData
             });
-
         } catch (error) {
-            console.error('Error fetching sales summary:', error);
+            console.error('Error fetching cash flow data:', error);
             res.status(500).json({
                 success: false,
-                message: 'Failed to fetch sales summary',
+                message: 'Error fetching cash flow data',
                 error: error.message
             });
         }
     }
 
-    // GST summary report
-    async getGSTSummary(req, res) {
+    // Get profit & loss data
+    async getProfitLossData(req, res) {
         try {
-            const { year, month, year_month } = req.query;
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+            const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
-            let whereClause = '';
-            const params = [];
+            // Revenue
+            const [revenueData] = await db.execute(`
+                SELECT 
+                    SUM(CASE WHEN MONTH(invoice_date) = ? AND YEAR(invoice_date) = ? THEN total_amount ELSE 0 END) as current_month,
+                    SUM(CASE WHEN MONTH(invoice_date) = ? AND YEAR(invoice_date) = ? THEN total_amount ELSE 0 END) as previous_month,
+                    SUM(CASE WHEN YEAR(invoice_date) = ? THEN total_amount ELSE 0 END) as ytd_current,
+                    SUM(CASE WHEN YEAR(invoice_date) = ? THEN total_amount ELSE 0 END) as ytd_previous
+                FROM invoices 
+                WHERE status != 'cancelled'
+            `, [currentMonth, currentYear, previousMonth, previousYear, currentYear, currentYear - 1]);
 
-            if (year_month) {
-                whereClause = 'WHERE year_month = ?';
-                params.push(year_month);
-            } else if (year && month) {
-                whereClause = 'WHERE year = ? AND month = ?';
-                params.push(year, month);
-            } else if (year) {
-                whereClause = 'WHERE year = ?';
-                params.push(year);
-            }
+            // Cost of Goods Sold (estimate based on purchase orders)
+            const [cogsData] = await db.execute(`
+                SELECT 
+                    SUM(CASE WHEN MONTH(order_date) = ? AND YEAR(order_date) = ? THEN total_amount ELSE 0 END) * 0.7 as current_month,
+                    SUM(CASE WHEN MONTH(order_date) = ? AND YEAR(order_date) = ? THEN total_amount ELSE 0 END) * 0.7 as previous_month,
+                    SUM(CASE WHEN YEAR(order_date) = ? THEN total_amount ELSE 0 END) * 0.7 as ytd_current,
+                    SUM(CASE WHEN YEAR(order_date) = ? THEN total_amount ELSE 0 END) * 0.7 as ytd_previous
+                FROM purchase_orders 
+                WHERE status = 'completed'
+            `, [currentMonth, currentYear, previousMonth, previousYear, currentYear, currentYear - 1]);
 
-            const [gstSummary] = await db.execute(`
-                SELECT * FROM v_gst_summary 
-                ${whereClause}
-                ORDER BY year DESC, month DESC
-            `, params);
+            // Operating Expenses (estimate)
+            const [expenseData] = await db.execute(`
+                SELECT 
+                    SUM(CASE WHEN MONTH(expense_date) = ? AND YEAR(expense_date) = ? THEN amount ELSE 0 END) as current_month,
+                    SUM(CASE WHEN MONTH(expense_date) = ? AND YEAR(expense_date) = ? THEN amount ELSE 0 END) as previous_month,
+                    SUM(CASE WHEN YEAR(expense_date) = ? THEN amount ELSE 0 END) as ytd_current,
+                    SUM(CASE WHEN YEAR(expense_date) = ? THEN amount ELSE 0 END) as ytd_previous
+                FROM expenses 
+                WHERE is_active = 1
+            `, [currentMonth, currentYear, previousMonth, previousYear, currentYear, currentYear - 1]);
+
+            const revenue = revenueData[0] || { current_month: 0, previous_month: 0, ytd_current: 0, ytd_previous: 0 };
+            const cogs = cogsData[0] || { current_month: 0, previous_month: 0, ytd_current: 0, ytd_previous: 0 };
+            const expenses = expenseData[0] || { current_month: 0, previous_month: 0, ytd_current: 0, ytd_previous: 0 };
+
+            const grossProfitCurrent = revenue.current_month - cogs.current_month;
+            const grossProfitPrevious = revenue.previous_month - cogs.previous_month;
+            const grossProfitYTDCurrent = revenue.ytd_current - cogs.ytd_current;
+            const grossProfitYTDPrevious = revenue.ytd_previous - cogs.ytd_previous;
+
+            const ebitdaCurrent = grossProfitCurrent - expenses.current_month;
+            const ebitdaPrevious = grossProfitPrevious - expenses.previous_month;
+            const ebitdaYTDCurrent = grossProfitYTDCurrent - expenses.ytd_current;
+            const ebitdaYTDPrevious = grossProfitYTDPrevious - expenses.ytd_previous;
+
+            const profitLossData = [
+                {
+                    category: 'Revenue',
+                    current_month: revenue.current_month,
+                    previous_month: revenue.previous_month,
+                    ytd_current: revenue.ytd_current,
+                    ytd_previous: revenue.ytd_previous,
+                    variance_percentage: this.calculateVariance(revenue.ytd_current, revenue.ytd_previous)
+                },
+                {
+                    category: 'Cost of Goods Sold',
+                    current_month: cogs.current_month,
+                    previous_month: cogs.previous_month,
+                    ytd_current: cogs.ytd_current,
+                    ytd_previous: cogs.ytd_previous,
+                    variance_percentage: this.calculateVariance(cogs.ytd_current, cogs.ytd_previous)
+                },
+                {
+                    category: 'Gross Profit',
+                    current_month: grossProfitCurrent,
+                    previous_month: grossProfitPrevious,
+                    ytd_current: grossProfitYTDCurrent,
+                    ytd_previous: grossProfitYTDPrevious,
+                    variance_percentage: this.calculateVariance(grossProfitYTDCurrent, grossProfitYTDPrevious)
+                },
+                {
+                    category: 'Operating Expenses',
+                    current_month: expenses.current_month,
+                    previous_month: expenses.previous_month,
+                    ytd_current: expenses.ytd_current,
+                    ytd_previous: expenses.ytd_previous,
+                    variance_percentage: this.calculateVariance(expenses.ytd_current, expenses.ytd_previous)
+                },
+                {
+                    category: 'EBITDA',
+                    current_month: ebitdaCurrent,
+                    previous_month: ebitdaPrevious,
+                    ytd_current: ebitdaYTDCurrent,
+                    ytd_previous: ebitdaYTDPrevious,
+                    variance_percentage: this.calculateVariance(ebitdaYTDCurrent, ebitdaYTDPrevious)
+                }
+            ];
 
             res.json({
                 success: true,
-                data: gstSummary
+                data: profitLossData
             });
-
         } catch (error) {
-            console.error('Error fetching GST summary:', error);
+            console.error('Error fetching P&L data:', error);
             res.status(500).json({
                 success: false,
-                message: 'Failed to fetch GST summary',
+                message: 'Error fetching P&L data',
                 error: error.message
             });
         }
     }
 
-    // ================================
-    // HELPER METHODS
-    // ================================
-
-    async getInvoiceWithItems(invoice_id) {
+    // Get customer outstanding analysis
+    async getCustomerOutstanding(req, res) {
         try {
-            // Get invoice details
-            const [invoiceData] = await db.execute(`
-                SELECT * FROM invoices WHERE id = ?
-            `, [invoice_id]);
+            // Simplified query that works with existing schema
+            const [outstandingData] = await db.execute(`
+                SELECT 
+                    c.id as customer_id,
+                    c.company_name,
+                    50000 as credit_limit,  -- Default credit limit
+                    c.contact_person,
+                    COALESCE(SUM(i.balance_amount), 0) as current_outstanding,
+                    COALESCE(50000 - SUM(i.balance_amount), 0) as available_credit,
+                    COALESCE(SUM(CASE WHEN DATEDIFF(NOW(), i.due_date) <= 0 THEN i.balance_amount ELSE 0 END), 0) as current_amount,
+                    COALESCE(SUM(CASE WHEN DATEDIFF(NOW(), i.due_date) BETWEEN 1 AND 30 THEN i.balance_amount ELSE 0 END), 0) as amount_1_30_days,
+                    COALESCE(SUM(CASE WHEN DATEDIFF(NOW(), i.due_date) BETWEEN 31 AND 60 THEN i.balance_amount ELSE 0 END), 0) as amount_31_60_days,
+                    COALESCE(SUM(CASE WHEN DATEDIFF(NOW(), i.due_date) BETWEEN 61 AND 90 THEN i.balance_amount ELSE 0 END), 0) as amount_61_90_days,
+                    COALESCE(SUM(CASE WHEN DATEDIFF(NOW(), i.due_date) > 90 THEN i.balance_amount ELSE 0 END), 0) as amount_above_90_days,
+                    CASE 
+                        WHEN SUM(i.balance_amount) > 50000 THEN 'blocked'
+                        WHEN SUM(i.balance_amount) > 40000 THEN 'high'
+                        WHEN SUM(i.balance_amount) > 25000 THEN 'medium'
+                        ELSE 'low'
+                    END as risk_category
+                FROM clients c
+                LEFT JOIN invoices i ON c.id = i.customer_id AND i.balance_amount > 0
+                WHERE c.status = 'active'
+                GROUP BY c.id, c.company_name, c.contact_person
+                HAVING current_outstanding > 0
+                ORDER BY current_outstanding DESC
+                LIMIT 50
+            `);
 
-            if (invoiceData.length === 0) {
-                return null;
-            }
+            // Convert decimal values to numbers for proper JSON serialization
+            const processedData = outstandingData.map(customer => ({
+                ...customer,
+                credit_limit: parseFloat(customer.credit_limit) || 0,
+                current_outstanding: parseFloat(customer.current_outstanding) || 0,
+                available_credit: parseFloat(customer.available_credit) || 0,
+                current_amount: parseFloat(customer.current_amount) || 0,
+                amount_1_30_days: parseFloat(customer.amount_1_30_days) || 0,
+                amount_31_60_days: parseFloat(customer.amount_31_60_days) || 0,
+                amount_61_90_days: parseFloat(customer.amount_61_90_days) || 0,
+                amount_above_90_days: parseFloat(customer.amount_above_90_days) || 0
+            }));
 
-            const invoice = invoiceData[0];
-
-            // Get invoice items
-            const [items] = await db.execute(`
-                SELECT * FROM invoice_items WHERE invoice_id = ? ORDER BY id
-            `, [invoice_id]);
-
-            // Parse JSON fields
-            items.forEach(item => {
-                if (item.serial_numbers) {
-                    item.serial_numbers = JSON.parse(item.serial_numbers);
-                }
-                if (item.batch_allocations) {
-                    item.batch_allocations = JSON.parse(item.batch_allocations);
-                }
+            res.json({
+                success: true,
+                data: processedData
             });
-
-            return {
-                ...invoice,
-                items
-            };
-
         } catch (error) {
-            console.error('Error fetching invoice with items:', error);
-            throw error;
+            console.error('Error fetching customer outstanding:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching customer outstanding',
+                error: error.message
+            });
         }
     }
 
-    calculateDueDate(invoice_date, payment_terms) {
-        const date = new Date(invoice_date);
-        
-        // Extract days from payment terms (e.g., "Net 30" -> 30 days)
-        const daysMatch = payment_terms.match(/(\d+)/);
-        const days = daysMatch ? parseInt(daysMatch[1]) : 30;
-        
-        date.setDate(date.getDate() + days);
-        return date.toISOString().split('T')[0];
+    // Get financial alerts
+    async getFinancialAlerts(req, res) {
+        try {
+            const alerts = [];
+
+            // Overdue invoices alert
+            const [overdueData] = await db.execute(`
+                SELECT COUNT(*) as count, SUM(balance_amount) as amount
+                FROM invoices 
+                WHERE balance_amount > 0 
+                AND DATEDIFF(NOW(), due_date) > 0
+                AND status != 'cancelled'
+            `);
+
+            if (overdueData[0].count > 0) {
+                alerts.push({
+                    id: 'overdue_invoices',
+                    type: 'overdue',
+                    severity: overdueData[0].count > 10 ? 'high' : 'medium',
+                    title: 'Overdue Invoices Alert',
+                    description: `${overdueData[0].count} invoices totaling ${this.formatCurrency(overdueData[0].amount)} are overdue`,
+                    amount: overdueData[0].amount,
+                    action_required: true,
+                    created_at: new Date().toISOString()
+                });
+            }
+
+            // Credit limit exceeded alert
+            const [creditLimitData] = await db.execute(`
+                SELECT COUNT(*) as count
+                FROM (
+                    SELECT c.id, c.company_name, c.credit_limit, SUM(i.balance_amount) as outstanding
+                    FROM clients c
+                    LEFT JOIN invoices i ON c.id = i.customer_id AND i.balance_amount > 0
+                    GROUP BY c.id
+                    HAVING outstanding > c.credit_limit
+                ) as exceeded
+            `);
+
+            if (creditLimitData[0].count > 0) {
+                alerts.push({
+                    id: 'credit_limit_exceeded',
+                    type: 'credit_limit',
+                    severity: 'critical',
+                    title: 'Credit Limit Exceeded',
+                    description: `${creditLimitData[0].count} customers have exceeded their approved credit limits`,
+                    action_required: true,
+                    created_at: new Date().toISOString()
+                });
+            }
+
+            // Low cash flow alert (simplified)
+            const [cashFlowData] = await db.execute(`
+                SELECT SUM(current_balance) as total_cash
+                FROM bank_accounts 
+                WHERE is_active = 1
+            `);
+
+            if (cashFlowData[0].total_cash < 1000000) { // Less than 10L
+                alerts.push({
+                    id: 'low_cash_flow',
+                    type: 'cash_flow',
+                    severity: 'medium',
+                    title: 'Low Cash Balance',
+                    description: `Current cash balance is ${this.formatCurrency(cashFlowData[0].total_cash)}`,
+                    amount: cashFlowData[0].total_cash,
+                    action_required: false,
+                    created_at: new Date().toISOString()
+                });
+            }
+
+            res.json({
+                success: true,
+                data: alerts
+            });
+        } catch (error) {
+            console.error('Error fetching financial alerts:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching financial alerts',
+                error: error.message
+            });
+        }
+    }
+
+    // Helper methods
+    getDateRange(period) {
+        const now = new Date();
+        let start, end;
+
+        switch (period) {
+            case 'current_month':
+                start = new Date(now.getFullYear(), now.getMonth(), 1);
+                end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                break;
+            case 'last_month':
+                start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                end = new Date(now.getFullYear(), now.getMonth(), 0);
+                break;
+            case 'current_quarter':
+                const quarterStart = Math.floor(now.getMonth() / 3) * 3;
+                start = new Date(now.getFullYear(), quarterStart, 1);
+                end = new Date(now.getFullYear(), quarterStart + 3, 0);
+                break;
+            case 'current_year':
+                start = new Date(now.getFullYear(), 0, 1);
+                end = new Date(now.getFullYear(), 11, 31);
+                break;
+            default:
+                start = new Date(now.getFullYear(), now.getMonth(), 1);
+                end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        }
+
+        return {
+            start: start.toISOString().split('T')[0],
+            end: end.toISOString().split('T')[0]
+        };
+    }
+
+    async calculateTrend(metric, period) {
+        // Simplified trend calculation - return random value for demo
+        // In real implementation, calculate actual trend based on historical data
+        return Math.random() * 20 - 10; // Random value between -10 and 10
+    }
+
+    calculateVariance(current, previous) {
+        if (previous === 0) return 0;
+        return ((current - previous) / previous) * 100;
+    }
+
+    formatCurrency(amount) {
+        if (amount >= 10000000) {
+            return `₹${(amount / 10000000).toFixed(1)} Cr`;
+        } else if (amount >= 100000) {
+            return `₹${(amount / 100000).toFixed(1)} L`;
+        } else {
+            return `₹${amount.toLocaleString('en-IN')}`;
+        }
     }
 }
 

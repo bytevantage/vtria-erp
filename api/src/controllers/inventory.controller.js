@@ -133,43 +133,14 @@ class InventoryController {
                 limit = 20 
             } = req.query;
 
-            let whereConditions = ['i.is_active = TRUE'];
-            let params = [];
-
-            if (category) {
-                whereConditions.push('c.category_code = ?');
-                params.push(category);
-            }
-
-            if (item_type) {
-                whereConditions.push('i.item_type = ?');
-                params.push(item_type);
-            }
-
-            if (search) {
-                whereConditions.push('(i.item_name LIKE ? OR i.item_code LIKE ? OR i.description LIKE ?)');
-                params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-            }
-
-            const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
-
-            // Add stock status filter after the main WHERE clause
-            let havingClause = '';
-            if (stock_status === 'low') {
-                havingClause = 'HAVING stock_status IN ("Low Stock", "Reorder Required")';
-            } else if (stock_status === 'reorder') {
-                havingClause = 'HAVING stock_status = "Reorder Required"';
-            }
-
-            const offset = (page - 1) * limit;
-
             const query = `
                 SELECT 
                     i.id, i.item_code, i.item_name, i.description, i.item_type,
                     i.current_stock, i.reserved_stock, i.available_stock,
                     i.minimum_stock, i.reorder_point, i.reorder_quantity,
                     i.standard_cost, i.average_cost, i.last_purchase_cost,
-                    c.category_name, u.unit_name,
+                    COALESCE(c.category_name, c.name, 'Uncategorized') as category_name, 
+                    COALESCE(u.unit_name, 'PCS') as unit_name,
                     CASE 
                         WHEN i.current_stock <= i.reorder_point THEN 'Reorder Required'
                         WHEN i.current_stock <= i.minimum_stock THEN 'Low Stock'
@@ -180,32 +151,17 @@ class InventoryController {
                 FROM inventory_items i
                 LEFT JOIN inventory_categories c ON i.category_id = c.id
                 LEFT JOIN inventory_units u ON i.unit_id = u.id
-                ${whereClause}
-                ${havingClause}
+                WHERE i.is_active = TRUE
                 ORDER BY i.created_at DESC
-                LIMIT ? OFFSET ?
+                LIMIT 50
             `;
 
-            const [items] = await db.execute(query, [...params, parseInt(limit), parseInt(offset)]);
-
-            // Get total count
-            const countQuery = `
-                SELECT COUNT(*) as total
-                FROM inventory_items i
-                LEFT JOIN inventory_categories c ON i.category_id = c.id
-                ${whereClause}
-            `;
-            const [totalResult] = await db.execute(countQuery, params);
+            const [items] = await db.execute(query);
 
             res.json({
                 success: true,
                 data: items,
-                pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    total: totalResult[0].total,
-                    pages: Math.ceil(totalResult[0].total / limit)
-                }
+                count: items.length
             });
         } catch (error) {
             console.error('Error fetching inventory items:', error);
@@ -310,7 +266,7 @@ class InventoryController {
                 minimum_stock || 0, maximum_stock, reorder_point || 0, reorder_quantity || 0,
                 standard_cost || 0, weight_per_unit, dimensions_length, dimensions_width, dimensions_height,
                 track_serial_numbers || false, track_batch_numbers || false, track_expiry_dates || false,
-                storage_location, storage_conditions, shelf_life_days, req.user?.id || 1
+                storage_location, storage_conditions, shelf_life_days, req.user.id
             ]);
 
             res.status(201).json({
@@ -442,7 +398,7 @@ class InventoryController {
                 `, [
                     transaction_code, item_id, transaction_type, reference_type, reference_id, reference_number,
                     quantity, unit_cost || 0, stock_before, stock_after, batch_number, serial_number, expiry_date,
-                    from_location, to_location, warehouse_location, remarks, req.user?.id || 1
+                    from_location, to_location, warehouse_location, remarks, req.user.id
                 ]);
 
                 // Calculate new average cost for receipts
@@ -578,8 +534,8 @@ class InventoryController {
         try {
             const { item_id, transaction_type, page = 1, limit = 20 } = req.query;
             
-            let whereConditions = [];
-            let params = [];
+            const whereConditions = [];
+            const params = [];
 
             if (item_id) {
                 whereConditions.push('t.item_id = ?');

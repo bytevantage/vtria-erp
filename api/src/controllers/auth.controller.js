@@ -86,3 +86,27 @@ exports.login = async (req, res) => {
         });
     }
 };
+
+exports.me = async (req, res) => {
+    try {
+        // For development mode, return mock user data
+        // In production, this would decode the JWT token and return user info
+        res.json({
+            success: true,
+            data: {
+                user: {
+                    id: 1,
+                    email: 'demo@vtria.com',
+                    full_name: 'Demo User',
+                    user_role: 'admin'
+                }
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user profile',
+            error: error.message
+        });
+    }
+};

@@ -9,8 +9,12 @@
   ],
   "scripts": {
     "install": "npm install --prefix client && npm install --prefix api",
-    "start": "docker-compose up -d",
+    "start": "./scripts/start.sh",
     "stop": "docker-compose down",
+    "restart": "npm run stop && npm start",
+    "logs": "docker-compose logs -f",
+    "status": "docker-compose ps",
+    "cleanup": "docker-compose down --volumes --remove-orphans && docker system prune -f",
     "dev": "docker-compose -f docker-compose.dev.yml up -d",
     "prod": "docker-compose -f docker-compose.production.yml up -d",
     "build": "npm run build --prefix client",
@@ -26,9 +30,9 @@
     "reset": "npm run clean && npm install"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
-    "concurrently": "^8.2.2"
+    "lint-staged": "^15.2.0"
   },
   "lint-staged": {
     "client/src/**/*.{js,jsx,ts,tsx}": [
@@ -63,5 +67,8 @@
     "docker"
   ],
   "author": "VTRIA Engineering Solutions Pvt Ltd",
-  "license": "PROPRIETARY"
+  "license": "PROPRIETARY",
+  "dependencies": {
+    "mysql2": "^3.14.5"
+  }
 }

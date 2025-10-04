@@ -157,7 +157,7 @@ class VendorPerformanceController {
                 limit = 20 
             } = req.query;
             
-            let whereConditions = [];
+            const whereConditions = [];
             const params = [];
             
             if (performance_category && performance_category !== 'all') {
@@ -555,7 +555,7 @@ class VendorPerformanceController {
             const { supplier_id } = req.params;
             const { evaluation_period_days = 90 } = req.body;
             
-            await db.execute(`CALL UpdateSupplierPerformanceMetrics(?, ?)`, [
+            await db.execute('CALL UpdateSupplierPerformanceMetrics(?, ?)', [
                 supplier_id, evaluation_period_days
             ]);
             
@@ -579,7 +579,7 @@ class VendorPerformanceController {
         try {
             const { product_id, supplier_id, months = 12 } = req.query;
             
-            let whereConditions = [];
+            const whereConditions = [];
             const params = [];
             
             if (product_id) {

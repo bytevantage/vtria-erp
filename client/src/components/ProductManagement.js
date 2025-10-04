@@ -339,6 +339,9 @@ const ProductManagement = () => {
                     <Typography variant="caption" color="text.secondary">
                       Last: ₹{parseFloat(product.last_purchase_price || 0).toLocaleString('en-IN')}
                     </Typography>
+                    <Typography variant="caption" color="primary">
+                      GST: {product.gst_rate || 18}%
+                    </Typography>
                   </Box>
                 </TableCell>
                 <TableCell>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PO Advance Payment Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .payment-list {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .payment-list th,
+    .payment-list td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .payment-list th {
+      background: #f8f9fa;
+    }
+
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-cleared {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-bounced {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>PO Advance Payment Management</h1>
+
+    <!-- Create Advance Payment Form -->
+    <h2>Create Advance Payment</h2>
+    <form id="advancePaymentForm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="form-group">
+          <label>Purchase Order ID:</label>
+          <input type="number" id="purchase_order_id" required min="1">
+        </div>
+        <div class="form-group">
+          <label>Payment Amount (₹):</label>
+          <input type="number" id="payment_amount" required min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Payment Date:</label>
+          <input type="date" id="payment_date" required>
+        </div>
+        <div class="form-group">
+          <label>Payment Method:</label>
+          <select id="payment_method">
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="cheque">Cheque</option>
+            <option value="upi">UPI</option>
+            <option value="cash">Cash</option>
+            <option value="dd">Demand Draft</option>
+            <option value="online">Online Payment</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bank Name:</label>
+          <input type="text" id="bank_name" placeholder="e.g., HDFC Bank">
+        </div>
+        <div class="form-group">
+          <label>Transaction Reference:</label>
+          <input type="text" id="transaction_reference" placeholder="Transaction ID/Reference">
+        </div>
+        <div class="form-group">
+          <label>UTR Number:</label>
+          <input type="text" id="utr_number" placeholder="UTR/RTGS Number">
+        </div>
+        <div class="form-group">
+          <label>Payment Due Date:</label>
+          <input type="date" id="payment_due_date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes:</label>
+        <textarea id="notes" rows="3" placeholder="Additional notes about the payment"></textarea>
+      </div>
+      <button type="submit">Create Advance Payment</button>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <!-- Payment List -->
+  <div class="container">
+    <h2>PO Advance Payments</h2>
+    <div class="form-group">
+      <label>Select PO to view payments:</label>
+      <input type="number" id="view_po_id" placeholder="Enter PO ID" min="1">
+      <button onclick="loadPayments()">Load Payments</button>
+    </div>
+
+    <div id="paymentsList"></div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="container">
+    <h2>Advance Payment Dashboard</h2>
+    <button onclick="loadDashboard()">Load Dashboard</button>
+    <div id="dashboard"></div>
+  </div>
+
+  <script>
+    // Set default date to today
+    document.getElementById('payment_date').valueAsDate = new Date();
+
+    const API_BASE = 'http://localhost:5000/api';
+    const token = 'your-jwt-token-here'; // Replace with actual token
+
+    // Create advance payment
+    document.getElementById('advancePaymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        purchase_order_id: parseInt(document.getElementById('purchase_order_id').value),
+        payment_amount: parseFloat(document.getElementById('payment_amount').value),
+        payment_date: document.getElementById('payment_date').value,
+        payment_method: document.getElementById('payment_method').value,
+        bank_name: document.getElementById('bank_name').value || null,
+        transaction_reference: document.getElementById('transaction_reference').value || null,
+        utr_number: document.getElementById('utr_number').value || null,
+        payment_due_date: document.getElementById('payment_due_date').value || null,
+        notes: document.getElementById('notes').value || null
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/po-advance-payments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showMessage(`Advance payment created successfully: ${result.data.payment_number}`, 'success');
+          document.getElementById('advancePaymentForm').reset();
+          document.getElementById('payment_date').valueAsDate = new Date();
+        } else {
+          showMessage(result.message || 'Error creating payment', 'error');
+        }
+      } catch (error) {
+        showMessage(`Error: ${error.message}`, 'error');
+      }
+    });
+
+    // Load payments for PO
+    async function loadPayments() {
+      const poId = document.getElementById('view_po_id').value;
+      if (!poId) {
+        showMessage('Please enter a PO ID', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/po-advance-payments/po/${poId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          displayPayments(result.data);
+        } else {
+          showMessage(result.message || 'Error loading payments', 'error');
+        }
+      } catch (error) {
+        showMessage(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    // Load dashboard
+    async function loadDashboard() {
+      try {
+        const response = await fetch(`${API_BASE}/po-advance-payments/dashboard`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          displayDashboard(result.data);
+        } else {
+          showMessage(result.message || 'Error loading dashboard', 'error');
+        }
+      } catch (error) {
+        showMessage(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    // Display payments
+    function displayPayments(data) {
+      const paymentsDiv = document.getElementById('paymentsList');
+
+      if (data.payments.length === 0) {
+        paymentsDiv.innerHTML = '<p>No advance payments found for this PO.</p>';
+        return;
+      }
+
+      let html = '<h3>Payment Summary</h3>';
+      if (data.summary) {
+        html += `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                        <p><strong>PO Total:</strong> ₹${data.summary.po_grand_total?.toLocaleString()}</p>
+                        <p><strong>Total Advance Paid:</strong> ₹${data.summary.total_advance_paid?.toLocaleString()}</p>
+                        <p><strong>Total Cleared:</strong> ₹${data.summary.total_advance_cleared?.toLocaleString()}</p>
+                        <p><strong>Balance Amount:</strong> ₹${data.summary.balance_amount?.toLocaleString()}</p>
+                        <p><strong>Payment Status:</strong> ${data.summary.payment_status?.replace('_', ' ')}</p>
+                    </div>
+                `;
+      }
+
+      html += '<h3>Payment Details</h3>';
+      html += '<table class="payment-list">';
+      html += `
+                <tr>
+                    <th>Payment Number</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Reference</th>
+                </tr>
+            `;
+
+      data.payments.forEach(payment => {
+        html += `
+                    <tr>
+                        <td>${payment.payment_number}</td>
+                        <td>${new Date(payment.payment_date).toLocaleDateString()}</td>
+                        <td>₹${parseFloat(payment.payment_amount).toLocaleString()}</td>
+                        <td>${payment.payment_method?.replace('_', ' ')}</td>
+                        <td><span class="status-badge status-${payment.payment_status}">${payment.payment_status}</span></td>
+                        <td>${payment.transaction_reference || '-'}</td>
+                    </tr>
+                `;
+      });
+
+      html += '</table>';
+      paymentsDiv.innerHTML = html;
+    }
+
+    // Display dashboard
+    function displayDashboard(data) {
+      const dashboardDiv = document.getElementById('dashboard');
+
+      let html = '<h3>Summary Statistics</h3>';
+      html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">';
+
+      const summary = data.summary;
+      html += `
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 4px;">
+                    <h4>Total POs with Advances</h4>
+                    <p style="font-size: 24px; font-weight: bold; margin: 0;">${summary.total_pos_with_advances}</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 4px;">
+                    <h4>Total Payments</h4>
+                    <p style="font-size: 24px; font-weight: bold; margin: 0;">${summary.total_payments}</p>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 4px;">
+                    <h4>Total Amount</h4>
+                    <p style="font-size: 24px; font-weight: bold; margin: 0;">₹${parseFloat(summary.total_amount_paid || 0).toLocaleString()}</p>
+                </div>
+                <div style="background: #fff3e0; padding: 15px; border-radius: 4px;">
+                    <h4>Amount Cleared</h4>
+                    <p style="font-size: 24px; font-weight: bold; margin: 0;">₹${parseFloat(summary.total_cleared || 0).toLocaleString()}</p>
+                </div>
+            `;
+      html += '</div>';
+
+      // Recent payments
+      if (data.recent_payments.length > 0) {
+        html += '<h3>Recent Payments</h3>';
+        html += '<table class="payment-list">';
+        html += '<tr><th>Payment Number</th><th>Date</th><th>PO Number</th><th>Supplier</th><th>Amount</th><th>Status</th></tr>';
+
+        data.recent_payments.forEach(payment => {
+          html += `
+                        <tr>
+                            <td>${payment.payment_number}</td>
+                            <td>${new Date(payment.payment_date).toLocaleDateString()}</td>
+                            <td>${payment.po_number}</td>
+                            <td>${payment.supplier_name}</td>
+                            <td>₹${parseFloat(payment.payment_amount).toLocaleString()}</td>
+                            <td><span class="status-badge status-${payment.payment_status}">${payment.payment_status}</span></td>
+                        </tr>
+                    `;
+        });
+        html += '</table>';
+      }
+
+      dashboardDiv.innerHTML = html;
+    }
+
+    // Show message
+    function showMessage(message, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+      setTimeout(() => {
+        messageDiv.innerHTML = '';
+      }, 5000);
+    }
+  </script>
+</body>
+
+</html>

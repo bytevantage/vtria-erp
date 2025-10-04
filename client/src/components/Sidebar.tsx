@@ -26,6 +26,8 @@ import {
   ShoppingBasket as ShoppingBasketIcon,
   PrecisionManufacturing as PrecisionManufacturingIcon,
   AdminPanelSettings as AdminPanelSettingsIcon,
+  Info as InfoIcon,
+  RequestQuote as SupplierQuoteIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -42,7 +44,6 @@ interface SidebarProps {
 }
 
 const menuItems: MenuItem[] = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', type: 'single' },
   { text: 'Case Dashboard', icon: <DashboardIcon />, path: '/case-dashboard', type: 'single' },
   {
     text: 'Sales & CRM',
@@ -53,14 +54,14 @@ const menuItems: MenuItem[] = [
       { text: 'Estimation', icon: <EngineeringIcon />, path: '/estimation', type: 'single' },
       { text: 'Quotation', icon: <QuoteIcon />, path: '/quotations', type: 'single' },
       { text: 'Sales Order', icon: <ShoppingCartIcon />, path: '/sales-orders', type: 'single' },
-      { text: 'Invoice Management', icon: <AssignmentIcon />, path: '/invoice-management', type: 'single' },
     ]
   },
   {
-    text: 'Purchase',
+    text: 'Purchase & Procurement',
     icon: <ShoppingBasketIcon />,
     type: 'group',
     children: [
+      { text: ' Competitive Bidding', icon: <AssignmentIcon />, path: '/competitive-bidding', type: 'single' },
       { text: 'Purchase Requisition', icon: <AssignmentIcon />, path: '/purchase-requisition', type: 'single' },
       { text: 'Purchase Order', icon: <ShoppingCartIcon />, path: '/purchase-orders', type: 'single' },
       { text: 'GRN', icon: <LocalShippingIcon />, path: '/grn', type: 'single' },
@@ -69,21 +70,14 @@ const menuItems: MenuItem[] = [
   {
     text: 'Manufacturing',
     icon: <PrecisionManufacturingIcon />,
-    type: 'group',
-    children: [
-      { text: 'Production Management', icon: <PrecisionManufacturingIcon />, path: '/production', type: 'single' },
-      { text: 'Manufacturing Workflow', icon: <PrecisionManufacturingIcon />, path: '/manufacturing', type: 'single' },
-    ]
+    path: '/production',
+    type: 'single'
   },
   {
-    text: 'Inventory Management',
+    text: 'Inventory & Products',
     icon: <InventoryIcon />,
-    type: 'group',
-    children: [
-      { text: 'Master Inventory Dashboard', icon: <DashboardIcon />, path: '/inventory', type: 'single' },
-      { text: 'Products', icon: <InventoryIcon />, path: '/products', type: 'single' },
-      { text: 'Product Dashboard', icon: <DashboardIcon />, path: '/product-dashboard', type: 'single' },
-    ]
+    path: '/inventory',
+    type: 'single'
   },
   {
     text: 'Financial Management',
@@ -91,6 +85,7 @@ const menuItems: MenuItem[] = [
     type: 'group',
     children: [
       { text: 'Financial Dashboard', icon: <DashboardIcon />, path: '/financial-dashboard', type: 'single' },
+      { text: 'Invoice Management', icon: <AssignmentIcon />, path: '/invoice-management', type: 'single' },
       { text: 'Payment Management', icon: <BusinessIcon />, path: '/payment-management', type: 'single' },
       { text: 'Profit Calculator', icon: <AssignmentIcon />, path: '/profit-calculator', type: 'single' },
     ]
@@ -112,10 +107,11 @@ const menuItems: MenuItem[] = [
     icon: <AssignmentIcon />,
     type: 'group',
     children: [
-      { text: 'Case Dashboard', icon: <DashboardIcon />, path: '/case-dashboard', type: 'single' },
-      { text: 'Price Comparison', icon: <QuoteIcon />, path: '/price-comparison', type: 'single' },
-      { text: 'Case History Tracker', icon: <AssignmentIcon />, path: '/case-history-tracker', type: 'single' },
-      { text: 'Technician Dashboard', icon: <EngineeringIcon />, path: '/technician-dashboard', type: 'single' },
+      { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', type: 'single' },
+      { text: 'Enterprise Case Analytics', icon: <DashboardIcon />, path: '/enterprise-case-dashboard', type: 'single' },
+      { text: 'Price Comparison Analytics', icon: <QuoteIcon />, path: '/price-comparison', type: 'single' },
+      { text: 'Technician Performance', icon: <EngineeringIcon />, path: '/technician-dashboard', type: 'single' },
+      { text: 'Assignee Workload Report', icon: <PeopleIcon />, path: '/assignee-report', type: 'single' },
     ]
   },
   {
@@ -124,9 +120,9 @@ const menuItems: MenuItem[] = [
     type: 'group',
     children: [
       { text: 'Clients', icon: <BusinessIcon />, path: '/clients', type: 'single' },
-      { text: 'Users', icon: <PeopleIcon />, path: '/users', type: 'single' },
+      { text: 'Vendors', icon: <BusinessIcon />, path: '/vendors', type: 'single' },
       { text: 'Settings', icon: <SecurityIcon />, path: '/settings', type: 'single' },
-      { text: 'API Test', icon: <SecurityIcon />, path: '/api-test', type: 'single' },
+      { text: 'About', icon: <InfoIcon />, path: '/about', type: 'single' },
     ]
   },
 ];
@@ -177,7 +173,7 @@ export default function Sidebar({ isLicenseValid }: SidebarProps) {
     } else if (item.type === 'group') {
       const isOpen = openGroups[item.text];
       const hasActiveChild = isChildActive(item.children);
-      
+
       return (
         <div key={item.text}>
           <ListItem disablePadding>

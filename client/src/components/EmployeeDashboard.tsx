@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -72,6 +73,7 @@ interface RecentActivity {
 }
 
 const EmployeeDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
   const [recentActivities] = useState<RecentActivity[]>([
@@ -117,27 +119,16 @@ const EmployeeDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      // Set mock data for demo
       setDashboardData({
-        employee_status_summary: [
-          { status: 'active', count: 45 },
-          { status: 'on_leave', count: 3 },
-          { status: 'inactive', count: 2 }
-        ],
-        department_summary: [
-          { department_name: 'Information Technology', employee_count: 15 },
-          { department_name: 'Sales & Marketing', employee_count: 12 },
-          { department_name: 'Operations', employee_count: 10 },
-          { department_name: 'Finance & Accounts', employee_count: 8 },
-          { department_name: 'Human Resources', employee_count: 5 }
-        ],
+        employee_status_summary: [],
+        department_summary: [],
         today_attendance: {
-          total_employees: 45,
-          checked_in: 42,
-          on_leave: 3,
-          late_arrivals: 5
+          total_employees: 0,
+          checked_in: 0,
+          on_leave: 0,
+          late_arrivals: 0
         },
-        pending_leaves: 7
+        pending_leaves: 0
       });
     } finally {
       setLoading(false);
@@ -170,7 +161,7 @@ const EmployeeDashboard: React.FC = () => {
     }
   };
 
-  const attendancePercentage = dashboardData 
+  const attendancePercentage = dashboardData
     ? Math.round((dashboardData.today_attendance.checked_in / dashboardData.today_attendance.total_employees) * 100)
     : 0;
 
@@ -185,21 +176,21 @@ const EmployeeDashboard: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<People />}
-            onClick={() => window.location.href = '/employees/manage'}
+            onClick={() => navigate('/employee-management')}
           >
             Manage Employees
           </Button>
           <Button
             variant="outlined"
             startIcon={<Schedule />}
-            onClick={() => window.location.href = '/employees/attendance'}
+            onClick={() => navigate('/attendance-management')}
           >
             Attendance
           </Button>
           <Button
             variant="outlined"
             startIcon={<CalendarToday />}
-            onClick={() => window.location.href = '/employees/leave'}
+            onClick={() => navigate('/leave-management')}
           >
             Leave Management
           </Button>
@@ -329,7 +320,7 @@ const EmployeeDashboard: React.FC = () => {
                       const percentage = dashboardData.today_attendance.total_employees > 0
                         ? Math.round((dept.employee_count / dashboardData.today_attendance.total_employees) * 100)
                         : 0;
-                      
+
                       return (
                         <TableRow key={dept.department_name}>
                           <TableCell>
@@ -380,13 +371,13 @@ const EmployeeDashboard: React.FC = () => {
                   <Typography variant="body2">Attendance Rate</Typography>
                   <Typography variant="body2">{attendancePercentage}%</Typography>
                 </Box>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={attendancePercentage} 
+                <LinearProgress
+                  variant="determinate"
+                  value={attendancePercentage}
                   sx={{ height: 8, borderRadius: 4 }}
                 />
               </Box>
-              
+
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Present:</Typography>
@@ -435,7 +426,7 @@ const EmployeeDashboard: React.FC = () => {
                   </ListItem>
                 ))}
               </List>
-              
+
               <Button
                 variant="text"
                 size="small"

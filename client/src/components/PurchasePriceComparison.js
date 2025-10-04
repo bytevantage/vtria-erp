@@ -48,6 +48,7 @@ import {
     CheckCircle as CheckIcon,
     Warning as WarningIcon
 } from '@mui/icons-material';
+import { API_BASE_URL } from '../config';
 import axios from 'axios';
 
 const PurchasePriceComparison = ({ estimationId }) => {
@@ -84,7 +85,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
         notes: ''
     });
 
-    const API_BASE_URL = 'http://localhost:3001';
+    // Using centralized config for API_BASE_URL
 
     useEffect(() => {
         if (estimationId) {
@@ -132,7 +133,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
 
     const fetchSuppliers = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/suppliers`, {
+            const response = await axios.get(`${API_BASE_URL}/api/vendors`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             setSuppliers(response.data.data || []);

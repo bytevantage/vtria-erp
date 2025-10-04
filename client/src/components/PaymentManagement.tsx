@@ -131,7 +131,7 @@ const PaymentManagement: React.FC = () => {
 
       const response = await fetch(`/api/financial/payments?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -153,7 +153,7 @@ const PaymentManagement: React.FC = () => {
     try {
       const response = await fetch(`/api/financial/invoices?customer_id=${customerId}&payment_status=unpaid,partial`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -178,7 +178,7 @@ const PaymentManagement: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify(paymentData),
       });

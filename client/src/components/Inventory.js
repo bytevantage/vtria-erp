@@ -38,9 +38,7 @@ import {
   Warning as WarningIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3001';
+import { api } from '../utils/api';
 
 const Inventory = () => {
   const [products, setProducts] = useState([]);
@@ -58,25 +56,38 @@ const Inventory = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/api/products`);
-      if (response.data.success) {
-        setProducts(response.data.data);
+      setError(null);
+      
+      const { data, error: fetchError } = await api.get('/api/products');
+      
+      if (fetchError) {
+        throw new Error(fetchError);
+      }
+      
+      if (data?.success) {
+        const productsData = data?.data || [];
+        setProducts(productsData);
         
         // Filter low stock and serial products
-        const lowStock = response.data.data.filter(p => 
-          p.stock_status === 'Low Stock' || p.stock_status === 'Critical'
+        const lowStock = productsData.filter(p => 
+          p.stock_status === 'Low Stock' || p.stock_status === 'Critical' || p.stock_status === 'low'
         );
-        const serialRequired = response.data.data.filter(p => 
-          p.serial_number_required === 1
+        const serialRequired = productsData.filter(p => 
+          p.requires_serial_tracking === 1 || p.serial_number_required === 1
         );
         
         setLowStockProducts(lowStock);
         setSerialProducts(serialRequired);
-        setError(null);
+      } else {
+        throw new Error('Invalid response format from server');
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      setError('Failed to load inventory data');
+      setError({
+        message: 'Failed to load inventory data',
+        details: error.message,
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setLoading(false);
     }
@@ -85,11 +96,20 @@ const Inventory = () => {
   // Fetch serial numbers for a product
   const fetchSerialNumbers = async (productId) => {
     try {
-      // This would be a new API endpoint to get serial numbers
-      const response = await axios.get(`${API_BASE_URL}/api/products/${productId}/serials`);
-      setSerialNumbers(response.data.data || []);
+      const { data, error: fetchError } = await api.get(`/api/products/${productId}/serials`);
+      
+      if (fetchError) {
+        throw new Error(fetchError);
+      }
+      
+      setSerialNumbers(data?.data || []);
     } catch (error) {
       console.error('Error fetching serial numbers:', error);
+      setError({
+        message: `Failed to load serial numbers for product ${productId}`,
+        details: error.message,
+        timestamp: new Date().toISOString()
+      });
       setSerialNumbers([]);
     }
   };
@@ -138,6 +158,7 @@ const Inventory = () => {
             <TableCell>Category</TableCell>
             <TableCell>Stock</TableCell>
             <TableCell>Unit Price</TableCell>
+            <TableCell>GST Rate</TableCell>
             <TableCell>Total Value</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Serial Required</TableCell>
@@ -147,13 +168,21 @@ const Inventory = () => {
         <TableBody>
           {productList.map((item) => (
             <TableRow key={item.id}>
-              <TableCell>{item.product_code || item.part_code || '-'}</TableCell>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.make ? `${item.make} ${item.model || ''}`.trim() : '-'}</TableCell>
-              <TableCell>{item.category_name || '-'}</TableCell>
-              <TableCell>{item.total_stock || 0}</TableCell>
-              <TableCell>₹{(item.mrp || 0).toLocaleString('en-IN')}</TableCell>
-              <TableCell>₹{((item.total_stock || 0) * (item.mrp || 0)).toLocaleString('en-IN')}</TableCell>
+              <TableCell>{item.item_code || item.product_code || item.part_code || '-'}</TableCell>
+              <TableCell>{item.item_name || item.name}</TableCell>
+              <TableCell>{item.brand ? `${item.brand} ${item.model_number || item.model || ''}`.trim() : (item.make ? `${item.make} ${item.model || ''}`.trim() : '-')}</TableCell>
+              <TableCell>{item.main_category_name || item.category_name || '-'}</TableCell>
+              <TableCell>{item.current_stock || item.total_stock || 0}</TableCell>
+              <TableCell>₹{(parseFloat(item.selling_price) || parseFloat(item.mrp) || 0).toLocaleString('en-IN')}</TableCell>
+              <TableCell>
+                <Chip
+                  label={`${item.gst_rate || 18}%`}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                />
+              </TableCell>
+              <TableCell>₹{((item.current_stock || item.total_stock || 0) * (parseFloat(item.selling_price) || parseFloat(item.mrp) || 0)).toLocaleString('en-IN')}</TableCell>
               <TableCell>
                 <Chip
                   label={item.stock_status || 'Unknown'}
@@ -163,10 +192,10 @@ const Inventory = () => {
               </TableCell>
               <TableCell>
                 <Chip
-                  icon={item.serial_number_required ? <QrCodeIcon /> : null}
-                  label={item.serial_number_required ? 'Yes' : 'No'}
-                  variant={item.serial_number_required ? 'filled' : 'outlined'}
-                  color={item.serial_number_required ? 'primary' : 'default'}
+                  icon={(item.requires_serial_tracking || item.serial_number_required) ? <QrCodeIcon /> : null}
+                  label={(item.requires_serial_tracking || item.serial_number_required) ? 'Yes' : 'No'}
+                  variant={(item.requires_serial_tracking || item.serial_number_required) ? 'filled' : 'outlined'}
+                  color={(item.requires_serial_tracking || item.serial_number_required) ? 'primary' : 'default'}
                   size="small"
                 />
               </TableCell>
@@ -175,7 +204,7 @@ const Inventory = () => {
                   <IconButton size="small" onClick={() => handleEditItem(item)} title="Edit Stock">
                     <EditIcon />
                   </IconButton>
-                  {item.serial_number_required && (
+                  {(item.requires_serial_tracking || item.serial_number_required) && (
                     <IconButton size="small" onClick={() => handleViewSerials(item)} title="View Serial Numbers">
                       <QrCodeIcon />
                     </IconButton>
@@ -194,8 +223,37 @@ const Inventory = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ mb: 2 }}
+          action={
+            <Button 
+              color="inherit" 
+              size="small" 
+              onClick={fetchProducts}
+              startIcon={<RefreshIcon />}
+            >
+              Retry
+            </Button>
+          }
+        >
+          <Typography variant="subtitle2">{error.message}</Typography>
+          <Typography variant="caption" component="div" sx={{ mt: 1 }}>
+            {error.details}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+            Error occurred at: {new Date(error.timestamp).toLocaleString()}
+          </Typography>
+        </Alert>
       </Box>
     );
   }
@@ -218,12 +276,6 @@ const Inventory = () => {
           </Button>
         </Box>
       </Box>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -277,7 +329,7 @@ const Inventory = () => {
             <CardContent>
               <Box display="flex" alignItems="center">
                 <Typography variant="h6" color="success.main">
-                  ₹{products.reduce((sum, p) => sum + (p.total_stock || 0) * (p.mrp || 0), 0).toLocaleString('en-IN')}
+                  ₹{products.reduce((sum, p) => sum + (p.current_stock || p.total_stock || 0) * (parseFloat(p.selling_price) || parseFloat(p.mrp) || 0), 0).toLocaleString('en-IN')}
                 </Typography>
               </Box>
               <Typography variant="body2" color="text.secondary">
@@ -304,7 +356,7 @@ const Inventory = () => {
 
       {/* Stock Edit Dialog */}
       <Dialog open={stockDialog} onClose={() => setStockDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Stock - {selectedProduct?.name}</DialogTitle>
+        <DialogTitle>Edit Stock - {selectedProduct?.item_name || selectedProduct?.name}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -313,7 +365,7 @@ const Inventory = () => {
             type="number"
             fullWidth
             variant="outlined"
-            defaultValue={selectedProduct?.total_stock || 0}
+            defaultValue={selectedProduct?.current_stock || selectedProduct?.total_stock || 0}
             sx={{ mb: 2 }}
           />
           <TextField
@@ -342,7 +394,7 @@ const Inventory = () => {
 
       {/* Serial Numbers Dialog */}
       <Dialog open={serialDialog} onClose={() => setSerialDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Serial Numbers - {selectedProduct?.name}</DialogTitle>
+        <DialogTitle>Serial Numbers - {selectedProduct?.item_name || selectedProduct?.name}</DialogTitle>
         <DialogContent>
           <TableContainer>
             <Table size="small">

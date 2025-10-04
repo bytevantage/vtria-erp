@@ -76,28 +76,28 @@ const MobileAttendanceApp: React.FC = () => {
     isLate: false,
     lateMinutes: 0
   });
-  
+
   const [currentLocation, setCurrentLocation] = useState<LocationInfo | null>(null);
   const [workLocations] = useState<WorkLocation[]>([
     { id: 1, name: 'Head Office', latitude: 12.9141, longitude: 74.8560, radius: 100 },
     { id: 2, name: 'Branch Office', latitude: 12.9160, longitude: 74.8570, radius: 50 }
   ]);
-  
+
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [batteryLevel, setBatteryLevel] = useState(100);
   const [autoSync, setAutoSync] = useState(true);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
-  
-  // Mock employee data
-  const employee = {
-    id: 1,
-    name: 'John Doe',
-    employee_id: 'EMP/2024/001',
-    department: 'IT',
-    shift: 'General Shift (9:00 AM - 6:00 PM)'
-  };
+
+  // Real employee data from authentication
+  const [employee, setEmployee] = useState({
+    id: null,
+    name: 'Loading...',
+    employee_id: 'Loading...',
+    department: 'Loading...',
+    shift: 'Loading...'
+  });
 
   useEffect(() => {
     // Check online status
@@ -107,6 +107,9 @@ const MobileAttendanceApp: React.FC = () => {
 
     // Get initial location
     getCurrentLocation();
+
+    // Load employee data from authentication
+    loadEmployeeData();
 
     // Check battery status (if supported)
     if ('getBattery' in navigator) {
@@ -124,10 +127,59 @@ const MobileAttendanceApp: React.FC = () => {
     };
   }, []);
 
+  const loadEmployeeData = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setLocationError('Authentication required. Please login first.');
+        return;
+      }
+
+      // Get current user data from JWT token or API
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/employees/current`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setEmployee({
+            id: result.data.id,
+            name: `${result.data.first_name} ${result.data.last_name}`,
+            employee_id: result.data.employee_id,
+            department: result.data.department || 'Not Assigned',
+            shift: result.data.shift_name || 'General Shift (9:00 AM - 6:00 PM)'
+          });
+        }
+      } else {
+        // Fallback to mock data for demo
+        setEmployee({
+          id: 1,
+          name: 'Demo User',
+          employee_id: 'DEMO/001',
+          department: 'Demo Department',
+          shift: 'General Shift (9:00 AM - 6:00 PM)'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading employee data:', error);
+      // Fallback to mock data
+      setEmployee({
+        id: 1,
+        name: 'Demo User',
+        employee_id: 'DEMO/001',
+        department: 'Demo Department',
+        shift: 'General Shift (9:00 AM - 6:00 PM)'
+      });
+    }
+  };
+
   const getCurrentLocation = () => {
     setLoading(true);
     setLocationError('');
-    
+
     if (!navigator.geolocation) {
       setLocationError('Geolocation is not supported by this browser');
       setLoading(false);
@@ -137,7 +189,7 @@ const MobileAttendanceApp: React.FC = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
-        
+
         // Check if within any work location
         const nearbyLocation = workLocations.find(location => {
           const distance = calculateDistance(latitude, longitude, location.latitude, location.longitude);
@@ -149,42 +201,42 @@ const MobileAttendanceApp: React.FC = () => {
           longitude,
           accuracy,
           isWithinGeofence: !!nearbyLocation,
-          distance: nearbyLocation ? 
-            calculateDistance(latitude, longitude, nearbyLocation.latitude, nearbyLocation.longitude) : 
+          distance: nearbyLocation ?
+            calculateDistance(latitude, longitude, nearbyLocation.latitude, nearbyLocation.longitude) :
             undefined
         });
-        
+
         setLoading(false);
       },
       (error) => {
         setLocationError(getLocationErrorMessage(error.code));
         setLoading(false);
       },
-      { 
-        enableHighAccuracy: true, 
-        timeout: 10000, 
-        maximumAge: 30000 
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000
       }
     );
   };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371e3; // Earth's radius in meters
-    const φ1 = lat1 * Math.PI/180;
-    const φ2 = lat2 * Math.PI/180;
-    const Δφ = (lat2-lat1) * Math.PI/180;
-    const Δλ = (lon2-lon1) * Math.PI/180;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) *
+      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c; // Distance in meters
   };
 
   const getLocationErrorMessage = (code: number): string => {
-    switch(code) {
+    switch (code) {
       case 1: return 'Location access denied. Please enable location permissions.';
       case 2: return 'Location unavailable. Please try again.';
       case 3: return 'Location request timeout. Please try again.';
@@ -193,6 +245,11 @@ const MobileAttendanceApp: React.FC = () => {
   };
 
   const handleAttendanceAction = async (action: 'check_in' | 'check_out') => {
+    if (!employee.id) {
+      setLocationError('Employee authentication required');
+      return;
+    }
+
     if (!currentLocation) {
       setLocationError('Please get your current location first');
       return;
@@ -206,34 +263,52 @@ const MobileAttendanceApp: React.FC = () => {
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/enhanced-attendance/record`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          employee_id: employee.id,
+          action,
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude,
+          notes: `Mobile attendance ${action} via VTRIA ERP App`
+        })
+      });
 
-      if (action === 'check_in') {
-        setAttendanceStatus({
-          isCheckedIn: true,
-          checkInTime: new Date().toISOString(),
-          totalHours: 0,
-          isLate: new Date().getHours() > 9,
-          lateMinutes: Math.max(0, (new Date().getHours() - 9) * 60 + new Date().getMinutes()),
-          location: 'Head Office'
-        });
-      } else {
-        const checkInTime = new Date(attendanceStatus.checkInTime!);
-        const checkOutTime = new Date();
-        const hours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+      if (response.ok) {
+        const result = await response.json();
         
-        setAttendanceStatus(prev => ({
-          ...prev,
-          checkOutTime: checkOutTime.toISOString(),
-          totalHours: Math.round(hours * 100) / 100
-        }));
+        if (action === 'check_in') {
+          setAttendanceStatus({
+            isCheckedIn: true,
+            checkInTime: new Date().toISOString(),
+            totalHours: 0,
+            isLate: result.data.is_late || false,
+            lateMinutes: result.data.late_minutes || 0,
+            location: result.data.location || 'Office Location'
+          });
+        } else {
+          setAttendanceStatus(prev => ({
+            ...prev,
+            checkOutTime: new Date().toISOString(),
+            totalHours: result.data.total_hours || 0
+          }));
+        }
+        
+        setLocationError(''); // Clear any previous errors
+      } else {
+        const error = await response.json();
+        setLocationError(error.message || 'Failed to record attendance');
       }
-
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
+      console.error('Error recording attendance:', error);
       setLocationError('Failed to record attendance. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -257,17 +332,17 @@ const MobileAttendanceApp: React.FC = () => {
   };
 
   return (
-    <Box sx={{ 
-      maxWidth: 400, 
-      mx: 'auto', 
-      bgcolor: 'grey.50', 
+    <Box sx={{
+      maxWidth: 400,
+      mx: 'auto',
+      bgcolor: 'grey.50',
       minHeight: '100vh',
       position: 'relative'
     }}>
       {/* Status Bar */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         px: 2,
         py: 1,
@@ -280,11 +355,11 @@ const MobileAttendanceApp: React.FC = () => {
             {getConnectionStatus().text}
           </Typography>
         </Box>
-        
+
         <Typography variant="h6">
           Attendance
         </Typography>
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <BatteryFull color={getBatteryColor() as any} />
           <Typography variant="caption">{batteryLevel}%</Typography>
@@ -319,13 +394,13 @@ const MobileAttendanceApp: React.FC = () => {
               <Today sx={{ mr: 1 }} />
               Today's Status
             </Typography>
-            <Chip 
-              label={attendanceStatus.isCheckedIn ? 'Active' : 'Not Started'} 
+            <Chip
+              label={attendanceStatus.isCheckedIn ? 'Active' : 'Not Started'}
               color={attendanceStatus.isCheckedIn ? 'success' : 'default'}
               size="small"
             />
           </Box>
-          
+
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Box sx={{ textAlign: 'center' }}>
@@ -349,13 +424,13 @@ const MobileAttendanceApp: React.FC = () => {
               </Box>
             </Grid>
           </Grid>
-          
+
           <Divider sx={{ my: 2 }} />
-          
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="body2">Total Hours:</Typography>
             <Typography variant="body2" fontWeight="bold">
-              {attendanceStatus.totalHours.toFixed(2)}h
+              {Number(attendanceStatus.totalHours).toFixed(2)}h
             </Typography>
           </Box>
         </CardContent>
@@ -373,9 +448,9 @@ const MobileAttendanceApp: React.FC = () => {
               <MyLocation />
             </IconButton>
           </Box>
-          
+
           {loading && <LinearProgress sx={{ mb: 2 }} />}
-          
+
           {currentLocation ? (
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -385,8 +460,8 @@ const MobileAttendanceApp: React.FC = () => {
                   <Warning color="error" sx={{ mr: 1 }} />
                 )}
                 <Typography variant="body2">
-                  {currentLocation.isWithinGeofence 
-                    ? 'Within work location' 
+                  {currentLocation.isWithinGeofence
+                    ? 'Within work location'
                     : 'Outside work location'
                   }
                 </Typography>
@@ -494,7 +569,7 @@ const MobileAttendanceApp: React.FC = () => {
               <Close />
             </IconButton>
           </Box>
-          
+
           {currentLocation && (
             <Box>
               <Typography variant="body2" gutterBottom>
@@ -506,11 +581,11 @@ const MobileAttendanceApp: React.FC = () => {
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Lng: {currentLocation.longitude.toFixed(6)}
               </Typography>
-              
+
               <Typography variant="body2" sx={{ mt: 2 }} gutterBottom>
                 <strong>Work Locations:</strong>
               </Typography>
-              
+
               <List dense>
                 {workLocations.map((location) => {
                   const distance = calculateDistance(
@@ -520,7 +595,7 @@ const MobileAttendanceApp: React.FC = () => {
                     location.longitude
                   );
                   const isNearby = distance <= location.radius;
-                  
+
                   return (
                     <ListItem key={location.id}>
                       <ListItemAvatar>
@@ -538,7 +613,7 @@ const MobileAttendanceApp: React.FC = () => {
               </List>
             </Box>
           )}
-          
+
           <Button
             variant="outlined"
             startIcon={<Refresh />}

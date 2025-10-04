@@ -119,6 +119,27 @@ const { body, query } = require('express-validator');
 const productionController = require('../controllers/production.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
+// Root route for production module
+router.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Production module is active',
+    data: {
+      module: 'production',
+      version: '1.0.0',
+      endpoints: [
+        'GET /items - Get production items',
+        'GET /work-orders - Get work orders',
+        'GET /dashboard - Production dashboard',
+        'GET /cases - Manufacturing cases',
+        'GET /master/categories - Production categories',
+        'GET /master/operations - Production operations',
+        'GET /master/manufacturing-units - Manufacturing units'
+      ]
+    }
+  });
+});
+
 // Validation middleware
 const validateProductionItem = [
   body('item_code').notEmpty().withMessage('Item code is required'),
@@ -445,8 +466,110 @@ router.get('/dashboard', authMiddleware.verifyToken, productionController.getPro
  *     responses:
  *       200:
  *         description: Manufacturing units retrieved successfully
+ *   post:
+ *     summary: Create new manufacturing unit
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - unit_name
+ *               - unit_code
+ *             properties:
+ *               unit_name:
+ *                 type: string
+ *               unit_code:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               capacity_per_day:
+ *                 type: number
+ *               unit_of_measurement:
+ *                 type: string
+ *               manager_employee_id:
+ *                 type: integer
+ *               contact_phone:
+ *                 type: string
+ *               contact_email:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Manufacturing unit created successfully
+ *       400:
+ *         description: Validation error
  */
 router.get('/master/manufacturing-units', authMiddleware.verifyToken, productionController.getManufacturingUnits);
+router.post('/master/manufacturing-units', authMiddleware.verifyToken, productionController.createManufacturingUnit);
+
+/**
+ * @swagger
+ * /api/production/master/manufacturing-units/{id}:
+ *   put:
+ *     summary: Update manufacturing unit
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               unit_name:
+ *                 type: string
+ *               unit_code:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               capacity_per_day:
+ *                 type: number
+ *               unit_of_measurement:
+ *                 type: string
+ *               manager_employee_id:
+ *                 type: integer
+ *               contact_phone:
+ *                 type: string
+ *               contact_email:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [active, inactive, maintenance]
+ *     responses:
+ *       200:
+ *         description: Manufacturing unit updated successfully
+ *       404:
+ *         description: Manufacturing unit not found
+ *   delete:
+ *     summary: Delete manufacturing unit
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Manufacturing unit deleted successfully
+ *       404:
+ *         description: Manufacturing unit not found
+ */
+router.put('/master/manufacturing-units/:id', authMiddleware.verifyToken, productionController.updateManufacturingUnit);
+router.delete('/master/manufacturing-units/:id', authMiddleware.verifyToken, productionController.deleteManufacturingUnit);
 
 /**
  * @swagger
@@ -459,8 +582,94 @@ router.get('/master/manufacturing-units', authMiddleware.verifyToken, production
  *     responses:
  *       200:
  *         description: Production operations retrieved successfully
+ *   post:
+ *     summary: Create new production operation
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - operation_code
+ *               - operation_name
+ *               - operation_type
+ *             properties:
+ *               operation_code:
+ *                 type: string
+ *               operation_name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               operation_type:
+ *                 type: string
+ *                 enum: [setup, production, inspection, packaging, testing]
+ *               work_center_code:
+ *                 type: string
+ *               setup_time_hours:
+ *                 type: number
+ *               run_time_per_unit_hours:
+ *                 type: number
+ *               teardown_time_hours:
+ *                 type: number
+ *               hourly_rate:
+ *                 type: number
+ *               setup_cost:
+ *                 type: number
+ *               requires_inspection:
+ *                 type: boolean
+ *               inspection_percentage:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Production operation created successfully
+ *       400:
+ *         description: Validation error
  */
 router.get('/master/operations', authMiddleware.verifyToken, productionController.getProductionOperations);
+router.post('/master/operations', authMiddleware.verifyToken, productionController.createProductionOperation);
+
+/**
+ * @swagger
+ * /api/production/master/operations/{id}:
+ *   put:
+ *     summary: Update production operation
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Production operation updated successfully
+ *       404:
+ *         description: Production operation not found
+ *   delete:
+ *     summary: Delete production operation
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Production operation deleted successfully
+ *       404:
+ *         description: Production operation not found
+ */
+router.put('/master/operations/:id', authMiddleware.verifyToken, productionController.updateProductionOperation);
+router.delete('/master/operations/:id', authMiddleware.verifyToken, productionController.deleteProductionOperation);
 
 /**
  * @swagger
@@ -473,7 +682,181 @@ router.get('/master/operations', authMiddleware.verifyToken, productionControlle
  *     responses:
  *       200:
  *         description: Production categories retrieved successfully
+ *   post:
+ *     summary: Create new production category
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - category_name
+ *             properties:
+ *               category_name:
+ *                 type: string
+ *               category_code:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               parent_category_id:
+ *                 type: integer
+ *               default_lead_time_days:
+ *                 type: integer
+ *               default_batch_size:
+ *                 type: integer
+ *               requires_quality_check:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Production category created successfully
+ *       400:
+ *         description: Validation error
  */
 router.get('/master/categories', authMiddleware.verifyToken, productionController.getProductionCategories);
+router.post('/master/categories', authMiddleware.verifyToken, productionController.createProductionCategory);
+
+/**
+ * @swagger
+ * /api/production/master/categories/{id}:
+ *   put:
+ *     summary: Update production category
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Production category updated successfully
+ *       404:
+ *         description: Production category not found
+ *   delete:
+ *     summary: Delete production category
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Production category deleted successfully
+ *       404:
+ *         description: Production category not found
+ */
+router.put('/master/categories/:id', authMiddleware.verifyToken, productionController.updateProductionCategory);
+router.delete('/master/categories/:id', authMiddleware.verifyToken, productionController.deleteProductionCategory);
+
+/**
+ * @swagger
+ * /api/production/cases/ready:
+ *   get:
+ *     summary: Get cases ready for production
+ *     tags: [Production Cases]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cases ready for production retrieved successfully
+ */
+router.get('/cases/ready', authMiddleware.verifyToken, productionController.getCasesReadyForProduction);
+
+/**
+ * @swagger
+ * /api/production/cases/{case_id}/move-to-production:
+ *   post:
+ *     summary: Move case to production state and create manufacturing case
+ *     tags: [Production Cases]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: case_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               planned_start_date:
+ *                 type: string
+ *                 format: date
+ *               planned_end_date:
+ *                 type: string
+ *                 format: date
+ *               manufacturing_unit_id:
+ *                 type: integer
+ *               priority:
+ *                 type: string
+ *                 enum: [low, medium, high, urgent]
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Manufacturing case created successfully
+ */
+router.post('/cases/:case_id/move-to-production', authMiddleware.verifyToken, productionController.moveToProduction);
+
+/**
+ * @swagger
+ * /api/production/cases:
+ *   get:
+ *     summary: Get all manufacturing cases
+ *     tags: [Production Cases]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Manufacturing cases retrieved successfully
+ */
+router.get('/cases', authMiddleware.verifyToken, productionController.getManufacturingCases);
+
+/**
+ * @swagger
+ * /api/production/cases/{case_id}/estimation-details:
+ *   get:
+ *     summary: Get estimation details for a case
+ *     tags: [Production Cases]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: case_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Estimation details retrieved successfully
+ */
+router.get('/cases/:case_id/estimation-details', authMiddleware.verifyToken, productionController.getEstimationDetailsForCase);
+
+// Manufacturing case management endpoints
+router.put('/manufacturing-cases/:id/status', authMiddleware.verifyToken, productionController.updateManufacturingCaseStatus);
+router.get('/manufacturing-cases/:id/work-orders', authMiddleware.verifyToken, productionController.getManufacturingCaseWorkOrders);
+router.post('/manufacturing-cases/:id/work-orders', authMiddleware.verifyToken, productionController.createManufacturingCaseWorkOrders);
+router.put('/work-orders/:workOrderId', authMiddleware.verifyToken, productionController.updateWorkOrder);
+router.delete('/work-orders/:workOrderId', authMiddleware.verifyToken, productionController.deleteWorkOrder);
+router.put('/manufacturing-cases/:id/progress', authMiddleware.verifyToken, productionController.updateManufacturingCaseProgress);
+router.get('/manufacturing-cases/:id/report', authMiddleware.verifyToken, productionController.generateManufacturingCaseReport);
+
+// BOM management endpoints
+router.get('/boms/active', authMiddleware.verifyToken, productionController.getActiveBOMs);
+router.get('/boms/:id/components', authMiddleware.verifyToken, productionController.getBOMComponents);
 
 module.exports = router;

@@ -3,11 +3,53 @@
 
 echo "🔍 Running pre-commit checks for VTRIA ERP..."
 
-# Run lint-staged
-npx lint-staged
+# 1. Check for sensitive data
+if git diff --cached --name-only | xargs grep -l "PASSWORD\|SECRET\|KEY\|TOKEN"; then
+  echo "❌ Error: Potential sensitive data detected in staged files"
+  exit 1
+fi
 
-# Check for forbidden patterns
-echo "🚫 Checking for forbidden patterns..."
+# 2. Run lint-staged
+echo "🔧 Running linters and formatters..."
+npx lint-staged || {
+  echo "❌ Linting/formatting failed"
+  exit 1
+}
+
+# 3. Run type checking for TypeScript projects
+if [ -d "client" ]; then
+  echo "🔍 Type checking client code..."
+  cd client && npm run type-check && cd .. || {
+    echo "❌ Type checking failed"
+    exit 1
+  }
+fi
+
+# 4. Run tests in watch mode
+if [ -d "client" ]; then
+  echo "🧪 Running client tests..."
+  cd client && CI=true npm test -- --watchAll=false --passWithNoTests && cd .. || {
+    echo "❌ Client tests failed"
+    exit 1
+  }
+fi
+
+if [ -d "api" ]; then
+  echo "🧪 Running API tests..."
+  cd api && npm test && cd .. || {
+    echo "❌ API tests failed"
+    exit 1
+  }
+fi
+
+# 5. Check for console.log statements in production code
+echo "🔎 Checking for console.log statements..."
+if git diff --cached --name-only | xargs grep -l "console\.log"; then
+  echo "❌ Error: console.log statements found in staged files"
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
 
 # Check for console.log in production files (excluding development/test files)
 if grep -r "console\.log" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \

@@ -32,6 +32,8 @@ import {
   Delete as DeleteIcon,
   Visibility as ViewIcon,
   GetApp as DownloadIcon,
+  CheckCircle as ApproveIcon,
+  Cancel as RejectIcon,
 } from '@mui/icons-material';
 import { QuotationPDFGenerator } from './PDFGenerator';
 
@@ -52,13 +54,26 @@ const Quotations = () => {
     fetchQuotations();
   }, []);
 
+  const authHeaders = () => ({
+    Authorization: `Bearer ${localStorage.getItem('vtria_token') || 'demo-token'}`
+  });
+
   const fetchQuotations = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('http://localhost:3001/api/quotation');
+      // Prefer enhanced endpoint for richer data; fall back to basic if unauthorized
+      let response;
+      try {
+        response = await axios.get('http://localhost:3001/api/quotations/enhanced/all', { headers: authHeaders() });
+      } catch (enhErr) {
+        if (enhErr.response && enhErr.response.status === 401) {
+          response = await axios.get('http://localhost:3001/api/quotations', { headers: authHeaders() });
+        } else {
+          throw enhErr;
+        }
+      }
       setQuotations(response.data.data || []);
-      // Fetch available estimations after quotations are loaded
       await fetchAvailableEstimations();
     } catch (error) {
       console.error('Error fetching quotations:', error);
@@ -70,15 +85,12 @@ const Quotations = () => {
 
   const fetchAvailableEstimations = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/estimation');
+      const response = await axios.get('http://localhost:3001/api/estimation', { headers: authHeaders() });
       const allEstimations = response.data.data || [];
-      
-      // Filter estimations that are approved and don't have quotations yet
-      const estimationsWithoutQuotations = allEstimations.filter(estimation => 
-        estimation.status === 'approved' && 
-        !quotations.some(quotation => quotation.estimation_id === estimation.id)
+      const estimationsWithoutQuotations = allEstimations.filter(estimation =>
+        estimation.status === 'approved' &&
+        !quotations.some(quotation => (quotation.estimation_fk_id || quotation.estimation_id) === estimation.id)
       );
-      
       setAvailableEstimations(estimationsWithoutQuotations);
     } catch (error) {
       console.error('Error fetching estimations:', error);
@@ -115,15 +127,15 @@ const Quotations = () => {
   const handleSubmit = async () => {
     try {
       setError('');
-      
+
       if (editingQuotation) {
         // Update existing quotation - not implemented yet
         setError('Edit functionality not yet implemented');
         return;
       } else {
         // Create new quotation
-        const response = await axios.post('http://localhost:3001/api/quotation', formData);
-        
+        const response = await axios.post('http://localhost:3001/api/quotations', formData, { headers: authHeaders() });
+
         // Refresh the quotations list and available estimations
         await fetchQuotations();
         await fetchAvailableEstimations();
@@ -138,7 +150,7 @@ const Quotations = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this quotation?')) {
       try {
-        await axios.delete(`http://localhost:3001/api/quotation/${id}`);
+        await axios.delete(`http://localhost:3001/api/quotations/${id}`, { headers: authHeaders() });
         setQuotations(quotations.filter(quotation => quotation.id !== id));
         // Refresh available estimations since one might now be available
         await fetchAvailableEstimations();
@@ -153,9 +165,71 @@ const Quotations = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved': return 'success';
+      case 'accepted': return 'success';
       case 'pending': return 'warning';
+      case 'pending_approval': return 'warning';
+      case 'draft': return 'default';
       case 'rejected': return 'error';
       default: return 'default';
+    }
+  };
+
+  const calculateProfitPercentage = (quotation) => {
+    if (quotation.profit_percentage_calculated != null) {
+      return `${Number(quotation.profit_percentage_calculated).toFixed(2)}%`;
+    }
+    if (quotation.total_mrp && quotation.total_final_price) {
+      const mrp = parseFloat(quotation.total_mrp);
+      const finalPrice = parseFloat(quotation.total_final_price);
+      if (mrp > 0) return `${(((mrp - finalPrice) / mrp) * 100).toFixed(2)}%`;
+    }
+    return 'N/A';
+  };
+
+  const handleApprove = async (quotationId) => {
+    try {
+      // First approve the quotation
+      const approveResponse = await axios.post(`http://localhost:3001/api/quotations/enhanced/${quotationId}/approve`, {}, { headers: authHeaders() });
+
+      if (approveResponse.data.success) {
+        // Then automatically create manufacturing case
+        try {
+          const manufacturingResponse = await axios.post(
+            'http://localhost:3001/api/manufacturing/cases/create-from-quote',
+            { quotation_id: quotationId, priority: 'medium', notes: 'Manufacturing case auto-created from approved quotation' },
+            { headers: authHeaders() }
+          );
+
+          if (manufacturingResponse.data.success) {
+            await fetchQuotations();
+            alert(`✅ Quotation approved and manufacturing case ${manufacturingResponse.data.data.case_number} created successfully!\n\nYou can now manage the manufacturing process in the Manufacturing section.`);
+          } else {
+            await fetchQuotations();
+            alert('✅ Quotation approved successfully!\n⚠️ Please manually create manufacturing case from Manufacturing section.');
+          }
+        } catch (manufacturingError) {
+          console.error('Error creating manufacturing case:', manufacturingError);
+          await fetchQuotations();
+          alert('✅ Quotation approved successfully!\n⚠️ Please manually create manufacturing case from Manufacturing section.');
+        }
+      }
+    } catch (error) {
+      console.error('Error approving quotation:', error);
+      alert('❌ Failed to approve quotation. Please try again.');
+    }
+  };
+
+  const handleStatusUpdate = async (quotationId, newStatus) => {
+    try {
+      const response = await axios.put(`http://localhost:3001/api/quotations/enhanced/${quotationId}/status`, {
+        status: newStatus
+      });
+      if (response.data.success) {
+        await fetchQuotations();
+      }
+    } catch (error) {
+      console.error('Error updating quotation status:', error);
+      alert('Failed to update quotation status. Please try again.');
     }
   };
 
@@ -189,9 +263,11 @@ const Quotations = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Quotation No.</TableCell>
+                <TableCell>Est.No</TableCell>
                 <TableCell>Client</TableCell>
                 <TableCell>Project</TableCell>
                 <TableCell>Amount</TableCell>
+                <TableCell>Profit %</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Actions</TableCell>
@@ -200,7 +276,7 @@ const Quotations = () => {
             <TableBody>
               {quotations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center">
+                  <TableCell colSpan={9} align="center">
                     <Typography variant="body2" color="textSecondary">
                       No quotations found. Create your first quotation!
                     </Typography>
@@ -209,33 +285,68 @@ const Quotations = () => {
               ) : (
                 quotations.map((quotation) => (
                   <TableRow key={quotation.id}>
-                    <TableCell>{quotation.quotation_number}</TableCell>
+                    <TableCell>{quotation.quotation_id}</TableCell>
+                    <TableCell>{quotation.estimation_code || quotation.estimation_id || quotation.estimation_fk_id || 'N/A'}</TableCell>
                     <TableCell>{quotation.client_name}</TableCell>
-                    <TableCell>{quotation.project_title}</TableCell>
+                    <TableCell>{quotation.project_name}</TableCell>
                     <TableCell>₹{quotation.total_amount?.toLocaleString('en-IN')}</TableCell>
+                    <TableCell>{calculateProfitPercentage(quotation)}</TableCell>
                     <TableCell>
-                      <Chip
-                        label={quotation.status}
-                        color={getStatusColor(quotation.status)}
-                        size="small"
-                      />
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Chip
+                          label={quotation.status}
+                          color={getStatusColor(quotation.status)}
+                          size="small"
+                        />
+                        <FormControl size="small" sx={{ minWidth: 100 }}>
+                          <Select
+                            value={quotation.status}
+                            onChange={(e) => handleStatusUpdate(quotation.id, e.target.value)}
+                            size="small"
+                            sx={{ height: '28px' }}
+                          >
+                            <MenuItem value="draft">Draft</MenuItem>
+                            <MenuItem value="pending_approval">Pending Approval</MenuItem>
+                            <MenuItem value="approved">Approved</MenuItem>
+                            <MenuItem value="accepted">Accepted by Client</MenuItem>
+                            <MenuItem value="rejected">Rejected</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Box>
                     </TableCell>
                     <TableCell>
                       {quotation.created_at ? new Date(quotation.created_at).toLocaleDateString('en-IN') : 'N/A'}
                     </TableCell>
                     <TableCell>
-                      <IconButton onClick={() => handleOpen(quotation)} size="small" title="Edit">
-                        <EditIcon />
-                      </IconButton>
-                      <QuotationPDFGenerator 
-                        quotationId={quotation.id}
-                        quotationNumber={quotation.quotation_number}
-                        variant="text"
-                        size="small"
-                      />
-                      <IconButton onClick={() => handleDelete(quotation.id)} size="small" title="Delete">
-                        <DeleteIcon />
-                      </IconButton>
+                      <Box display="flex" gap={1} alignItems="center">
+                        <IconButton onClick={() => handleOpen(quotation)} size="small" title="Edit">
+                          <EditIcon />
+                        </IconButton>
+
+                        {(quotation.status === 'draft' || quotation.status === 'pending_approval') && (
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color="success"
+                            startIcon={<ApproveIcon />}
+                            onClick={() => handleApprove(quotation.id)}
+                            sx={{ minWidth: 'auto', px: 1 }}
+                          >
+                            Approve & Start Manufacturing
+                          </Button>
+                        )}
+
+                        <QuotationPDFGenerator
+                          quotationId={quotation.id}
+                          quotationNumber={quotation.quotation_id}
+                          variant="text"
+                          size="small"
+                        />
+
+                        <IconButton onClick={() => handleDelete(quotation.id)} size="small" title="Delete">
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))
@@ -245,10 +356,10 @@ const Quotations = () => {
         </TableContainer>
       )}
 
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
-        maxWidth="lg" 
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="lg"
         fullWidth
         PaperProps={{
           sx: {
@@ -259,7 +370,7 @@ const Quotations = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
+        <DialogTitle sx={{
           background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
           color: 'white',
           fontSize: '1.5rem',
@@ -268,11 +379,11 @@ const Quotations = () => {
           borderBottom: 'none'
         }}>
           <Box display="flex" alignItems="center" gap={2.5}>
-            <Box 
-              sx={{ 
-                width: 48, 
-                height: 48, 
-                borderRadius: '12px', 
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: '12px',
                 backgroundColor: 'rgba(255,255,255,0.2)',
                 display: 'flex',
                 alignItems: 'center',
@@ -295,9 +406,9 @@ const Quotations = () => {
         <DialogContent sx={{ padding: '0', backgroundColor: '#fafafa' }}>
           {error && (
             <Box sx={{ p: 4, pb: 0 }}>
-              <Alert 
-                severity="error" 
-                sx={{ 
+              <Alert
+                severity="error"
+                sx={{
                   borderRadius: '16px',
                   border: '1px solid #ffcdd2',
                   backgroundColor: '#fff8f8'
@@ -308,12 +419,12 @@ const Quotations = () => {
             </Box>
           )}
           <Box sx={{ p: 4 }}>
-            <Typography 
-              variant="h6" 
-              gutterBottom 
-              sx={{ 
-                mb: 4, 
-                color: '#2c3e50', 
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{
+                mb: 4,
+                color: '#2c3e50',
                 fontWeight: 600,
                 fontSize: '1.2rem',
                 display: 'flex',
@@ -323,8 +434,8 @@ const Quotations = () => {
             >
               📋 Quotation Information
             </Typography>
-            <Box 
-              sx={{ 
+            <Box
+              sx={{
                 backgroundColor: 'white',
                 borderRadius: '20px',
                 padding: '36px',
@@ -335,11 +446,11 @@ const Quotations = () => {
               <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -353,26 +464,26 @@ const Quotations = () => {
                         value={formData.estimation_id}
                         onChange={(e) => {
                           const selectedEstimation = availableEstimations.find(est => est.id.toString() === e.target.value);
-                          setFormData({ 
-                            ...formData, 
+                          setFormData({
+                            ...formData,
                             estimation_id: e.target.value,
                             description: selectedEstimation ? `Quotation for ${selectedEstimation.project_name || 'Project'}` : formData.description
                           });
                         }}
                         displayEmpty
                         variant="outlined"
-                        sx={{ 
+                        sx={{
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -392,11 +503,11 @@ const Quotations = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -413,19 +524,19 @@ const Quotations = () => {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       placeholder="Provide detailed terms, conditions, specifications, delivery terms, payment terms, and any special considerations..."
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -438,16 +549,16 @@ const Quotations = () => {
             </Box>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ 
-          padding: '24px 36px', 
+        <DialogActions sx={{
+          padding: '24px 36px',
           backgroundColor: '#f8f9fa',
           borderTop: '1px solid #e8eaed',
           gap: 3
         }}>
-          <Button 
+          <Button
             onClick={handleClose}
             variant="outlined"
-            sx={{ 
+            sx={{
               borderRadius: '16px',
               textTransform: 'none',
               fontWeight: 600,
@@ -466,10 +577,10 @@ const Quotations = () => {
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             variant="contained"
-            sx={{ 
+            sx={{
               borderRadius: '16px',
               textTransform: 'none',
               fontWeight: 700,
@@ -478,7 +589,7 @@ const Quotations = () => {
               fontSize: '1rem',
               background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
               boxShadow: '0 8px 24px rgba(25, 118, 210, 0.3)',
-              '&:hover': { 
+              '&:hover': {
                 background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
                 boxShadow: '0 12px 32px rgba(25, 118, 210, 0.4)',
                 transform: 'translateY(-1px)'

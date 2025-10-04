@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'vtria_user',
     password: process.env.DB_PASS || 'dev_password',
     database: process.env.DB_NAME || 'vtria_erp',
@@ -15,7 +16,7 @@ const promisePool = pool.promise();
 
 // Add connection error handling
 pool.on('connection', (connection) => {
-    console.log('Database connected as id ' + connection.threadId);
+    console.log(`Database connected as id ${connection.threadId}`);
 });
 
 pool.on('error', (err) => {

@@ -27,7 +27,7 @@ const mockEnquiryStore: EnquiryState = {
       mockEnquiryStore.loading = true;
       mockEnquiryStore.error = null;
       const response = await enquiryService.getById(id);
-      mockEnquiryStore.currentEnquiry = response.data;
+      mockEnquiryStore.currentEnquiry = response.data || null;
       mockEnquiryStore.loading = false;
     } catch (error) {
       mockEnquiryStore.error = 'Failed to fetch enquiry';
@@ -40,9 +40,11 @@ const mockEnquiryStore: EnquiryState = {
       mockEnquiryStore.loading = true;
       mockEnquiryStore.error = null;
       const response = await enquiryService.create(data);
-      mockEnquiryStore.enquiries = [response.data, ...mockEnquiryStore.enquiries];
+      if (response.data) {
+        mockEnquiryStore.enquiries = [response.data, ...mockEnquiryStore.enquiries];
+        mockEnquiryStore.currentEnquiry = response.data;
+      }
       mockEnquiryStore.loading = false;
-      mockEnquiryStore.currentEnquiry = response.data;
     } catch (error) {
       mockEnquiryStore.error = 'Failed to create enquiry';
       mockEnquiryStore.loading = false;
@@ -59,7 +61,7 @@ const mockEnquiryStore: EnquiryState = {
       );
       mockEnquiryStore.enquiries = updatedEnquiries;
       mockEnquiryStore.loading = false;
-      mockEnquiryStore.currentEnquiry = response.data;
+      mockEnquiryStore.currentEnquiry = response.data || null;
     } catch (error) {
       mockEnquiryStore.error = 'Failed to update enquiry';
       mockEnquiryStore.loading = false;
@@ -78,6 +80,10 @@ const mockEnquiryStore: EnquiryState = {
       mockEnquiryStore.error = 'Failed to delete enquiry';
       mockEnquiryStore.loading = false;
     }
+  },
+
+  setCurrentEnquiry: (enquiry: SalesEnquiry | null) => {
+    mockEnquiryStore.currentEnquiry = enquiry;
   },
 };
 

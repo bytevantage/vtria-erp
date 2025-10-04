@@ -64,13 +64,10 @@ class AuthMiddleware {
     static verifyToken(req, res, next) {
         // Development bypass check
         if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
-            // Set a default development user
-            req.user = {
-                id: 1,
-                username: 'dev_admin',
-                role: 'admin',
-                location: 'Mangalore',
-                permissions: ROLE_PERMISSIONS.admin
+            req.user = { 
+                id: 1, 
+                role: 'director',
+                permissions: ROLE_PERMISSIONS.director 
             };
             return next();
         }

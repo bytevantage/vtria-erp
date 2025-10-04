@@ -9,7 +9,7 @@ class CaseAssignmentController {
             const userId = req.user.id;
 
             let whereClause = '';
-            let params = [];
+            const params = [];
 
             // Filter based on user role and permissions
             if (userRole === 'technician') {
@@ -132,7 +132,7 @@ class CaseAssignmentController {
                 (reference_type, reference_id, status, notes, created_by)
                 VALUES (?, ?, ?, ?, ?)`,
                 ['assignment', case_id, 'assigned',
-                 `Case assigned to user ID ${assigned_to}${notes ? ': ' + notes : ''}`,
+                 `Case assigned to user ID ${assigned_to}${notes ? `: ${notes}` : ''}`,
                  assigned_by]
             );
 
@@ -186,7 +186,7 @@ class CaseAssignmentController {
                 (reference_type, reference_id, status, notes, created_by)
                 VALUES (?, ?, ?, ?, ?)`,
                 ['assignment', case_id, 'unassigned',
-                 `Case unassigned${notes ? ': ' + notes : ''}`,
+                 `Case unassigned${notes ? `: ${notes}` : ''}`,
                  unassigned_by]
             );
 

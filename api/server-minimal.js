@@ -66,6 +66,7 @@ const stockRoutes = require('./src/routes/stock.routes');
 const stockAvailabilityRoutes = require('./src/routes/stockAvailability.routes');
 const userRoutes = require('./src/routes/user.routes');
 const suppliersRoutes = require('./src/routes/suppliers.routes');
+const inventoryEnhancedRoutes = require('./src/routes/inventoryEnhanced.routes');
 
 // Middleware
 app.use(cors());
@@ -75,8 +76,8 @@ app.use(databaseMiddleware);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
+    res.json({
+        status: 'OK',
         timestamp: new Date(),
         message: 'Server is running successfully'
     });
@@ -84,8 +85,8 @@ app.get('/health', (req, res) => {
 
 // Simple test endpoint
 app.get('/test', (req, res) => {
-    res.json({ 
-        success: true, 
+    res.json({
+        success: true,
         message: 'API is working',
         timestamp: new Date()
     });
@@ -123,16 +124,17 @@ app.use('/api/stock', stockRoutes);
 app.use('/api/stock-availability', stockAvailabilityRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/suppliers', suppliersRoutes);
+app.use('/api/enhanced-inventory', inventoryEnhancedRoutes);
 
 // Global error handler middleware
 app.use((error, req, res, next) => {
     console.error('Global error handler:', error);
-    
+
     // Check if headers were already sent
     if (res.headersSent) {
         return next(error);
     }
-    
+
     res.status(500).json({
         success: false,
         message: 'Internal server error',

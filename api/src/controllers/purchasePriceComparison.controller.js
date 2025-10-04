@@ -1,497 +1,523 @@
 const moment = require('moment');
+const db = require('../config/database');
+
+// Helper functions
+async function generateQuoteRequestNumber() {
+    const year = new Date().getFullYear();
+    const [result] = await db.execute(
+        `SELECT COUNT(*) as count FROM supplier_quote_requests WHERE YEAR(created_at) = ?`,
+        [year]
+    );
+    const sequence = (result[0].count || 0) + 1;
+    return `RFQ/${year}/${sequence.toString().padStart(4, '0')}`;
+}
+
+async function generateSupplierQuoteNumber() {
+    const year = new Date().getFullYear();
+    const [result] = await db.execute(
+        `SELECT COUNT(*) as count FROM supplier_quotes WHERE YEAR(created_at) = ?`,
+        [year]
+    );
+    const sequence = (result[0].count || 0) + 1;
+    return `SQ/${year}/${sequence.toString().padStart(4, '0')}`;
+}
 
 class PurchasePriceComparisonController {
     // Get price comparison for estimation items
     async getEstimationPriceComparison(req, res) {
         try {
             const { estimationId } = req.params;
-            
-            const query = `
+
+            // Get estimation items with their current quotes
+            const estimationItemsQuery = `
                 SELECT 
                     ei.id as estimation_item_id,
-                    ei.item_name,
+                    p.name as item_name,
                     ei.quantity,
-                    ei.unit_price as estimated_price,
-                    ei.total_price as estimated_total,
-                    p.id as product_id,
+                    ei.discounted_price as estimated_price,
+                    ei.final_price as estimated_total,
+                    ei.product_id,
                     p.name as product_name,
                     p.sku,
-                    p.cost_price as current_cost_price,
-                    -- Get latest supplier quotes
-                    sq.id as quote_id,
-                    sq.quote_number,
-                    sq.supplier_id,
-                    s.name as supplier_name,
-                    sqi.unit_price as quoted_price,
-                    sqi.total_price as quoted_total,
-                    sq.valid_until,
-                    sq.created_at as quote_date,
-                    -- Calculate variance
-                    ROUND(((sqi.unit_price - ei.unit_price) / ei.unit_price) * 100, 2) as price_variance_percent,
-                    (sqi.unit_price - ei.unit_price) as price_variance_amount
+                    p.cost_price as current_cost_price
                 FROM estimation_items ei
                 LEFT JOIN products p ON ei.product_id = p.id
-                LEFT JOIN supplier_quote_items sqi ON p.id = sqi.product_id
-                LEFT JOIN supplier_quotes sq ON sqi.quote_id = sq.id
-                LEFT JOIN suppliers s ON sq.supplier_id = s.id
                 WHERE ei.estimation_id = ?
-                AND (sq.id IS NULL OR sq.valid_until >= CURDATE())
-                ORDER BY ei.id, sq.created_at DESC
+                ORDER BY ei.id
             `;
-            
-            const [rows] = await req.db.execute(query, [estimationId]);
-            
-            // Group by estimation item and get best quotes
-            const comparisonData = {};
-            
-            rows.forEach(row => {
-                const itemId = row.estimation_item_id;
-                
-                if (!comparisonData[itemId]) {
-                    comparisonData[itemId] = {
-                        estimation_item_id: row.estimation_item_id,
-                        item_name: row.item_name,
-                        quantity: row.quantity,
-                        estimated_price: row.estimated_price,
-                        estimated_total: row.estimated_total,
-                        product_id: row.product_id,
-                        product_name: row.product_name,
-                        sku: row.sku,
-                        current_cost_price: row.current_cost_price,
-                        supplier_quotes: []
-                    };
-                }
-                
-                if (row.quote_id) {
-                    comparisonData[itemId].supplier_quotes.push({
-                        quote_id: row.quote_id,
-                        quote_number: row.quote_number,
-                        supplier_id: row.supplier_id,
-                        supplier_name: row.supplier_name,
-                        quoted_price: row.quoted_price,
-                        quoted_total: row.quoted_total,
-                        valid_until: row.valid_until,
-                        quote_date: row.quote_date,
-                        price_variance_percent: row.price_variance_percent,
-                        price_variance_amount: row.price_variance_amount
-                    });
-                }
-            });
-            
-            // Convert to array and find best quotes
-            const result = Object.values(comparisonData).map(item => {
-                // Sort quotes by price (ascending)
-                item.supplier_quotes.sort((a, b) => a.quoted_price - b.quoted_price);
-                
-                // Find best quote
-                const bestQuote = item.supplier_quotes.length > 0 ? item.supplier_quotes[0] : null;
-                
-                return {
+
+            const [estimationItems] = await db.execute(estimationItemsQuery, [estimationId]);
+
+            const priceComparison = [];
+
+            for (const item of estimationItems) {
+                // Get quotes for this item
+                const quotesQuery = `
+                    SELECT 
+                        sq.id as quote_id,
+                        sq.quote_number,
+                        sq.supplier_id,
+                        iv.vendor_name as supplier_name,
+                        sqi.unit_price as quoted_price,
+                        sqi.final_price as quoted_total,
+                        sq.valid_until,
+                        sq.quote_date,
+                        ((sqi.unit_price - ?) / ? * 100) as price_variance_percent,
+                        (sqi.unit_price - ?) as price_variance_amount
+                    FROM supplier_quotes sq
+                    JOIN supplier_quote_items sqi ON sq.id = sqi.quote_id
+                    JOIN supplier_quote_request_items sqri ON sqi.request_item_id = sqri.id
+                    JOIN inventory_vendors iv ON sq.supplier_id = iv.id
+                    WHERE sqri.estimation_item_id = ?
+                        AND sq.status IN ('submitted', 'under_review', 'approved')
+                        AND sq.valid_until >= CURDATE()
+                    ORDER BY sqi.unit_price ASC
+                `;
+
+                const [quotes] = await db.execute(quotesQuery, [
+                    item.estimated_price, item.estimated_price, item.estimated_price, item.estimation_item_id
+                ]);
+
+                const best_quote = quotes.length > 0 ? quotes[0] : null;
+
+                priceComparison.push({
                     ...item,
-                    best_quote: bestQuote,
-                    has_quotes: item.supplier_quotes.length > 0,
-                    potential_savings: bestQuote ? 
-                        (item.estimated_price - bestQuote.quoted_price) * item.quantity : 0
-                };
-            });
-            
+                    supplier_quotes: quotes,
+                    best_quote,
+                    has_quotes: quotes.length > 0,
+                    potential_savings: best_quote ? (item.estimated_price - best_quote.quoted_price) * item.quantity : 0
+                });
+            }
+
+            // Calculate summary
+            const total_estimated_cost = priceComparison.reduce((sum, item) => sum + item.estimated_total, 0);
+            const items_with_quotes = priceComparison.filter(item => item.has_quotes).length;
+            const total_potential_savings = priceComparison.reduce((sum, item) => sum + item.potential_savings, 0);
+
+            const summary = {
+                total_items: priceComparison.length,
+                items_with_quotes,
+                quote_coverage_percent: priceComparison.length > 0 ? (items_with_quotes / priceComparison.length * 100).toFixed(2) : 0,
+                total_estimated_cost,
+                total_potential_savings,
+                savings_percent: total_estimated_cost > 0 ? (total_potential_savings / total_estimated_cost * 100).toFixed(2) : 0
+            };
+
             res.json({
                 success: true,
-                data: result
+                data: {
+                    estimation_id: estimationId,
+                    items: priceComparison,
+                    summary
+                }
             });
-            
+
         } catch (error) {
-            console.error('Error fetching price comparison:', error);
-            res.status(500).json({ error: 'Failed to fetch price comparison' });
+            console.error('Error in getEstimationPriceComparison:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching price comparison data',
+                error: error.message
+            });
         }
     }
-    
-    // Create supplier quote request
+
+    // Create quote request to suppliers
     async createQuoteRequest(req, res) {
         try {
             const {
                 estimation_id,
                 supplier_ids,
-                items,
+                vendor_ids,
                 due_date,
-                notes
+                notes,
+                terms_conditions,
+                items
             } = req.body;
-            
+
             const user_id = req.user?.id || 1;
-            
-            // Start transaction
-            await req.db.beginTransaction();
-            
-            try {
-                const quoteRequests = [];
-                
-                // Create quote request for each supplier
-                for (const supplierId of supplier_ids) {
-                    const requestNumber = await this.generateQuoteRequestNumber(req.db);
-                    
-                    const requestQuery = `
-                        INSERT INTO supplier_quote_requests 
-                        (request_number, estimation_id, supplier_id, status, 
-                         due_date, notes, requested_by, requested_at)
-                        VALUES (?, ?, ?, 'sent', ?, ?, ?, NOW())
+
+            // Handle both supplier_ids and vendor_ids field names
+            const vendorIds = supplier_ids || vendor_ids || [];
+
+            // Ensure vendorIds is an array
+            const vendorIdsArray = Array.isArray(vendorIds) ? vendorIds : [vendorIds];
+
+            const quoteRequests = [];
+
+            for (const supplier_id of vendorIdsArray) {
+                // Generate request number
+                const request_number = await generateQuoteRequestNumber();
+
+                // Create quote request
+                const requestQuery = `
+                    INSERT INTO supplier_quote_requests 
+                    (request_number, estimation_id, supplier_id, requested_by, due_date, status, notes, terms_conditions)
+                    VALUES (?, ?, ?, ?, ?, 'sent', ?, ?)
+                `;
+
+                const [requestResult] = await db.execute(requestQuery, [
+                    request_number, estimation_id, supplier_id, user_id, due_date, notes, terms_conditions
+                ]);
+
+                const request_id = requestResult.insertId;
+
+                // Add items to request
+                for (const item of items) {
+                    const itemQuery = `
+                        INSERT INTO supplier_quote_request_items 
+                        (request_id, estimation_item_id, item_name, item_description, quantity, unit, estimated_price, notes)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     `;
-                    
-                    const [requestResult] = await req.db.execute(requestQuery, [
-                        requestNumber,
-                        estimation_id,
-                        supplierId,
-                        due_date,
-                        notes,
-                        user_id
+
+                    await db.execute(itemQuery, [
+                        request_id,
+                        item.estimation_item_id,
+                        item.item_name,
+                        item.item_description || '',
+                        item.quantity,
+                        item.unit || 'NOS',
+                        item.estimated_price,
+                        item.notes || ''
                     ]);
-                    
-                    const requestId = requestResult.insertId;
-                    
-                    // Add items to quote request
-                    for (const item of items) {
-                        const itemQuery = `
-                            INSERT INTO supplier_quote_request_items 
-                            (request_id, product_id, quantity, estimated_price, specifications)
-                            VALUES (?, ?, ?, ?, ?)
-                        `;
-                        
-                        await req.db.execute(itemQuery, [
-                            requestId,
-                            item.product_id,
-                            item.quantity,
-                            item.estimated_price,
-                            item.specifications || null
-                        ]);
-                    }
-                    
-                    quoteRequests.push({
-                        request_id: requestId,
-                        request_number: requestNumber,
-                        supplier_id: supplierId
-                    });
                 }
-                
-                await req.db.commit();
-                
-                res.json({
-                    success: true,
-                    message: 'Quote requests created successfully',
-                    requests: quoteRequests
+
+                quoteRequests.push({
+                    request_id,
+                    request_number,
+                    supplier_id,
+                    estimation_id
                 });
-                
-            } catch (error) {
-                await req.db.rollback();
-                throw error;
             }
-            
+
+            res.json({
+                success: true,
+                message: `Quote requests created for ${vendorIdsArray.length} suppliers`,
+                data: {
+                    quote_requests: quoteRequests
+                }
+            });
+
         } catch (error) {
-            console.error('Error creating quote request:', error);
-            res.status(500).json({ error: 'Failed to create quote request' });
+            console.error('Error in createQuoteRequest:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error creating quote request',
+                error: error.message
+            });
         }
     }
-    
+
     // Record supplier quote response
     async recordSupplierQuote(req, res) {
         try {
             const {
                 request_id,
                 supplier_id,
-                quote_number,
                 quote_date,
                 valid_until,
                 payment_terms,
                 delivery_terms,
+                warranty_terms,
                 items,
                 notes
             } = req.body;
-            
+
             const user_id = req.user?.id || 1;
-            
-            // Start transaction
-            await req.db.beginTransaction();
-            
-            try {
-                // Create supplier quote
-                const quoteQuery = `
-                    INSERT INTO supplier_quotes 
-                    (quote_number, request_id, supplier_id, quote_date, 
-                     valid_until, payment_terms, delivery_terms, 
-                     total_amount, notes, status, created_by, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'received', ?, NOW())
+
+            // Generate quote number
+            const quote_number = await generateSupplierQuoteNumber();
+
+            // Calculate totals
+            const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
+            const tax_amount = items.reduce((sum, item) => sum + parseFloat(item.tax_amount || 0), 0);
+            const total_amount = items.reduce((sum, item) => sum + parseFloat(item.final_price || 0), 0);
+
+            // Create supplier quote
+            const quoteQuery = `
+                INSERT INTO supplier_quotes 
+                (quote_number, request_id, supplier_id, quote_date, valid_until, 
+                 subtotal, tax_amount, total_amount, payment_terms, delivery_terms, 
+                 warranty_terms, notes, status, reviewed_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted', ?)
+            `;
+
+            const [quoteResult] = await db.execute(quoteQuery, [
+                quote_number, request_id, supplier_id, quote_date, valid_until,
+                subtotal, tax_amount, total_amount, payment_terms, delivery_terms,
+                warranty_terms, notes, user_id
+            ]);
+
+            const quote_id = quoteResult.insertId;
+
+            // Add quote items
+            for (const item of items) {
+                const itemQuery = `
+                    INSERT INTO supplier_quote_items 
+                    (quote_id, request_item_id, item_name, item_description, quantity, unit, 
+                     unit_price, total_price, tax_rate, tax_amount, final_price, 
+                     specifications, brand, model_number, part_number, delivery_days, warranty_months, notes)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `;
-                
-                const totalAmount = items.reduce((sum, item) => sum + item.total_price, 0);
-                
-                const [quoteResult] = await req.db.execute(quoteQuery, [
-                    quote_number,
-                    request_id,
-                    supplier_id,
-                    quote_date,
-                    valid_until,
-                    payment_terms,
-                    delivery_terms,
-                    totalAmount,
-                    notes,
-                    user_id
+
+                await db.execute(itemQuery, [
+                    quote_id,
+                    item.request_item_id,
+                    item.item_name,
+                    item.item_description || '',
+                    item.quantity,
+                    item.unit || 'NOS',
+                    item.unit_price,
+                    item.total_price,
+                    item.tax_rate || 0,
+                    item.tax_amount || 0,
+                    item.final_price,
+                    JSON.stringify(item.specifications || {}),
+                    item.brand || '',
+                    item.model_number || '',
+                    item.part_number || '',
+                    item.delivery_days || null,
+                    item.warranty_months || 12,
+                    item.notes || ''
                 ]);
-                
-                const quoteId = quoteResult.insertId;
-                
-                // Add quote items
-                for (const item of items) {
-                    const itemQuery = `
-                        INSERT INTO supplier_quote_items 
-                        (quote_id, product_id, quantity, unit_price, total_price, 
-                         delivery_time, specifications, notes)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    `;
-                    
-                    await req.db.execute(itemQuery, [
-                        quoteId,
-                        item.product_id,
-                        item.quantity,
-                        item.unit_price,
-                        item.total_price,
-                        item.delivery_time || null,
-                        item.specifications || null,
-                        item.notes || null
-                    ]);
-                }
-                
-                // Update request status
-                await req.db.execute(
-                    'UPDATE supplier_quote_requests SET status = "received" WHERE id = ?',
-                    [request_id]
-                );
-                
-                await req.db.commit();
-                
-                res.json({
-                    success: true,
-                    message: 'Supplier quote recorded successfully',
-                    quote_id: quoteId
-                });
-                
-            } catch (error) {
-                await req.db.rollback();
-                throw error;
             }
-            
+
+            res.json({
+                success: true,
+                message: 'Supplier quote recorded successfully',
+                data: {
+                    quote_id,
+                    quote_number,
+                    total_amount
+                }
+            });
+
         } catch (error) {
-            console.error('Error recording supplier quote:', error);
-            res.status(500).json({ error: 'Failed to record supplier quote' });
+            console.error('Error in recordSupplierQuote:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error recording supplier quote',
+                error: error.message
+            });
         }
     }
-    
+
     // Get quote requests
     async getQuoteRequests(req, res) {
         try {
-            const { status, supplier_id, estimation_id } = req.query;
-            
-            let whereClause = 'WHERE 1=1';
-            const params = [];
-            
-            if (status) {
-                whereClause += ' AND sqr.status = ?';
-                params.push(status);
-            }
-            
-            if (supplier_id) {
-                whereClause += ' AND sqr.supplier_id = ?';
-                params.push(supplier_id);
-            }
-            
+            const { estimation_id, supplier_id, status } = req.query;
+
+            let whereConditions = [];
+            let queryParams = [];
+
             if (estimation_id) {
-                whereClause += ' AND sqr.estimation_id = ?';
-                params.push(estimation_id);
+                whereConditions.push('sqr.estimation_id = ?');
+                queryParams.push(estimation_id);
             }
-            
+
+            if (supplier_id) {
+                whereConditions.push('sqr.supplier_id = ?');
+                queryParams.push(supplier_id);
+            }
+
+            if (status) {
+                whereConditions.push('sqr.status = ?');
+                queryParams.push(status);
+            }
+
+            const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
             const query = `
                 SELECT 
                     sqr.*,
-                    s.name as supplier_name,
-                    s.email as supplier_email,
-                    s.phone as supplier_phone,
-                    e.estimation_number,
-                    c.name as client_name,
-                    u.name as requested_by_name,
+                    iv.vendor_name as supplier_name,
+                    e.estimation_id as estimation_number,
+                    u.full_name as requested_by_name,
                     COUNT(sqri.id) as item_count
                 FROM supplier_quote_requests sqr
-                LEFT JOIN suppliers s ON sqr.supplier_id = s.id
+                JOIN inventory_vendors iv ON sqr.supplier_id = iv.id
                 LEFT JOIN estimations e ON sqr.estimation_id = e.id
-                LEFT JOIN clients c ON e.client_id = c.id
                 LEFT JOIN users u ON sqr.requested_by = u.id
                 LEFT JOIN supplier_quote_request_items sqri ON sqr.id = sqri.request_id
                 ${whereClause}
                 GROUP BY sqr.id
-                ORDER BY sqr.requested_at DESC
+                ORDER BY sqr.created_at DESC
             `;
-            
-            const [rows] = await req.db.execute(query, params);
-            
+
+            const [requests] = await db.execute(query, queryParams);
+
             res.json({
                 success: true,
-                data: rows
+                data: requests
             });
-            
+
         } catch (error) {
-            console.error('Error fetching quote requests:', error);
-            res.status(500).json({ error: 'Failed to fetch quote requests' });
+            console.error('Error in getQuoteRequests:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching quote requests',
+                error: error.message
+            });
         }
     }
-    
+
     // Get supplier quotes
     async getSupplierQuotes(req, res) {
         try {
-            const { estimation_id, supplier_id, product_id } = req.query;
-            
-            let whereClause = 'WHERE 1=1';
-            const params = [];
-            
-            if (estimation_id) {
-                whereClause += ' AND sqr.estimation_id = ?';
-                params.push(estimation_id);
+            const { request_id, supplier_id, status } = req.query;
+
+            let whereConditions = [];
+            let queryParams = [];
+
+            if (request_id) {
+                whereConditions.push('sq.request_id = ?');
+                queryParams.push(request_id);
             }
-            
+
             if (supplier_id) {
-                whereClause += ' AND sq.supplier_id = ?';
-                params.push(supplier_id);
+                whereConditions.push('sq.supplier_id = ?');
+                queryParams.push(supplier_id);
             }
-            
-            if (product_id) {
-                whereClause += ' AND sqi.product_id = ?';
-                params.push(product_id);
+
+            if (status) {
+                whereConditions.push('sq.status = ?');
+                queryParams.push(status);
             }
-            
+
+            const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
             const query = `
                 SELECT 
                     sq.*,
-                    s.name as supplier_name,
+                    iv.vendor_name as supplier_name,
+                    sqr.request_number,
                     sqr.estimation_id,
-                    e.estimation_number,
-                    COUNT(sqi.id) as item_count,
-                    AVG(sqi.unit_price) as avg_unit_price
+                    e.estimation_id as estimation_number,
+                    COUNT(sqi.id) as item_count
                 FROM supplier_quotes sq
-                LEFT JOIN suppliers s ON sq.supplier_id = s.id
-                LEFT JOIN supplier_quote_requests sqr ON sq.request_id = sqr.id
+                JOIN inventory_vendors iv ON sq.supplier_id = iv.id
+                JOIN supplier_quote_requests sqr ON sq.request_id = sqr.id
                 LEFT JOIN estimations e ON sqr.estimation_id = e.id
                 LEFT JOIN supplier_quote_items sqi ON sq.id = sqi.quote_id
                 ${whereClause}
                 GROUP BY sq.id
                 ORDER BY sq.created_at DESC
             `;
-            
-            const [rows] = await req.db.execute(query, params);
-            
+
+            const [quotes] = await db.execute(query, queryParams);
+
             res.json({
                 success: true,
-                data: rows
+                data: quotes
             });
-            
+
         } catch (error) {
-            console.error('Error fetching supplier quotes:', error);
-            res.status(500).json({ error: 'Failed to fetch supplier quotes' });
+            console.error('Error in getSupplierQuotes:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching supplier quotes',
+                error: error.message
+            });
         }
     }
-    
+
     // Get price analysis report
     async getPriceAnalysisReport(req, res) {
         try {
             const { estimationId } = req.params;
-            
-            // Get estimation summary
-            const estimationQuery = `
-                SELECT 
-                    e.*,
-                    c.name as client_name,
-                    SUM(ei.total_price) as total_estimated_cost
-                FROM estimations e
-                LEFT JOIN clients c ON e.client_id = c.id
-                LEFT JOIN estimation_items ei ON e.id = ei.estimation_id
-                WHERE e.id = ?
-                GROUP BY e.id
+
+            // Get or create analysis
+            const analysisQuery = `
+                SELECT * FROM price_comparison_analysis 
+                WHERE estimation_id = ? 
+                ORDER BY created_at DESC 
+                LIMIT 1
             `;
-            
-            const [estimationRows] = await req.db.execute(estimationQuery, [estimationId]);
-            
-            if (estimationRows.length === 0) {
-                return res.status(404).json({ error: 'Estimation not found' });
+
+            let [analysis] = await db.execute(analysisQuery, [estimationId]);
+
+            if (analysis.length === 0) {
+                // Generate new analysis
+                analysis = await this.generatePriceAnalysis(estimationId);
+            } else {
+                analysis = analysis[0];
             }
-            
-            // Get best quotes summary
-            const quotesQuery = `
-                SELECT 
-                    ei.id as estimation_item_id,
-                    ei.item_name,
-                    ei.quantity,
-                    ei.unit_price as estimated_price,
-                    ei.total_price as estimated_total,
-                    MIN(sqi.unit_price) as best_quoted_price,
-                    MIN(sqi.total_price) as best_quoted_total,
-                    s.name as best_supplier_name,
-                    sq.quote_number as best_quote_number
-                FROM estimation_items ei
-                LEFT JOIN products p ON ei.product_id = p.id
-                LEFT JOIN supplier_quote_items sqi ON p.id = sqi.product_id
-                LEFT JOIN supplier_quotes sq ON sqi.quote_id = sq.id
-                LEFT JOIN suppliers s ON sq.supplier_id = s.id
-                WHERE ei.estimation_id = ? 
-                AND (sq.valid_until IS NULL OR sq.valid_until >= CURDATE())
-                GROUP BY ei.id
-                HAVING best_quoted_price IS NOT NULL
-            `;
-            
-            const [quotesRows] = await req.db.execute(quotesQuery, [estimationId]);
-            
-            // Calculate savings
-            const totalEstimated = estimationRows[0].total_estimated_cost;
-            const totalBestQuoted = quotesRows.reduce((sum, row) => sum + row.best_quoted_total, 0);
-            const potentialSavings = totalEstimated - totalBestQuoted;
-            const savingsPercentage = totalEstimated > 0 ? (potentialSavings / totalEstimated) * 100 : 0;
-            
+
             res.json({
                 success: true,
-                data: {
-                    estimation: estimationRows[0],
-                    items_comparison: quotesRows,
-                    summary: {
-                        total_estimated_cost: totalEstimated,
-                        total_best_quoted_cost: totalBestQuoted,
-                        potential_savings: potentialSavings,
-                        savings_percentage: Math.round(savingsPercentage * 100) / 100,
-                        items_with_quotes: quotesRows.length,
-                        total_items: await this.getEstimationItemCount(req.db, estimationId)
-                    }
-                }
+                data: analysis
             });
-            
+
         } catch (error) {
-            console.error('Error generating price analysis report:', error);
-            res.status(500).json({ error: 'Failed to generate price analysis report' });
+            console.error('Error in getPriceAnalysisReport:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error generating price analysis report',
+                error: error.message
+            });
         }
     }
-    
-    // Helper methods
-    async generateQuoteRequestNumber(db) {
-        const year = moment().format('YY');
-        const query = `
-            SELECT COUNT(*) as count 
-            FROM supplier_quote_requests 
-            WHERE request_number LIKE 'VESPL/QR/${year}%'
+
+    // Helper: Generate price analysis
+    async generatePriceAnalysis(estimationId) {
+        const user_id = 1; // Default user for system-generated analysis
+
+        // Get estimation items and their best quotes
+        const itemsQuery = `
+            SELECT 
+                ei.id,
+                ei.final_price as estimated_cost,
+                MIN(sqi.final_price) as best_quote_price
+            FROM estimation_items ei
+            LEFT JOIN supplier_quote_request_items sqri ON ei.id = sqri.estimation_item_id
+            LEFT JOIN supplier_quote_items sqi ON sqri.id = sqi.request_item_id
+            LEFT JOIN supplier_quotes sq ON sqi.quote_id = sq.id
+            WHERE ei.estimation_id = ? 
+                AND (sq.status IN ('submitted', 'under_review', 'approved') OR sq.id IS NULL)
+                AND (sq.valid_until >= CURDATE() OR sq.id IS NULL)
+            GROUP BY ei.id
         `;
-        
-        const [rows] = await db.execute(query);
-        const sequence = (rows[0].count + 1).toString().padStart(3, '0');
-        
-        return `VESPL/QR/${year}/${sequence}`;
-    }
-    
-    async getEstimationItemCount(db, estimationId) {
-        const [rows] = await db.execute(
-            'SELECT COUNT(*) as count FROM estimation_items WHERE estimation_id = ?',
-            [estimationId]
-        );
-        return rows[0].count;
+
+        const [items] = await db.execute(itemsQuery, [estimationId]);
+
+        const total_estimated_cost = items.reduce((sum, item) => sum + item.estimated_cost, 0);
+        const total_best_quote_cost = items.reduce((sum, item) => sum + (item.best_quote_price || item.estimated_cost), 0);
+        const total_potential_savings = total_estimated_cost - total_best_quote_cost;
+        const items_with_quotes = items.filter(item => item.best_quote_price).length;
+
+        const analysisData = {
+            total_items: items.length,
+            items_with_quotes,
+            quote_coverage_percent: items.length > 0 ? (items_with_quotes / items.length * 100).toFixed(2) : 0,
+            total_estimated_cost,
+            total_best_quote_cost,
+            total_potential_savings,
+            average_savings_percent: total_estimated_cost > 0 ? (total_potential_savings / total_estimated_cost * 100).toFixed(2) : 0
+        };
+
+        // Save analysis
+        const insertQuery = `
+            INSERT INTO price_comparison_analysis 
+            (estimation_id, analysis_date, total_estimated_cost, total_best_quote_cost, 
+             total_potential_savings, average_savings_percent, items_with_quotes, 
+             total_items, quote_coverage_percent, analysis_data, generated_by)
+            VALUES (?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        await db.execute(insertQuery, [
+            estimationId,
+            analysisData.total_estimated_cost,
+            analysisData.total_best_quote_cost,
+            analysisData.total_potential_savings,
+            analysisData.average_savings_percent,
+            analysisData.items_with_quotes,
+            analysisData.total_items,
+            analysisData.quote_coverage_percent,
+            JSON.stringify(analysisData),
+            user_id
+        ]);
+
+        return analysisData;
     }
 }
 

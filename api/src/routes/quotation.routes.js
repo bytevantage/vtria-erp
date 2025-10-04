@@ -35,11 +35,19 @@ const validateQuotationUpdate = [
 // Enhanced Routes (prioritized)
 router.get('/enhanced/all', authMiddleware.verifyToken, quotationEnhancedController.getAllQuotations);
 router.post('/enhanced/create', authMiddleware.verifyToken, validateEnhancedQuotation, quotationEnhancedController.createQuotationFromEstimation);
+router.post('/enhanced/create-from-estimation', authMiddleware.verifyToken, quotationEnhancedController.createQuotationFromEstimation);
 router.get('/enhanced/:id', authMiddleware.verifyToken, quotationEnhancedController.getQuotationById);
 router.put('/enhanced/:id', authMiddleware.verifyToken, validateQuotationUpdate, quotationEnhancedController.updateQuotation);
 router.put('/enhanced/:id/status', authMiddleware.verifyToken, quotationEnhancedController.updateQuotationStatus);
 router.post('/enhanced/:id/approve', authMiddleware.verifyToken, quotationEnhancedController.approveQuotation);
 router.get('/enhanced/:id/pdf', authMiddleware.verifyToken, (req, res) => quotationEnhancedController.generateQuotationPDF(req, res));
+router.get('/enhanced/:id/bom', authMiddleware.verifyToken, (req, res) => quotationEnhancedController.generateBOMPDF(req, res));
+router.post('/enhanced/:id/recalculate', authMiddleware.verifyToken, (req, res) => quotationEnhancedController.recalculateQuotationTotals(req, res));
+
+// Basic Quotation routes
+
+// Case-based Routes
+router.get('/by-case/:caseNumber', authMiddleware.verifyToken, quotationEnhancedController.getQuotationByCaseNumber);
 
 // Original Routes (for backward compatibility)
 router.get('/', authMiddleware.verifyToken, quotationController.getAllQuotations);

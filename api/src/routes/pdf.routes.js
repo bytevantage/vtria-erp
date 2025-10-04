@@ -15,10 +15,22 @@ router.post('/purchase-order/:poId',
     pdfController.generatePurchaseOrderPDF
 );
 
+// Generate sales order PDF
+router.post('/sales-order/:salesOrderId', 
+    checkPermission('sales_orders', 'read'),
+    pdfController.generateSalesOrderPDF
+);
+
 // Generate GRN PDF
 router.post('/grn/:grnId', 
     checkPermission('inventory', 'read'),
     pdfController.generateGRNPDF
+);
+
+// Generate BOM PDF
+router.post('/bom/:bomId', 
+    checkPermission('production', 'read'),
+    pdfController.generateBOMPDF
 );
 
 // Download PDF file

@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { logger } from '../utils/logger.js';
 
 // License server configuration
 const LICENSE_SERVER_URL = process.env.REACT_APP_LICENSE_SERVER_URL || 'https://api.bytevantage.in';
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = ''; // Use relative URLs for proxy compatibility
 
 // Create axios instance for license server
 const licenseAPI = axios.create({
@@ -58,8 +59,8 @@ class LicenseService {
   // Validate license key with ByteVantage server
   async validateLicense(licenseKey, clientId = 'VTRIA-ERP-CLIENT') {
     try {
-      console.log('Validating license key:', licenseKey);
-      
+      logger.log('Validating license key:', licenseKey);
+
       const response = await licenseAPI.post('/api/admin/validate-license', {
         license_key: licenseKey,
         client_id: clientId,
@@ -74,12 +75,12 @@ class LicenseService {
       if (response.data.success) {
         this.licenseKey = licenseKey;
         this.licenseData = response.data.license;
-        
+
         // Store in localStorage
         localStorage.setItem('vtria_license_key', licenseKey);
         localStorage.setItem('vtria_license_data', JSON.stringify(response.data.license));
-        
-        console.log('License validated successfully:', response.data.license);
+
+        logger.log('License validated successfully:', response.data.license);
         return {
           success: true,
           license: response.data.license,
@@ -89,7 +90,7 @@ class LicenseService {
         throw new Error(response.data.message || 'License validation failed');
       }
     } catch (error) {
-      console.error('License validation error:', error);
+      logger.error('License validation error:', error);
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to validate license'
@@ -107,14 +108,14 @@ class LicenseService {
     if (this.licenseData.expires_at) {
       const expiryDate = new Date(this.licenseData.expires_at);
       if (expiryDate < new Date()) {
-        console.warn('License has expired:', this.licenseData.expires_at);
+        logger.warn('License has expired:', this.licenseData.expires_at);
         return false;
       }
     }
 
     // Check license status
     if (this.licenseData.status !== 'active') {
-      console.warn('License is not active:', this.licenseData.status);
+      logger.warn('License is not active:', this.licenseData.status);
       return false;
     }
 
@@ -149,7 +150,7 @@ class LicenseService {
         serverInfo: response.data
       };
     } catch (error) {
-      console.error('License server connection error:', error);
+      logger.error('License server connection error:', error);
       return {
         success: false,
         error: 'Cannot connect to ByteVantage License Server'
@@ -162,7 +163,7 @@ class LicenseService {
     if (!this.licenseKey) {
       throw new Error('No license key available');
     }
-    
+
     return await this.validateLicense(this.licenseKey);
   }
 }

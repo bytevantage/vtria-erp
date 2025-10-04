@@ -251,7 +251,7 @@ class NotificationService {
 
         } catch (error) {
             // If user_notifications table doesn't exist, that's OK for now
-            logger.warn(`In-app notification failed (table may not exist):`, error.message);
+            logger.warn('In-app notification failed (table may not exist):', error.message);
             return { success: true }; // Don't fail the whole notification for this
         }
     }

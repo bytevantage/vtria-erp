@@ -111,7 +111,7 @@ class MultiLocationInventoryController {
                 priority = 'normal'
             } = req.body;
             
-            const user_id = req.user?.id || 1; // Get from auth middleware
+            const user_id = req.user.id; // Get from auth middleware
             
             // Generate transfer number
             const transferNumber = await generateTransferNumber(connection);
@@ -291,7 +291,7 @@ class MultiLocationInventoryController {
         try {
             const { transferId } = req.params;
             const { approved_by_notes } = req.body;
-            const user_id = req.user?.id || 1;
+            const user_id = req.user.id;
             
             const query = `
                 UPDATE inter_store_transfers 
@@ -328,7 +328,7 @@ class MultiLocationInventoryController {
         try {
             const { transferId } = req.params;
             const { shipped_items } = req.body;
-            const user_id = req.user?.id || 1;
+            const user_id = req.user.id;
             
             // Start transaction
             await req.db.beginTransaction();

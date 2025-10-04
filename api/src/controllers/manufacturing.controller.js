@@ -69,7 +69,7 @@ exports.createWorkOrder = async (req, res) => {
             safety_notes
         } = req.body;
         
-        const userId = req.user?.id || 1; // Default for auth bypass
+        const userId = req.user.id; // User must be authenticated
         
         // Generate work order ID (VESPL/WO/2526/XXX)
         const financialYear = DocumentNumberGenerator.getCurrentFinancialYear();
@@ -271,7 +271,7 @@ exports.updateWorkOrderStatus = async (req, res) => {
         
         const { id } = req.params;
         const { status, progress_percentage, notes } = req.body;
-        const userId = req.user?.id || 1;
+        const userId = req.user.id;
         
         // Update work order
         await connection.execute(
@@ -316,7 +316,7 @@ exports.assignTechnician = async (req, res) => {
     try {
         const { id } = req.params;
         const { assigned_to, notes } = req.body;
-        const userId = req.user?.id || 1;
+        const userId = req.user.id;
         
         await db.execute(
             `UPDATE work_orders 

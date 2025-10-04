@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      target: production
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=vtria_user
+      - DB_PASS=SecurePassword123!
+      - DB_NAME=vtria_erp
+      - JWT_SECRET=CHANGE_THIS_TO_SECURE_32_CHAR_STRING_FOR_PRODUCTION_MINIMUM_LENGTH
+      - JWT_EXPIRATION=24h
+      - BYPASS_AUTH=false
+      - LOG_LEVEL=error
+    volumes:
+      # Windows-compatible volume mapping
+      - ./logs:/var/log/vtria-erp
+      - ./uploads:/var/www/vtria-erp/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - vtria-network
+
+  client:
+    build:
+      context: ./client
+      target: production
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - vtria-network
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/schema:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=SecureRootPassword123!
+      - MYSQL_DATABASE=vtria_erp
+      - MYSQL_USER=vtria_user
+      - MYSQL_PASSWORD=SecurePassword123!
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=SecurePassword123!" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - vtria-network
+
+volumes:
+  mysql_data:
+
+
+networks:
+  vtria-network:
+    driver: bridge

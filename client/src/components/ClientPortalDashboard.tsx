@@ -119,11 +119,11 @@ const ClientPortalDashboard: React.FC<ClientPortalDashboardProps> = ({
     fetchCases();
   }, [clientId]);
 
-  // Auto-refresh live data every 30 seconds
+  // Auto-refresh live data every 2 minutes (optimized for performance)
   useEffect(() => {
     if (selectedCase) {
       fetchLiveProgress();
-      const interval = setInterval(fetchLiveProgress, 30000);
+      const interval = setInterval(fetchLiveProgress, 120000);
       return () => clearInterval(interval);
     }
   }, [selectedCase]);
@@ -159,7 +159,7 @@ const ClientPortalDashboard: React.FC<ClientPortalDashboardProps> = ({
 
   const fetchLiveProgress = async () => {
     if (!selectedCase) return;
-    
+
     try {
       const response = await fetch(`/api/client-portal/progress/${encodeURIComponent(selectedCase)}/live`);
       const data = await response.json();
@@ -397,10 +397,10 @@ const ClientPortalDashboard: React.FC<ClientPortalDashboardProps> = ({
                         secondary={
                           <Box>
                             <Typography variant="body2">
-                              Status: <Chip 
-                                label={milestone.status.replace('_', ' ')} 
-                                size="small" 
-                                color={getStatusColor(milestone.status)} 
+                              Status: <Chip
+                                label={milestone.status.replace('_', ' ')}
+                                size="small"
+                                color={getStatusColor(milestone.status)}
                               />
                             </Typography>
                             <LinearProgress
@@ -409,7 +409,7 @@ const ClientPortalDashboard: React.FC<ClientPortalDashboardProps> = ({
                               sx={{ mt: 1, mb: 1 }}
                             />
                             <Typography variant="caption">
-                              Progress: {milestone.progress_percentage}% | 
+                              Progress: {milestone.progress_percentage}% |
                               Due: {new Date(milestone.planned_end_date).toLocaleDateString()}
                             </Typography>
                             {milestone.latest_update && (

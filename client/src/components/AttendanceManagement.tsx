@@ -57,7 +57,7 @@ interface AttendanceRecord {
   check_out_time?: string;
   check_in_location?: string;
   check_out_location?: string;
-  total_hours?: number;
+  total_hours?: string | number; // API returns string, but can be converted to number
   attendance_status: string;
   is_late: boolean;
   late_minutes: number;
@@ -71,12 +71,14 @@ interface Employee {
 }
 
 const AttendanceManagement: React.FC = () => {
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [openCheckInDialog, setOpenCheckInDialog] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState('');
-  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number, lng: number } | null>(null);
   const [locationError, setLocationError] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
@@ -96,7 +98,7 @@ const AttendanceManagement: React.FC = () => {
         ...(employeeFilter && { employee_id: employeeFilter })
       });
 
-      const response = await fetch(`/api/employees/attendance/records?${params}`, {
+      const response = await fetch(`${API_BASE_URL}/api/employees/attendance/records?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -145,7 +147,7 @@ const AttendanceManagement: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('/api/employees?status=active', {
+      const response = await fetch(`${API_BASE_URL}/api/employees?status=active`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
@@ -198,7 +200,7 @@ const AttendanceManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch('/api/employees/attendance/record', {
+      const response = await fetch(`${API_BASE_URL}/api/employees/attendance/record`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -260,7 +262,7 @@ const AttendanceManagement: React.FC = () => {
   const getTodaysAttendanceStats = () => {
     const today = new Date().toISOString().split('T')[0];
     const todayRecords = attendanceRecords.filter(record => record.attendance_date === today);
-    
+
     return {
       total: todayRecords.length,
       present: todayRecords.filter(record => record.check_in_time).length,
@@ -317,7 +319,7 @@ const AttendanceManagement: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -513,7 +515,7 @@ const AttendanceManagement: React.FC = () => {
                       </TableCell>
                       <TableCell align="center">
                         <Typography variant="body2" fontWeight="medium">
-                          {record.total_hours ? `${record.total_hours.toFixed(2)}h` : '--'}
+                          {record.total_hours ? `${parseFloat(record.total_hours).toFixed(2)}h` : '--'}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -582,7 +584,7 @@ const AttendanceManagement: React.FC = () => {
                       Location Information
                     </Typography>
                   </Box>
-                  
+
                   {!currentLocation && !locationError && (
                     <Box sx={{ textAlign: 'center', py: 2 }}>
                       <Button

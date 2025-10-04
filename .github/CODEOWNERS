@@ -1,0 +1,67 @@
+# Default owners for everything in the repo
+*       @vtria/engineering-team
+
+# Core application code
+/client/src           @vtria/frontend-team
+/api/src              @vtria/backend-team
+/database             @vtria/database-team
+
+# Documentation
+/README.md            @vtria/tech-writers
+/docs/                @vtria/tech-writers
+
+# Infrastructure
+/docker/              @vtria/devops
+/.github/             @vtria/devops
+
+# Configuration files
+/.eslintrc.js         @vtria/frontend-leads
+/.prettierrc          @vtria/frontend-leads
+/tsconfig.json        @vtria/frontend-leads
+
+# Security-related files
+/.env*                @vtria/security-team
+
+# API Documentation
+/api-docs/            @vtria/backend-leads @vtria/tech-writers
+
+# Tests
+/__tests__/           @vtria/qa-team
+/test/                @vtria/qa-team
+
+# Dependencies
+/package.json         @vtria/backend-leads @vtria/frontend-leads
+yarn.lock             @vtria/backend-leads @vtria/frontend-leads
+package-lock.json     @vtria/backend-leads @vtria/frontend-leads
+
+# Pull Request Reviewers
+# These people will be automatically requested for review on PRs
+# that modify files in these paths
+/client/src/**/*.{js,jsx,ts,tsx}  @vtria/frontend-team
+/api/src/**/*.js                  @vtria/backend-team
+/database/**/*.sql                @vtria/database-team
+
+# Documentation updates
+/*.md                     @vtria/tech-writers
+/docs/**/*.md             @vtria/tech-writers
+
+# Security-related changes
+/**/security*.{js,ts}     @vtria/security-team
+/**/auth*.{js,ts}         @vtria/security-team
+
+# Configuration changes
+/.github/                 @vtria/devops @vtria/engineering-managers
+/package.json             @vtria/backend-leads @vtria/frontend-leads
+
+# Required Reviews
+# These require at least 2 approvals from the specified teams
+/client/src/**/*.test.{js,jsx,ts,tsx}  @vtria/frontend-leads @vtria/qa-team
+/api/**/*.test.js                      @vtria/backend-leads @vtria/qa-team
+
+# Sensitive paths (require security team review)
+/**/secrets/**/*           @vtria/security-team
+/**/config/credentials.*   @vtria/security-team
+
+# Documentation exempt from review
+/.github/CODEOWNERS    @vtria/engineering-managers
+/README.md             @vtria/engineering-managers

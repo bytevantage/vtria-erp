@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   Typography,
@@ -25,12 +26,14 @@ import {
   Business as BusinessIcon,
 } from '@mui/icons-material';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 const Clients = () => {
   const [clients, setClients] = useState([]);
   const [open, setOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
+    company_name: '',
     contact_person: '',
     email: '',
     phone: '',
@@ -38,8 +41,7 @@ const Clients = () => {
     city: '',
     state: '',
     pincode: '',
-    gst_number: '',
-    pan_number: '',
+    gstin: '',
   });
 
   useEffect(() => {
@@ -48,51 +50,10 @@ const Clients = () => {
 
   const fetchClients = async () => {
     try {
-      // Mock data for VTRIA clients
-      setClients([
-        {
-          id: 1,
-          name: 'Mangalore Steel Company',
-          contact_person: 'Mr. Suresh Rao',
-          email: 'suresh.rao@mansteel.com',
-          phone: '+91-824-2234567',
-          address: 'Industrial Area, Bajpe',
-          city: 'Mangalore',
-          state: 'Karnataka',
-          pincode: '574142',
-          gst_number: '29ABCDE1234F1Z5',
-          pan_number: 'ABCDE1234F',
-          created_at: '2025-09-01',
-        },
-        {
-          id: 2,
-          name: 'Bangalore Manufacturing Ltd',
-          contact_person: 'Ms. Priya Sharma',
-          email: 'priya@banmfg.com',
-          phone: '+91-80-25567890',
-          address: 'Electronics City, Phase 2',
-          city: 'Bangalore',
-          state: 'Karnataka',
-          pincode: '560100',
-          gst_number: '29FGHIJ5678K2L6',
-          pan_number: 'FGHIJ5678K',
-          created_at: '2025-09-02',
-        },
-        {
-          id: 3,
-          name: 'Pune Auto Components',
-          contact_person: 'Mr. Suresh Patil',
-          email: 'suresh.patil@puneauto.com',
-          phone: '+91-20-26789012',
-          address: 'Pimpri Industrial Area',
-          city: 'Pune',
-          state: 'Maharashtra',
-          pincode: '411018',
-          gst_number: '27KLMNO9012P3Q7',
-          pan_number: 'KLMNO9012P',
-          created_at: '2025-09-03',
-        },
-      ]);
+      const response = await axios.get(`${API_BASE_URL}/api/clients`);
+      if (response.data.success) {
+        setClients(response.data.data);
+      }
     } catch (error) {
       console.error('Error fetching clients:', error);
     }
@@ -101,11 +62,21 @@ const Clients = () => {
   const handleOpen = (client = null) => {
     if (client) {
       setEditingClient(client);
-      setFormData(client);
+      setFormData({
+        company_name: client.company_name || '',
+        contact_person: client.contact_person || '',
+        email: client.email || '',
+        phone: client.phone || '',
+        address: client.address || '',
+        city: client.city || '',
+        state: client.state || '',
+        pincode: client.pincode || '',
+        gstin: client.gstin || '',
+      });
     } else {
       setEditingClient(null);
       setFormData({
-        name: '',
+        company_name: '',
         contact_person: '',
         email: '',
         phone: '',
@@ -113,8 +84,7 @@ const Clients = () => {
         city: '',
         state: '',
         pincode: '',
-        gst_number: '',
-        pan_number: '',
+        gstin: '',
       });
     }
     setOpen(true);
@@ -129,27 +99,35 @@ const Clients = () => {
     try {
       if (editingClient) {
         // Update existing client
-        setClients(clients.map(c => 
-          c.id === editingClient.id ? { ...c, ...formData } : c
-        ));
+        const response = await axios.put(`${API_BASE_URL}/api/clients/${editingClient.id}`, formData);
+        if (response.data.success) {
+          await fetchClients(); // Refresh the list
+        }
       } else {
         // Add new client
-        const newClient = {
-          id: Date.now(),
-          ...formData,
-          created_at: new Date().toISOString().split('T')[0],
-        };
-        setClients([...clients, newClient]);
+        const response = await axios.post(`${API_BASE_URL}/api/clients`, formData);
+        if (response.data.success) {
+          await fetchClients(); // Refresh the list
+        }
       }
       handleClose();
     } catch (error) {
       console.error('Error saving client:', error);
+      alert('Error saving client. Please try again.');
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
-      setClients(clients.filter(c => c.id !== id));
+      try {
+        const response = await axios.delete(`${API_BASE_URL}/api/clients/${id}`);
+        if (response.data.success) {
+          await fetchClients(); // Refresh the list
+        }
+      } catch (error) {
+        console.error('Error deleting client:', error);
+        alert('Error deleting client. Please try again.');
+      }
     }
   };
 
@@ -185,14 +163,14 @@ const Clients = () => {
                 <TableCell>
                   <Box display="flex" alignItems="center">
                     <BusinessIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    {client.name}
+                    {client.company_name}
                   </Box>
                 </TableCell>
                 <TableCell>{client.contact_person}</TableCell>
                 <TableCell>{client.email}</TableCell>
                 <TableCell>{client.phone}</TableCell>
                 <TableCell>{client.city}, {client.state}</TableCell>
-                <TableCell>{client.gst_number}</TableCell>
+                <TableCell>{client.gstin}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleOpen(client)} size="small">
                     <EditIcon />
@@ -207,10 +185,10 @@ const Clients = () => {
         </Table>
       </TableContainer>
 
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
-        maxWidth="lg" 
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="lg"
         fullWidth
         PaperProps={{
           sx: {
@@ -221,7 +199,7 @@ const Clients = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
+        <DialogTitle sx={{
           background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
           color: 'white',
           fontSize: '1.5rem',
@@ -230,11 +208,11 @@ const Clients = () => {
           borderBottom: 'none'
         }}>
           <Box display="flex" alignItems="center" gap={2.5}>
-            <Box 
-              sx={{ 
-                width: 48, 
-                height: 48, 
-                borderRadius: '12px', 
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: '12px',
                 backgroundColor: 'rgba(255,255,255,0.2)',
                 display: 'flex',
                 alignItems: 'center',
@@ -256,12 +234,12 @@ const Clients = () => {
         </DialogTitle>
         <DialogContent sx={{ padding: '0', backgroundColor: '#fafafa' }}>
           <Box sx={{ p: 4 }}>
-            <Typography 
-              variant="h6" 
-              gutterBottom 
-              sx={{ 
-                mb: 4, 
-                color: '#2c3e50', 
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{
+                mb: 4,
+                color: '#2c3e50',
                 fontWeight: 600,
                 fontSize: '1.2rem',
                 display: 'flex',
@@ -271,8 +249,8 @@ const Clients = () => {
             >
               📋 Client Information
             </Typography>
-            <Box 
-              sx={{ 
+            <Box
+              sx={{
                 backgroundColor: 'white',
                 borderRadius: '20px',
                 padding: '36px',
@@ -283,11 +261,11 @@ const Clients = () => {
               <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -298,23 +276,23 @@ const Clients = () => {
                     </Typography>
                     <TextField
                       fullWidth
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      value={formData.company_name}
+                      onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                       placeholder="Enter company name"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -325,11 +303,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -344,19 +322,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
                       placeholder="Enter contact person name"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -367,11 +345,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -387,19 +365,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="Enter email address"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -410,11 +388,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -429,19 +407,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Enter phone number"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -452,11 +430,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -473,19 +451,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="Enter complete address including street, area, and landmarks"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -496,11 +474,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -515,19 +493,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                       placeholder="Enter city"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -538,11 +516,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -557,19 +535,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                       placeholder="Enter state"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -580,11 +558,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -599,19 +577,19 @@ const Clients = () => {
                       onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                       placeholder="Enter pincode"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -622,11 +600,11 @@ const Clients = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 2,
+                        color: '#555',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
@@ -637,65 +615,23 @@ const Clients = () => {
                     </Typography>
                     <TextField
                       fullWidth
-                      value={formData.gst_number}
-                      onChange={(e) => setFormData({ ...formData, gst_number: e.target.value })}
+                      value={formData.gstin}
+                      onChange={(e) => setFormData({ ...formData, gstin: e.target.value })}
                       placeholder="Enter GST number"
                       variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: '16px',
                           backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
+                          '& fieldset': {
                             borderColor: '#e0e7ff',
                             borderWidth: '2px'
                           },
-                          '&:hover fieldset': { 
+                          '&:hover fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           },
-                          '&.Mui-focused fieldset': { 
-                            borderColor: '#1976d2',
-                            borderWidth: '2px'
-                          }
-                        }
-                      }}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ mb: 2 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: '#555', 
-                        fontWeight: 600,
-                        fontSize: '0.9rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                      }}
-                    >
-                      PAN Number
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      value={formData.pan_number}
-                      onChange={(e) => setFormData({ ...formData, pan_number: e.target.value })}
-                      placeholder="Enter PAN number"
-                      variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': { 
-                          borderRadius: '16px',
-                          backgroundColor: '#f8f9fa',
-                          '& fieldset': { 
-                            borderColor: '#e0e7ff',
-                            borderWidth: '2px'
-                          },
-                          '&:hover fieldset': { 
-                            borderColor: '#1976d2',
-                            borderWidth: '2px'
-                          },
-                          '&.Mui-focused fieldset': { 
+                          '&.Mui-focused fieldset': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'
                           }
@@ -708,16 +644,16 @@ const Clients = () => {
             </Box>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ 
-          padding: '24px 36px', 
+        <DialogActions sx={{
+          padding: '24px 36px',
           backgroundColor: '#f8f9fa',
           borderTop: '1px solid #e8eaed',
           gap: 3
         }}>
-          <Button 
+          <Button
             onClick={handleClose}
             variant="outlined"
-            sx={{ 
+            sx={{
               borderRadius: '16px',
               textTransform: 'none',
               fontWeight: 600,
@@ -736,10 +672,10 @@ const Clients = () => {
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             variant="contained"
-            sx={{ 
+            sx={{
               borderRadius: '16px',
               textTransform: 'none',
               fontWeight: 700,
@@ -748,7 +684,7 @@ const Clients = () => {
               fontSize: '1rem',
               background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
               boxShadow: '0 8px 24px rgba(25, 118, 210, 0.3)',
-              '&:hover': { 
+              '&:hover': {
                 background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
                 boxShadow: '0 12px 32px rgba(25, 118, 210, 0.4)',
                 transform: 'translateY(-1px)'

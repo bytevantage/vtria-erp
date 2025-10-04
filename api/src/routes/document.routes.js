@@ -11,4 +11,7 @@ router.post('/purchase-order/:poId/generate-pdf', authMiddleware.verifyToken, do
 router.post('/estimation/:estimationId/generate-pdf', authMiddleware.verifyToken, documentController.generateEstimationPDF);
 router.post('/bom/:bomId/generate-pdf', authMiddleware.verifyToken, documentController.generateBomPDF);
 
+// Document Download Routes
+router.get('/download/:category/:fileName', authMiddleware.verifyToken, documentController.downloadDocument);
+
 module.exports = router;

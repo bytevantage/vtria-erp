@@ -35,6 +35,7 @@ import {
   LineElement
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import SystemStatus from '../../components/SystemStatus/SystemStatus';
 
 // Register Chart.js components
 ChartJS.register(
@@ -133,6 +134,11 @@ const Dashboard = () => {
         Welcome to VTRIA ERP - Engineering Solutions Management
       </Typography>
 
+      {/* System Status */}
+      <Box sx={{ mb: 3 }}>
+        <SystemStatus />
+      </Box>
+      
       {/* Key Metrics */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>

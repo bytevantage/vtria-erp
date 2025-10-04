@@ -19,6 +19,7 @@ I - Invoice
 PO - Purchase Order
 PI - Proforma Invoice
 DC - Delivery Challan
+BOM - Bill of Material
 
 XX is the appropriate code such as EQ,ET etc.
 2526 is the financial year. Next year it will be 2627.

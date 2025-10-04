@@ -176,8 +176,8 @@ exports.listEnquiries = async (req, res) => {
         
         // Get total count
         const [countResult] = await db.execute(
-            'SELECT COUNT(*) as total FROM sales_enquiries WHERE 1=1' + 
-            (status ? ' AND status = ?' : ''),
+            `SELECT COUNT(*) as total FROM sales_enquiries WHERE 1=1${  
+            status ? ' AND status = ?' : ''}`,
             status ? [status] : []
         );
         

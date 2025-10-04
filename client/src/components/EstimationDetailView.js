@@ -50,7 +50,7 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
       setLoading(true);
       setError(null);
       const response = await axios.get(`${API_BASE_URL}/api/estimation/${estimationId}/details`);
-      
+
       if (response.data.success) {
         setEstimation(response.data.data);
       } else {
@@ -65,24 +65,42 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
   };
 
   const calculateTotals = () => {
-    if (!estimation?.sections) return { totalMRP: 0, totalFinalPrice: 0, totalDiscount: 0, discountPercentage: 0 };
+    if (!estimation?.sections || !Array.isArray(estimation.sections)) return { totalMRP: 0, totalFinalPrice: 0, totalDiscount: 0, discountPercentage: 0 };
 
     let totalMRP = 0;
     let totalFinalPrice = 0;
     let totalDiscount = 0;
 
     estimation.sections.forEach(section => {
-      section.subsections?.forEach(subsection => {
-        subsection.items?.forEach(item => {
+      // Process items in subsections
+      if (section.subsections && Array.isArray(section.subsections)) {
+        section.subsections.forEach(subsection => {
+          if (subsection.items && Array.isArray(subsection.items)) {
+            subsection.items.forEach(item => {
+              const mrp = parseFloat(item.mrp) || 0;
+              const quantity = parseInt(item.quantity) || 0;
+              const finalPrice = parseFloat(item.final_price) || 0;
+
+              totalMRP += mrp * quantity;
+              totalFinalPrice += finalPrice;
+              totalDiscount += (mrp * quantity) - finalPrice;
+            });
+          }
+        });
+      }
+
+      // Also process direct items in sections (if any)
+      if (section.items && Array.isArray(section.items)) {
+        section.items.forEach(item => {
           const mrp = parseFloat(item.mrp) || 0;
           const quantity = parseInt(item.quantity) || 0;
           const finalPrice = parseFloat(item.final_price) || 0;
-          
+
           totalMRP += mrp * quantity;
           totalFinalPrice += finalPrice;
           totalDiscount += (mrp * quantity) - finalPrice;
         });
-      });
+      }
     });
 
     return {
@@ -113,13 +131,13 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
       maxWidth="xl"
       fullWidth
       PaperProps={{
-        sx: { 
+        sx: {
           height: '95vh',
           borderRadius: '12px'
         }
       }}
     >
-      <DialogTitle sx={{ 
+      <DialogTitle sx={{
         background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
         color: 'white',
         fontWeight: 600,
@@ -136,7 +154,7 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
             variant="outlined"
             startIcon={<PrintIcon />}
             onClick={handlePrint}
-            sx={{ 
+            sx={{
               color: 'white',
               borderColor: 'white',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
@@ -148,7 +166,7 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
             variant="outlined"
             startIcon={<PdfIcon />}
             onClick={handleExportPDF}
-            sx={{ 
+            sx={{
               color: 'white',
               borderColor: 'white',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
@@ -160,7 +178,7 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
             edge="end"
             color="inherit"
             onClick={onClose}
-            sx={{ 
+            sx={{
               color: 'white',
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
@@ -194,7 +212,7 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
                     <Typography variant="h6" sx={{ color: '#64748b', mb: 3 }}>
                       {estimation.project_name}
                     </Typography>
-                    
+
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
                         <Typography variant="body1" sx={{ mb: 1 }}>
@@ -211,26 +229,28 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
                         <Typography variant="body1" sx={{ mb: 1 }}>
                           <strong>Enquiry ID:</strong> {estimation.enquiry_id}
                         </Typography>
-                        <Typography variant="body1" sx={{ mb: 1 }}>
-                          <strong>Status:</strong> 
-                          <Chip 
-                            label={estimation.status?.toUpperCase()} 
+                        <Box display="flex" alignItems="center" sx={{ mb: 1 }}>
+                          <Typography variant="body1">
+                            <strong>Status:</strong>
+                          </Typography>
+                          <Chip
+                            label={estimation.status?.toUpperCase()}
                             color={estimation.status === 'approved' ? 'success' : estimation.status === 'draft' ? 'warning' : 'default'}
                             size="small"
                             sx={{ ml: 1 }}
                           />
-                        </Typography>
+                        </Box>
                         <Typography variant="body1">
                           <strong>Created By:</strong> {estimation.created_by_name}
                         </Typography>
                       </Grid>
                     </Grid>
                   </Grid>
-                  
-                  <Grid item xs={12} md={4}>
-                    <Card sx={{ 
-                      p: 3, 
-                      backgroundColor: '#1e293b', 
+
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{
+                      p: 3,
+                      backgroundColor: '#1e293b',
                       color: 'white',
                       borderRadius: '8px',
                       textAlign: 'center'
@@ -248,94 +268,127 @@ const EstimationDetailView = ({ open, onClose, estimationId }) => {
                       )}
                     </Card>
                   </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{
+                      p: 3,
+                      backgroundColor: '#22c55e',
+                      color: 'white',
+                      borderRadius: '8px',
+                      textAlign: 'center'
+                    }}>
+                      <Typography variant="h6" gutterBottom sx={{ color: '#f0fdf4' }}>
+                        Final Total
+                      </Typography>
+                      <Typography variant="h3" fontWeight={700} sx={{ color: 'white', mb: 2 }}>
+                        ₹{totals.totalFinalPrice.toLocaleString('en-IN')}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#dcfce7' }}>
+                        After discounts applied
+                      </Typography>
+                    </Card>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
 
             {/* Sections and Items */}
-            {estimation.sections?.map((section, sectionIndex) => (
+            {estimation.sections && Array.isArray(estimation.sections) && estimation.sections.map((section, sectionIndex) => (
               <Card key={section.id} sx={{ mb: 3, borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                 <Accordion defaultExpanded={sectionIndex === 0}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: '#f1f5f9' }}>
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                      {section.section_name || section.heading}
+                      {section.heading || section.section_name}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    {section.subsections?.map((subsection) => (
-                      <Box key={subsection.id} sx={{ mb: 3 }}>
-                        <Typography variant="h6" sx={{ mb: 2, color: '#475569', fontWeight: 600 }}>
-                          {subsection.subsection_name}
-                        </Typography>
-                        
-                        {subsection.items?.length > 0 ? (
-                          <TableContainer component={Paper} sx={{ borderRadius: '8px' }}>
-                            <Table>
-                              <TableHead>
-                                <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                                  <TableCell><strong>Product</strong></TableCell>
-                                  <TableCell><strong>Make/Model</strong></TableCell>
-                                  <TableCell align="right"><strong>MRP</strong></TableCell>
-                                  <TableCell align="center"><strong>Qty</strong></TableCell>
-                                  <TableCell align="right"><strong>Subtotal</strong></TableCell>
-                                  <TableCell align="center"><strong>Discount</strong></TableCell>
-                                  <TableCell align="right"><strong>Final Price</strong></TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {subsection.items.map((item) => (
-                                  <TableRow key={item.id} hover>
-                                    <TableCell>
-                                      <Typography variant="body2" fontWeight={600}>
-                                        {item.product_name}
-                                      </Typography>
-                                      <Typography variant="caption" color="text.secondary">
-                                        Code: {item.part_code}
-                                      </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Typography variant="body2">
-                                        {item.make} {item.model}
-                                      </Typography>
-                                      <Typography variant="caption" color="text.secondary">
-                                        {item.category_name}
-                                      </Typography>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                      ₹{parseFloat(item.mrp || 0).toLocaleString('en-IN')}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                      {item.quantity}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                      ₹{(parseFloat(item.mrp || 0) * parseInt(item.quantity || 0)).toLocaleString('en-IN')}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                      {parseFloat(item.discount_percentage || 0).toFixed(1)}%
-                                    </TableCell>
-                                    <TableCell align="right">
-                                      <Typography variant="body2" fontWeight={600} color="primary">
-                                        ₹{parseFloat(item.final_price || 0).toLocaleString('en-IN')}
-                                      </Typography>
-                                    </TableCell>
+                    {/* Display subsections and their items */}
+                    {section.subsections && Array.isArray(section.subsections) ? (
+                      section.subsections.map(subsection => (
+                        <Box key={subsection.id} sx={{ mb: subsection !== section.subsections[section.subsections.length - 1] ? 3 : 0 }}>
+                          {section.subsections.length > 1 && (
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#374151', mb: 2, pl: 1 }}>
+                              {subsection.subsection_name}
+                            </Typography>
+                          )}
+                          {subsection.items && Array.isArray(subsection.items) && subsection.items.length > 0 ? (
+                            <TableContainer component={Paper} sx={{ borderRadius: '8px' }}>
+                              <Table>
+                                <TableHead>
+                                  <TableRow sx={{ backgroundColor: '#f8fafc' }}>
+                                    <TableCell><strong>Product</strong></TableCell>
+                                    <TableCell><strong>Make/Model</strong></TableCell>
+                                    <TableCell align="right"><strong>MRP</strong></TableCell>
+                                    <TableCell align="center"><strong>Qty</strong></TableCell>
+                                    <TableCell align="right"><strong>Subtotal</strong></TableCell>
+                                    <TableCell align="center"><strong>Discount</strong></TableCell>
+                                    <TableCell align="right"><strong>Final Price</strong></TableCell>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary" sx={{ p: 2, fontStyle: 'italic' }}>
-                            No items in this subsection
-                          </Typography>
-                        )}
-                      </Box>
-                    ))}
+                                </TableHead>
+                                <TableBody>
+                                  {subsection.items.map((item) => (
+                                    <TableRow key={item.id} hover>
+                                      <TableCell>
+                                        <Box>
+                                          <Typography variant="body2" fontWeight={600}>
+                                            {item.item_name || item.product_name}
+                                          </Typography>
+                                          <Typography variant="caption" color="text.secondary">
+                                            Code: {item.item_code || item.part_code}
+                                          </Typography>
+                                        </Box>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Box>
+                                          <Typography variant="body2">
+                                            {(item.make && item.make !== 'Unknown' ? item.make : '') +
+                                              (item.model && item.model !== 'N/A' ? ` ${item.model}` : '') ||
+                                              'Not specified'}
+                                          </Typography>
+                                          <Typography variant="caption" color="text.secondary">
+                                            {item.category_name}
+                                          </Typography>
+                                        </Box>
+                                      </TableCell>
+                                      <TableCell align="right">
+                                        ₹{parseFloat(item.mrp || 0).toLocaleString('en-IN')}
+                                      </TableCell>
+                                      <TableCell align="center">
+                                        {item.quantity}
+                                      </TableCell>
+                                      <TableCell align="right">
+                                        ₹{(parseFloat(item.mrp || 0) * parseInt(item.quantity || 0)).toLocaleString('en-IN')}
+                                      </TableCell>
+                                      <TableCell align="center">
+                                        {parseFloat(item.discount_percentage || 0).toFixed(1)}%
+                                      </TableCell>
+                                      <TableCell align="right">
+                                        <Typography variant="body2" fontWeight={600} color="primary">
+                                          ₹{parseFloat(item.final_price || 0).toLocaleString('en-IN')}
+                                        </Typography>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary" sx={{ p: 2, fontStyle: 'italic' }}>
+                              No items in {subsection.subsection_name}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="text.secondary" sx={{ p: 2, fontStyle: 'italic' }}>
+                        No subsections in this section
+                      </Typography>
+                    )}
                   </AccordionDetails>
                 </Accordion>
               </Card>
             ))}
 
-            {estimation.sections?.length === 0 && (
+            {!estimation.sections || estimation.sections.length === 0 && (
               <Card sx={{ p: 4, textAlign: 'center', borderRadius: '12px' }}>
                 <Typography variant="h6" color="text.secondary">
                   No sections found in this estimation

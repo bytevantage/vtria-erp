@@ -5,12 +5,33 @@ echo "🚀 Running pre-push checks for VTRIA ERP..."
 
 # Get the current branch name
 current_branch=$(git rev-parse --abbrev-ref HEAD)
+protected_branches="^(main|master|release/|hotfix/)"
 
-# Prevent pushing to main/master without proper review
-if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
-    echo "❌ Direct push to $current_branch is not allowed!"
+# Prevent pushing to protected branches without proper review
+if echo "$current_branch" | grep -Eq "$protected_branches"; then
+    echo "❌ Direct push to protected branch '$current_branch' is not allowed!"
     echo "Please create a pull request for code review."
     exit 1
+fi
+
+# Check for uncommitted changes
+if ! git diff --quiet; then
+    echo "❌ You have uncommitted changes. Please commit or stash them before pushing."
+    exit 1
+fi
+
+# Check for untracked files that should be tracked
+untracked_files=$(git ls-files --others --exclude-standard)
+if [ -n "$untracked_files" ]; then
+    echo "⚠️  You have untracked files:"
+    echo "$untracked_files" | sed 's/^/  /'
+    echo "Consider adding them to .gitignore or committing them."
+    echo "Continue pushing? [y/N]"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo "Push aborted."
+        exit 1
+    fi
 fi
 
 # Run full validation suite
@@ -22,31 +43,80 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Check if package-lock.json is updated
-if git diff --name-only HEAD~1 HEAD | grep -q "package.json"; then
-    if ! git diff --name-only HEAD~1 HEAD | grep -q "package-lock.json"; then
-        echo "⚠️  package.json was modified but package-lock.json wasn't updated."
-        echo "Consider running 'npm install' to update package-lock.json"
+# Run tests
+if [ -d "client" ]; then
+    echo "🧪 Running client tests..."
+    cd client && CI=true npm test -- --watchAll=false --passWithNoTests && cd .. || {
+        echo "❌ Client tests failed"
+        exit 1
+    }
+fi
+
+if [ -d "api" ]; then
+    echo "🧪 Running API tests..."
+    cd api && npm test && cd .. || {
+        echo "❌ API tests failed"
+        exit 1
+    }
+fi
+
+# Check for package-lock.json consistency
+if [ -f "package-lock.json" ]; then
+    echo "🔒 Verifying package-lock.json..."
+    if ! npm ci --audit=false --prefer-offline --no-audit --no-fund; then
+        echo "❌ package-lock.json is not in sync with package.json"
+        echo "Run 'npm install' to update package-lock.json"
+        exit 1
+    fi
+fi
+
+# Check for outdated dependencies
+echo "🔄 Checking for outdated dependencies..."
+npm outdated --long || echo "⚠️  Some dependencies are outdated. Consider updating them."
+
+# Check for security vulnerabilities
+echo "🔒 Checking for security vulnerabilities..."
+npm audit --production || echo "⚠️  Security vulnerabilities found. Run 'npm audit fix' to fix them."
+
+# Check for console.log in production code
+echo "🔎 Checking for console.log in production code..."
+if git grep -l "console\.log" -- '*.js' '*.jsx' '*.ts' '*.tsx' ':!*.test.*' ':!*.spec.*' ':!*.stories.*' ':!node_modules/*'; then
+    echo "❌ console.log found in production code. Please remove or replace with proper logging."
+    exit 1
+fi
+
+# Check for debugger statements
+if git grep -l "debugger" -- '*.js' '*.jsx' '*.ts' '*.tsx' ':!*.test.*' ':!*.spec.*' ':!node_modules/*'; then
+    echo "❌ debugger statement found in code. Please remove before pushing."
+    exit 1
+fi
+
+# Check for large files (>1MB)
+large_files=$(find . -type f -size +1M -not -path "*/\.*" -not -path "*/node_modules/*" -not -path "*/build/*" -not -path "*/dist/*")
+if [ -n "$large_files" ]; then
+    echo "⚠️  The following files are larger than 1MB:"
+    echo "$large_files" | sed 's/^/  /'
+    echo "Consider adding them to .gitignore or using Git LFS if they're binary assets."
+    echo "Continue pushing? [y/N]"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo "Push aborted."
+        exit 1
     fi
 fi
 
 # Security check: ensure no sensitive files are being committed
 sensitive_files=".env .env.local .env.production .env.staging"
 for file in $sensitive_files; do
-    if git diff --name-only HEAD~1 HEAD | grep -q "$file"; then
-        echo "❌ Sensitive file detected: $file"
+    if git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+        echo "❌ Sensitive file detected in git tracking: $file"
         echo "Please remove sensitive files from git tracking"
+        echo "Run: git rm --cached $file"
+        echo "And add $file to .gitignore"
         exit 1
     fi
 done
 
-# Check for large files (>10MB)
-large_files=$(git diff --cached --name-only | xargs ls -la 2>/dev/null | awk '$5 > 10485760 {print $9}')
-if [ -n "$large_files" ]; then
-    echo "❌ Large files detected (>10MB):"
-    echo "$large_files"
-    echo "Consider using Git LFS for large files"
-    exit 1
-fi
+echo "✅ All pre-push checks passed!"
 
 echo "✅ Pre-push checks completed successfully!"

@@ -52,7 +52,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
       ]
     }
   ]);
-  
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingSectionId, setEditingSectionId] = useState(null);
@@ -155,7 +155,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
     updatedSections[currentSubsectionIndex.section]
       .subsections[currentSubsectionIndex.subsection]
       .items.push(newItem);
-    
+
     setSections(updatedSections);
     setShowAddItemDialog(false);
   };
@@ -163,14 +163,14 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
   const updateItemDiscount = (sectionIndex, subsectionIndex, itemIndex, newDiscount) => {
     const updatedSections = [...sections];
     const item = updatedSections[sectionIndex].subsections[subsectionIndex].items[itemIndex];
-    
+
     const discountedPrice = item.last_price * (1 - newDiscount / 100);
     const finalPrice = item.quantity * discountedPrice;
-    
+
     item.discount_percentage = newDiscount;
     item.discounted_price = discountedPrice;
     item.final_price = finalPrice;
-    
+
     setSections(updatedSections);
   };
 
@@ -202,9 +202,9 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
   const saveEstimation = async () => {
     try {
       setLoading(true);
-      
+
       const { totalMRP, totalDiscounted, totalDiscountAmount } = calculateTotals();
-      
+
       const estimationData = {
         enquiry_id: enquiryId,
         sections: sections,
@@ -212,7 +212,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
       };
 
       const response = await axios.post(`${API_BASE_URL}/estimation/enhanced`, estimationData);
-      
+
       if (response.data.success) {
         alert('Estimation created successfully!');
         if (onEstimationCreated) {
@@ -297,7 +297,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
               </IconButton>
             </Box>
           </AccordionSummary>
-          
+
           <AccordionDetails>
             {/* Subsections */}
             {section.subsections.map((subsection, subsectionIndex) => (
@@ -359,9 +359,9 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
                       </TableHead>
                       <TableBody>
                         {subsection.items.map((item, itemIndex) => (
-                          <TableRow 
-                            key={itemIndex}
-                            sx={{ 
+                          <TableRow
+                            key={`${item.part_code || item.product_name || 'item'}-${itemIndex}`}
+                            sx={{
                               bgcolor: !item.is_stock_available ? 'warning.light' : 'inherit',
                               '&:hover': { bgcolor: 'action.hover' }
                             }}
@@ -399,9 +399,9 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
                                 type="number"
                                 value={item.discount_percentage}
                                 onChange={(e) => updateItemDiscount(
-                                  sectionIndex, 
-                                  subsectionIndex, 
-                                  itemIndex, 
+                                  sectionIndex,
+                                  subsectionIndex,
+                                  itemIndex,
                                   parseFloat(e.target.value) || 0
                                 )}
                                 size="small"
@@ -472,8 +472,8 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
       </Box>
 
       {/* Add Item Dialog */}
-      <Dialog 
-        open={showAddItemDialog} 
+      <Dialog
+        open={showAddItemDialog}
         onClose={() => setShowAddItemDialog(false)}
         maxWidth="md"
         fullWidth
@@ -501,7 +501,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
                 ))}
               </TextField>
             </Grid>
-            
+
             {selectedProduct && (
               <>
                 <Grid item xs={6}>
@@ -524,7 +524,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
                     inputProps={{ min: 0, max: 100, step: 0.1 }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12}>
                   <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
                     <Typography variant="body2"><strong>MRP:</strong> ₹{selectedProduct.mrp}</Typography>
@@ -544,7 +544,7 @@ const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowAddItemDialog(false)}>Cancel</Button>
-          <Button 
+          <Button
             onClick={addItemToSubsection}
             variant="contained"
             disabled={!selectedProduct}

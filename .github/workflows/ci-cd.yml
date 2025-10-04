@@ -1,0 +1,101 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18.x'
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  NODE_ENV: test
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: vtria_erp_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install Dependencies
+      run: npm ci
+      
+    - name: Run Linter
+      run: npm run lint
+      
+    - name: Run Tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        DATABASE_URL: mysql://root:root@localhost:3306/vtria_erp_test
+  
+  build:
+    name: Build and Deploy
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install Dependencies
+      run: npm ci
+      
+    - name: Build Application
+      run: npm run build
+      
+    - name: Deploy to Production
+      if: github.ref == 'refs/heads/main'
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        script: |
+          cd /var/www/vtria-erp
+          git pull origin main
+          npm ci --production
+          npm run build
+          pm2 restart all
+    
+    - name: Deploy to Staging
+      if: github.ref == 'refs/heads/develop'
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /var/www/vtria-erp-staging
+          git pull origin develop
+          npm ci --production
+          npm run build
+          pm2 restart all

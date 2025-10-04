@@ -248,7 +248,7 @@ class PurchaseOrderService {
     
     async insertPurchaseOrder(connection, data) {
         const [result] = await connection.execute(
-            `INSERT INTO purchase_orders SET ?`,
+            'INSERT INTO purchase_orders SET ?',
             {
                 po_id: data.poId,
                 pi_id: data.piId,

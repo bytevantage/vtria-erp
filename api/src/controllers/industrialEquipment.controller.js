@@ -13,7 +13,7 @@ class IndustrialEquipmentController {
                 limit = 20 
             } = req.query;
 
-            let whereConditions = [];
+            const whereConditions = [];
             const params = [];
 
             if (equipment_type && equipment_type !== 'all') {
@@ -411,7 +411,7 @@ class IndustrialEquipmentController {
             const { serial_number } = req.params;
             const { hours_to_add, power_cycles_to_add = 0 } = req.body;
 
-            await db.execute(`CALL UpdateEquipmentOperatingHours(?, ?, ?)`, [
+            await db.execute('CALL UpdateEquipmentOperatingHours(?, ?, ?)', [
                 serial_number,
                 hours_to_add,
                 power_cycles_to_add

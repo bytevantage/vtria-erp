@@ -91,6 +91,13 @@ const ROLE_PERMISSIONS = {
 const checkPermission = (module, action) => {
   return async (req, res, next) => {
     try {
+      // Bypass RBAC in development mode if BYPASS_AUTH is enabled
+      if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+        console.log(`RBAC: Bypassing permission check for ${module}:${action} in development mode`);
+        req.user = { id: 1, role: 'director' }; // Mock user for development
+        return next();
+      }
+
       // Get user from token (assuming auth middleware sets req.user)
       const userId = req.user?.id || req.headers['x-user-id'];
       

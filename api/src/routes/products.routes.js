@@ -1,17 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const { body, param, query } = require('express-validator');
 const productsController = require('../controllers/products.controller');
 const authMiddleware = require('../middleware/auth.middleware');
-const { body } = require('express-validator');
+const { handleValidationErrors, sanitizeInput } = require('../middleware/validation.middleware');
+
+// Apply sanitization to all routes
+router.use(sanitizeInput);
 
 // Validation middleware
 const validateProduct = [
-    body('name').notEmpty().withMessage('Product name is required'),
-    body('product_code').notEmpty().withMessage('Product code is required'),
-    body('mrp').isDecimal().withMessage('Valid MRP is required'),
-    body('unit').notEmpty().withMessage('Unit is required'),
-    body('category_id').isInt().withMessage('Valid category is required')
+    body('name').trim().isLength({ min: 1, max: 255 }).withMessage('Product name is required and must not exceed 255 characters'),
+    body('product_code').trim().isLength({ min: 1, max: 50 }).withMessage('Product code is required and must not exceed 50 characters'),
+    body('description').optional().trim().isLength({ max: 1000 }).withMessage('Description must not exceed 1000 characters'),
+    body('category').optional().trim().isLength({ max: 100 }).withMessage('Category must not exceed 100 characters'),
+    body('unit').trim().isLength({ min: 1, max: 20 }).withMessage('Unit is required and must not exceed 20 characters'),
+    body('mrp').optional().isFloat({ min: 0 }).withMessage('MRP must be a positive number'),
+    body('cost_price').optional().isFloat({ min: 0 }).withMessage('Cost price must be a positive number')
 ];
+
+const validateId = param('id').isInt({ min: 1 }).withMessage('Invalid product ID');
 
 // Categories routes (must come before /:id routes)
 router.get('/categories/flat', authMiddleware.verifyToken, productsController.getFlatCategories);
@@ -29,8 +37,8 @@ router.post('/:id/serials', authMiddleware.verifyToken, productsController.addPr
 
 // CRUD routes
 router.get('/', authMiddleware.verifyToken, productsController.getAllProducts);
-router.post('/', authMiddleware.verifyToken, validateProduct, productsController.createProduct);
-router.get('/:id', authMiddleware.verifyToken, productsController.getProduct);
-router.put('/:id', authMiddleware.verifyToken, productsController.updateProduct);
+router.post('/', authMiddleware.verifyToken, validateProduct, handleValidationErrors, productsController.createProduct);
+router.get('/:id', authMiddleware.verifyToken, validateId, handleValidationErrors, productsController.getProduct);
+router.put('/:id', authMiddleware.verifyToken, validateId, validateProduct, handleValidationErrors, productsController.updateProduct);
 
 module.exports = router;

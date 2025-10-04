@@ -377,7 +377,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                     {insights.map((insight) => (
                       <TableRow key={insight.id}>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             icon={getInsightIcon(insight.insight_type)}
                             label={insight.insight_type}
                             size="small"
@@ -394,8 +394,8 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                         </TableCell>
                         <TableCell>
                           <Box display="flex" alignItems="center">
-                            <LinearProgress 
-                              variant="determinate" 
+                            <LinearProgress
+                              variant="determinate"
                               value={insight.confidence_score * 100}
                               sx={{ width: 60, mr: 1 }}
                             />
@@ -405,7 +405,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                           </Box>
                         </TableCell>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             icon={getSeverityIcon(insight.severity_level)}
                             label={insight.severity_level}
                             size="small"
@@ -413,7 +413,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             label={insight.insight_category}
                             size="small"
                             variant="outlined"
@@ -421,7 +421,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                         </TableCell>
                         <TableCell>
                           <Tooltip title="View Details">
-                            <IconButton 
+                            <IconButton
                               size="small"
                               onClick={() => setInsightDialog({ open: true, insight })}
                             >
@@ -466,7 +466,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                     {dashboardData.alerts.map((alert) => (
                       <TableRow key={alert.id}>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             icon={getSeverityIcon(alert.severity)}
                             label={alert.severity}
                             size="small"
@@ -530,7 +530,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                     {dashboardData.recommendations.map((recommendation) => (
                       <TableRow key={recommendation.id}>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             label={recommendation.priority_level}
                             size="small"
                             color={getSeverityColor(recommendation.priority_level) as any}
@@ -548,7 +548,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                         <TableCell>{recommendation.effort_level}</TableCell>
                         <TableCell>{Math.round(recommendation.confidence_score * 100)}%</TableCell>
                         <TableCell>
-                          {recommendation.estimated_cost_impact ? `$${recommendation.estimated_cost_impact}` : 'TBD'}
+                          {recommendation.estimated_cost_impact ? `₹${recommendation.estimated_cost_impact}` : 'TBD'}
                         </TableCell>
                         <TableCell>
                           <Chip label={recommendation.status} size="small" />
@@ -589,7 +589,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                 </TableHead>
                 <TableBody>
                   {dashboardData.modelPerformance.map((model, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={`model-${model.model_name}-${index}`}>
                       <TableCell>
                         <Typography variant="subtitle2">
                           {model.model_name}
@@ -599,8 +599,8 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                       <TableCell>{model.model_category}</TableCell>
                       <TableCell>{model.insights_generated}</TableCell>
                       <TableCell>
-                        {model.avg_insight_confidence ? 
-                          `${Math.round(parseFloat(model.avg_insight_confidence.toString()) * 100)}%` : 
+                        {model.avg_insight_confidence ?
+                          `${Math.round(parseFloat(model.avg_insight_confidence.toString()) * 100)}%` :
                           'N/A'
                         }
                       </TableCell>
@@ -608,7 +608,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                         {Math.round(parseFloat(model.confidence_threshold.toString()) * 100)}%
                       </TableCell>
                       <TableCell>
-                        <Chip 
+                        <Chip
                           label={model.insights_generated > 0 ? 'Active' : 'Inactive'}
                           size="small"
                           color={model.insights_generated > 0 ? 'success' : 'default'}
@@ -639,14 +639,14 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
               <Typography variant="body1" gutterBottom>
                 {insightDialog.insight.description}
               </Typography>
-              
+
               <Grid container spacing={2} mt={2}>
                 <Grid item xs={6}>
                   <Typography variant="caption" color="textSecondary">
                     Confidence Score
                   </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
+                  <LinearProgress
+                    variant="determinate"
                     value={insightDialog.insight.confidence_score * 100}
                     sx={{ mt: 1 }}
                   />
@@ -659,7 +659,7 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                     Severity Level
                   </Typography>
                   <Box mt={1}>
-                    <Chip 
+                    <Chip
                       label={insightDialog.insight.severity_level}
                       color={getSeverityColor(insightDialog.insight.severity_level) as any}
                     />
@@ -667,19 +667,19 @@ const AIDashboard: React.FC<AIDashboardProps> = ({ clientId }) => {
                 </Grid>
               </Grid>
 
-              {insightDialog.insight.recommended_actions && 
-               insightDialog.insight.recommended_actions.length > 0 && (
-                <Box mt={3}>
-                  <Typography variant="h6" gutterBottom>
-                    Recommended Actions
-                  </Typography>
-                  {insightDialog.insight.recommended_actions.map((action, index) => (
-                    <Typography key={index} variant="body2" sx={{ mb: 1 }}>
-                      • {action}
+              {insightDialog.insight.recommended_actions &&
+                insightDialog.insight.recommended_actions.length > 0 && (
+                  <Box mt={3}>
+                    <Typography variant="h6" gutterBottom>
+                      Recommended Actions
                     </Typography>
-                  ))}
-                </Box>
-              )}
+                    {insightDialog.insight.recommended_actions.map((action, index) => (
+                      <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+                        • {action}
+                      </Typography>
+                    ))}
+                  </Box>
+                )}
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setInsightDialog({ open: false, insight: null })}>

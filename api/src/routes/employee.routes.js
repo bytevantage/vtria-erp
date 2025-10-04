@@ -476,7 +476,7 @@ router.get('/:id/leave-balances', authMiddleware.verifyToken, employeeController
  *       200:
  *         description: Dashboard data retrieved successfully
  */
-router.get('/dashboard/data', authMiddleware.verifyToken, employeeController.getDashboardData);
+router.get('/dashboard/data', employeeController.getDashboardData);
 
 /**
  * @swagger
@@ -489,8 +489,30 @@ router.get('/dashboard/data', authMiddleware.verifyToken, employeeController.get
  *     responses:
  *       200:
  *         description: Departments retrieved successfully
+ *   post:
+ *     summary: Create new department
+ *     tags: [Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               department_name:
+ *                 type: string
+ *               department_code:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Department created successfully
  */
 router.get('/master/departments', authMiddleware.verifyToken, employeeController.getDepartments);
+router.post('/master/departments', authMiddleware.verifyToken, employeeController.createDepartment);
 
 /**
  * @swagger
@@ -519,5 +541,386 @@ router.get('/master/leave-types', authMiddleware.verifyToken, employeeController
  *         description: Work locations retrieved successfully
  */
 router.get('/master/work-locations', authMiddleware.verifyToken, employeeController.getWorkLocations);
+
+// ===================================
+// Technician Profile Management Routes
+// ===================================
+
+/**
+ * @swagger
+ * /api/employees/{id}/technician-profile:
+ *   get:
+ *     summary: Get complete technician profile with skills, certifications, and specializations
+ *     tags: [Technician Profile]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Employee ID
+ *     responses:
+ *       200:
+ *         description: Technician profile retrieved successfully
+ *       404:
+ *         description: Employee not found
+ */
+router.get('/:id/technician-profile', authMiddleware.verifyToken, employeeController.getTechnicianProfile);
+
+/**
+ * @swagger
+ * /api/employees/technicians/analytics:
+ *   get:
+ *     summary: Get all technicians data for analytics dashboard
+ *     tags: [Technician Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Technician analytics data retrieved successfully
+ */
+router.get('/technicians/analytics', authMiddleware.verifyToken, employeeController.getAllTechnicians);
+
+/**
+ * @swagger
+ * /api/employees/{employee_id}/skills:
+ *   post:
+ *     summary: Add or update employee skill
+ *     tags: [Technician Skills]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employee_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Employee ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - skill_id
+ *             properties:
+ *               skill_id:
+ *                 type: integer
+ *                 description: Skill master ID
+ *               proficiency_level:
+ *                 type: string
+ *                 enum: [beginner, intermediate, advanced, expert]
+ *                 description: Proficiency level
+ *               proficiency_score:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 100
+ *                 description: Proficiency score out of 100
+ *               years_of_experience:
+ *                 type: number
+ *                 description: Years of experience with this skill
+ *               is_certified:
+ *                 type: boolean
+ *                 description: Whether certified in this skill
+ *               certification_date:
+ *                 type: string
+ *                 format: date
+ *                 description: Certification date if certified
+ *               certification_expiry:
+ *                 type: string
+ *                 format: date
+ *                 description: Certification expiry date
+ *               certification_body:
+ *                 type: string
+ *                 description: Certification issuing body
+ *               usage_frequency:
+ *                 type: string
+ *                 enum: [daily, weekly, monthly, rarely, never]
+ *                 description: How frequently this skill is used
+ *               assessment_notes:
+ *                 type: string
+ *                 description: Assessment notes
+ *     responses:
+ *       200:
+ *         description: Employee skill updated successfully
+ *       400:
+ *         description: Validation error
+ */
+router.post('/:employee_id/skills', authMiddleware.verifyToken, [
+  body('skill_id').isInt().withMessage('Skill ID is required'),
+  body('proficiency_level').optional().isIn(['beginner', 'intermediate', 'advanced', 'expert']),
+  body('proficiency_score').optional().isInt({ min: 0, max: 100 }).withMessage('Proficiency score must be between 0-100'),
+  body('years_of_experience').optional().isFloat({ min: 0 }).withMessage('Experience years must be positive'),
+  body('usage_frequency').optional().isIn(['daily', 'weekly', 'monthly', 'rarely', 'never'])
+], employeeController.addEmployeeSkill);
+
+/**
+ * @swagger
+ * /api/employees/{employee_id}/certifications:
+ *   post:
+ *     summary: Add employee certification
+ *     tags: [Technician Certifications]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employee_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Employee ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - certification_id
+ *               - obtained_date
+ *             properties:
+ *               certification_id:
+ *                 type: integer
+ *                 description: Certification master ID
+ *               certificate_number:
+ *                 type: string
+ *                 description: Certificate number
+ *               obtained_date:
+ *                 type: string
+ *                 format: date
+ *                 description: Date obtained
+ *               expiry_date:
+ *                 type: string
+ *                 format: date
+ *                 description: Expiry date
+ *               grade_or_score:
+ *                 type: string
+ *                 description: Grade or score achieved
+ *               certificate_file_path:
+ *                 type: string
+ *                 description: Path to certificate file
+ *               verification_url:
+ *                 type: string
+ *                 description: Online verification URL
+ *               cost_incurred:
+ *                 type: number
+ *                 description: Cost of certification
+ *               training_duration_days:
+ *                 type: integer
+ *                 description: Training duration in days
+ *               employer_sponsored:
+ *                 type: boolean
+ *                 description: Whether employer sponsored
+ *     responses:
+ *       201:
+ *         description: Employee certification added successfully
+ *       400:
+ *         description: Validation error
+ */
+router.post('/:employee_id/certifications', authMiddleware.verifyToken, [
+  body('certification_id').isInt().withMessage('Certification ID is required'),
+  body('obtained_date').isDate().withMessage('Valid obtained date is required'),
+  body('expiry_date').optional().isDate().withMessage('Valid expiry date required'),
+  body('cost_incurred').optional().isFloat({ min: 0 }).withMessage('Cost must be positive'),
+  body('training_duration_days').optional().isInt({ min: 0 }).withMessage('Duration must be positive')
+], employeeController.addEmployeeCertification);
+
+/**
+ * @swagger
+ * /api/employees/{employee_id}/specializations:
+ *   post:
+ *     summary: Add or update employee specialization
+ *     tags: [Technician Specializations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employee_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Employee ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - specialization_id
+ *             properties:
+ *               specialization_id:
+ *                 type: integer
+ *                 description: Specialization master ID
+ *               proficiency_level:
+ *                 type: string
+ *                 enum: [learning, competent, proficient, expert, master]
+ *                 description: Proficiency level
+ *               years_of_experience:
+ *                 type: number
+ *                 description: Years of experience in this specialization
+ *               projects_completed:
+ *                 type: integer
+ *                 description: Number of projects completed
+ *               is_primary_specialization:
+ *                 type: boolean
+ *                 description: Whether this is primary specialization
+ *               currently_working_on:
+ *                 type: boolean
+ *                 description: Currently working on projects in this area
+ *               assessment_notes:
+ *                 type: string
+ *                 description: Assessment notes
+ *     responses:
+ *       200:
+ *         description: Employee specialization updated successfully
+ *       400:
+ *         description: Validation error
+ */
+router.post('/:employee_id/specializations', authMiddleware.verifyToken, [
+  body('specialization_id').isInt().withMessage('Specialization ID is required'),
+  body('proficiency_level').optional().isIn(['learning', 'competent', 'proficient', 'expert', 'master']),
+  body('years_of_experience').optional().isFloat({ min: 0 }).withMessage('Experience years must be positive'),
+  body('projects_completed').optional().isInt({ min: 0 }).withMessage('Projects count must be positive')
+], employeeController.addEmployeeSpecialization);
+
+/**
+ * @swagger
+ * /api/employees/{employee_id}/experience:
+ *   put:
+ *     summary: Update employee experience details
+ *     tags: [Technician Experience]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: employee_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Employee ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               total_experience_years:
+ *                 type: number
+ *                 description: Total years of experience
+ *               relevant_experience_years:
+ *                 type: number
+ *                 description: Relevant experience years
+ *               industry_experience_years:
+ *                 type: number
+ *                 description: Industry-specific experience
+ *               automation_experience_years:
+ *                 type: number
+ *                 description: Automation experience years
+ *               programming_experience_years:
+ *                 type: number
+ *                 description: Programming experience years
+ *               project_management_experience_years:
+ *                 type: number
+ *                 description: Project management experience
+ *               client_facing_experience_years:
+ *                 type: number
+ *                 description: Client-facing experience
+ *               previous_companies:
+ *                 type: array
+ *                 description: Previous companies and roles
+ *               key_achievements:
+ *                 type: array
+ *                 description: Key achievements and projects
+ *               projects_led:
+ *                 type: integer
+ *                 description: Number of projects led
+ *               projects_participated:
+ *                 type: integer
+ *                 description: Number of projects participated
+ *               team_size_managed:
+ *                 type: integer
+ *                 description: Maximum team size managed
+ *               budget_managed_lakhs:
+ *                 type: number
+ *                 description: Budget managed in lakhs
+ *               training_programs_completed:
+ *                 type: integer
+ *                 description: Training programs completed
+ *               conferences_attended:
+ *                 type: integer
+ *                 description: Conferences attended
+ *               papers_published:
+ *                 type: integer
+ *                 description: Papers published
+ *               patents_filed:
+ *                 type: integer
+ *                 description: Patents filed
+ *               seniority_level:
+ *                 type: string
+ *                 enum: [trainee, junior, mid_level, senior, lead, principal, architect]
+ *                 description: Seniority level
+ *     responses:
+ *       200:
+ *         description: Employee experience updated successfully
+ *       400:
+ *         description: Validation error
+ */
+router.put('/:employee_id/experience', authMiddleware.verifyToken, [
+  body('total_experience_years').optional().isFloat({ min: 0 }).withMessage('Total experience must be positive'),
+  body('projects_led').optional().isInt({ min: 0 }).withMessage('Projects led must be positive'),
+  body('projects_participated').optional().isInt({ min: 0 }).withMessage('Projects participated must be positive'),
+  body('seniority_level').optional().isIn(['trainee', 'junior', 'mid_level', 'senior', 'lead', 'principal', 'architect'])
+], employeeController.updateEmployeeExperience);
+
+// ===================================
+// Master Data Routes for Technician Profiles
+// ===================================
+
+/**
+ * @swagger
+ * /api/employees/master/skills:
+ *   get:
+ *     summary: Get all skills master data
+ *     tags: [Technician Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Skills master data retrieved successfully
+ */
+router.get('/master/skills', authMiddleware.verifyToken, employeeController.getSkillsMaster);
+
+/**
+ * @swagger
+ * /api/employees/master/certifications:
+ *   get:
+ *     summary: Get all certifications master data
+ *     tags: [Technician Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Certifications master data retrieved successfully
+ */
+router.get('/master/certifications', authMiddleware.verifyToken, employeeController.getCertificationsMaster);
+
+/**
+ * @swagger
+ * /api/employees/master/specializations:
+ *   get:
+ *     summary: Get all specializations master data
+ *     tags: [Technician Master Data]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Specializations master data retrieved successfully
+ */
+router.get('/master/specializations', authMiddleware.verifyToken, employeeController.getSpecializationsMaster);
 
 module.exports = router;

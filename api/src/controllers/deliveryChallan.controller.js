@@ -198,7 +198,7 @@ class DeliveryChallanController {
             const dispatched_by = req.user?.id || 1;
             
             let updateQuery = 'UPDATE delivery_challans SET status = ?';
-            let updateParams = [status];
+            const updateParams = [status];
             
             if (status === 'dispatched') {
                 updateQuery += ', dispatched_by = ?, lr_number = ?';

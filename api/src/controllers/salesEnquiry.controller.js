@@ -1,5 +1,5 @@
 const db = require('../config/database');
-const { generateDocumentId } = require('../utils/documentIdGenerator');
+const { generateDocumentId, DOCUMENT_TYPES } = require('../utils/documentIdGenerator');
 
 class SalesEnquiryController {
     // Get all enquiries with client information and case details
@@ -22,11 +22,13 @@ class SalesEnquiryController {
                 LEFT JOIN users u ON se.enquiry_by = u.id
                 LEFT JOIN users au ON se.assigned_to = au.id
                 LEFT JOIN cases cs ON se.case_id = cs.id
+                WHERE se.deleted_at IS NULL 
+                AND (cs.id IS NULL OR cs.current_state = 'enquiry')
                 ORDER BY se.created_at DESC
             `;
-            
+
             const [enquiries] = await db.execute(query);
-            
+
             res.json({
                 success: true,
                 data: enquiries,
@@ -36,8 +38,8 @@ class SalesEnquiryController {
             console.error('Error fetching enquiries:', error);
             res.status(500).json({
                 success: false,
-                message: 'Error fetching enquiries',
-                error: error.message
+                message: 'Database connection error. Please ensure the database is running and properly configured.',
+                error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
             });
         }
     }
@@ -46,7 +48,7 @@ class SalesEnquiryController {
     async getEnquiryById(req, res) {
         try {
             const { id } = req.params;
-            
+
             const query = `
                 SELECT 
                     se.*,
@@ -65,16 +67,16 @@ class SalesEnquiryController {
                 LEFT JOIN users u ON se.assigned_to = u.id
                 WHERE se.id = ?
             `;
-            
+
             const [enquiries] = await db.execute(query, [id]);
-            
+
             if (enquiries.length === 0) {
                 return res.status(404).json({
                     success: false,
                     message: 'Enquiry not found'
                 });
             }
-            
+
             res.json({
                 success: true,
                 data: enquiries[0]
@@ -92,10 +94,10 @@ class SalesEnquiryController {
     // Create new enquiry with case management integration
     async createEnquiry(req, res) {
         const connection = await db.getConnection();
-        
+
         try {
             await connection.beginTransaction();
-            
+
             const {
                 client_id,
                 project_name,
@@ -117,30 +119,22 @@ class SalesEnquiryController {
 
             // Generate enquiry ID within transaction
             const currentYear = new Date().getFullYear();
-            const financialYear = currentYear % 100 + '' + ((currentYear + 1) % 100);
-            
-            // Get or create sequence for current financial year
-            const [sequences] = await connection.execute(
-                'SELECT last_sequence FROM document_sequences WHERE document_type = ? AND financial_year = ?',
-                ['EQ', financialYear]
+            const financialYear = `${currentYear % 100}${(currentYear + 1) % 100}`;
+
+            // Get the highest existing sequence number for this financial year
+            const [existingEnquiries] = await connection.execute(
+                'SELECT enquiry_id FROM sales_enquiries WHERE enquiry_id LIKE ? ORDER BY enquiry_id DESC LIMIT 1',
+                [`VESPL/EQ/${financialYear}/%`]
             );
-            
+
             let nextSequence = 1;
-            if (sequences.length > 0) {
-                nextSequence = sequences[0].last_sequence + 1;
-                // Update sequence
-                await connection.execute(
-                    'UPDATE document_sequences SET last_sequence = ? WHERE document_type = ? AND financial_year = ?',
-                    [nextSequence, 'EQ', financialYear]
-                );
-            } else {
-                // Create new sequence
-                await connection.execute(
-                    'INSERT INTO document_sequences (document_type, financial_year, last_sequence) VALUES (?, ?, ?)',
-                    ['EQ', financialYear, nextSequence]
-                );
+            if (existingEnquiries.length > 0) {
+                const lastEnquiryId = existingEnquiries[0].enquiry_id;
+                const sequencePart = lastEnquiryId.split('/').pop();
+                const lastSequence = parseInt(sequencePart, 10);
+                nextSequence = lastSequence + 1;
             }
-            
+
             const enquiry_id = `VESPL/EQ/${financialYear}/${nextSequence.toString().padStart(3, '0')}`;
             const date = new Date().toISOString().split('T')[0];
 
@@ -165,6 +159,51 @@ class SalesEnquiryController {
             const [enquiryResult] = await connection.execute(enquiryQuery, enquiryParams);
 
             const enquiry_insert_id = enquiryResult.insertId;
+
+            // Automatically create a case from this enquiry
+            try {
+                // Generate case number
+                const caseNumber = await generateDocumentId(DOCUMENT_TYPES.CASE);
+
+                // Create case
+                const [caseResult] = await connection.execute(
+                    `INSERT INTO cases
+                    (case_number, enquiry_id, current_state, client_id, project_name, requirements,
+                     priority, estimated_value, created_by, updated_by)
+                    VALUES (?, ?, 'enquiry', ?, ?, ?, 'medium', ?, ?, ?)`,
+                    [
+                        caseNumber,
+                        enquiry_insert_id,
+                        client_id,
+                        project_name,
+                        description,
+                        estimated_value || null,
+                        enquiry_by,
+                        enquiry_by
+                    ]
+                );
+
+                const case_id = caseResult.insertId;
+
+                // Update enquiry with case_id
+                await connection.execute(
+                    'UPDATE sales_enquiries SET case_id = ? WHERE id = ?',
+                    [case_id, enquiry_insert_id]
+                );
+
+                // Create initial state transition
+                await connection.execute(
+                    `INSERT INTO case_state_transitions 
+                    (case_id, from_state, to_state, transition_reason, reference_type, reference_id, created_by)
+                    VALUES (?, NULL, 'enquiry', 'Case created from enquiry', 'enquiry', ?, ?)`,
+                    [case_id, enquiry_insert_id, enquiry_by]
+                );
+
+                console.log(`Created case ${caseNumber} for enquiry ${enquiry_id}`);
+            } catch (caseError) {
+                console.error('Error creating case:', caseError);
+                // Don't fail the enquiry creation if case creation fails
+            }
 
             await connection.commit();
             connection.release();
@@ -304,9 +343,9 @@ class SalesEnquiryController {
                 FROM sales_enquiries
                 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
             `;
-            
+
             const [stats] = await db.execute(statsQuery);
-            
+
             res.json({
                 success: true,
                 data: stats[0]

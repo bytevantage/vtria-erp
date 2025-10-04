@@ -1,4 +1,5 @@
 const db = require('../config/database');
+const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
 exports.getUsers = async (req, res) => {
@@ -16,6 +17,63 @@ exports.getUsers = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error fetching users',
+            error: error.message
+        });
+    }
+};
+
+exports.createUser = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation errors',
+                errors: errors.array()
+            });
+        }
+
+        const { email, full_name, user_role, password } = req.body;
+
+        // Check if email already exists
+        const [existingUser] = await db.execute(
+            'SELECT id FROM users WHERE email = ?',
+            [email]
+        );
+        
+        if (existingUser.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email already exists'
+            });
+        }
+
+        // Hash password if provided, otherwise use default
+        const defaultPassword = 'vtria123';
+        const hashedPassword = await bcrypt.hash(password || defaultPassword, 10);
+
+        // Insert new user
+        const [result] = await db.execute(
+            'INSERT INTO users (email, full_name, user_role, password_hash, status) VALUES (?, ?, ?, ?, ?)',
+            [email, full_name, user_role, hashedPassword, 'active']
+        );
+
+        // Get the created user (without password)
+        const [newUser] = await db.execute(
+            'SELECT id, email, full_name, user_role, status, created_at, updated_at FROM users WHERE id = ?',
+            [result.insertId]
+        );
+
+        res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            data: newUser[0]
+        });
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating user',
             error: error.message
         });
     }
