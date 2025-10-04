@@ -515,7 +515,7 @@ const AttendanceManagement: React.FC = () => {
                       </TableCell>
                       <TableCell align="center">
                         <Typography variant="body2" fontWeight="medium">
-                          {record.total_hours ? `${parseFloat(record.total_hours).toFixed(2)}h` : '--'}
+                          {record.total_hours ? `${Number(record.total_hours).toFixed(2)}h` : '--'}
                         </Typography>
                       </TableCell>
                       <TableCell>
