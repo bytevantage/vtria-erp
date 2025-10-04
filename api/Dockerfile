@@ -55,7 +55,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+# Use npm install if no lock file exists, otherwise use npm ci
+RUN if [ -f package-lock.json ]; then npm ci --only=production; else npm install --only=production && npm shrinkwrap; fi
 
 # Copy built files from development stage
 COPY --from=development /usr/src/app .
