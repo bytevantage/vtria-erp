@@ -74,7 +74,7 @@ const CasePerformanceDashboard: React.FC = () => {
     // Data states
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [slaCompliance, setSlaCompliance] = useState<any[]>([]);
-    const [performanceMetrics, setPerformanceMetrics] = useState<any[]>([]);
+    const [performanceMetrics, setPerformanceMetrics] = useState<any>(null);
     const [notificationQueue, setNotificationQueue] = useState<any[]>([]);
     const [escalationRules, setEscalationRules] = useState<any[]>([]);
     const [escalationHistory, setEscalationHistory] = useState<any[]>([]);
