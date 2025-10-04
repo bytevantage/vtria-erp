@@ -7,7 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$RepoUrl = "https://github.com/srbhandary1/vtria-erp.git"
+$RepoUrl = "https://github.com/bytevantage/vtria-erp.git"
 $DeployPath = "C:\vtria-erp"
 
 function Write-Status {
@@ -53,6 +53,8 @@ if ($FirstTime) {
     Write-Status "🔧 Next steps:" "Yellow"
     Write-Status "  1. Edit C:\vtria-erp\.env.production" "White"
     Write-Status "  2. Run: docker-compose -f docker-compose.windows.yml up -d" "White"
+    
+}
     
 } else {
     Write-Status "🔄 UPDATE DEPLOYMENT" "Yellow"
