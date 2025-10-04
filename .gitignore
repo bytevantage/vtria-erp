@@ -50,3 +50,8 @@ out/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Deployment packages (too large for Git)
+vtria-erp-deployment-*.zip
+deployment-package/
+temp_package/
