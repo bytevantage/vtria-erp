@@ -26,9 +26,9 @@ WORKDIR /usr/src/app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
+# Install all dependencies (including dev) for build
 # Use npm install if no lock file exists, otherwise use npm ci
-RUN if [ -f package-lock.json ]; then npm ci --only=production; else npm install --only=production && npm shrinkwrap; fi
+RUN if [ -f package-lock.json ]; then npm ci; else npm install && npm shrinkwrap; fi
 
 # Copy source code
 COPY . .
