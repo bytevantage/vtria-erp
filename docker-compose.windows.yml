@@ -20,7 +20,6 @@ services:
       - BYPASS_AUTH=false
       - LOG_LEVEL=error
     volumes:
-      # Windows-compatible volume mapping
       - ./logs:/var/log/vtria-erp
       - ./uploads:/var/www/vtria-erp/uploads
     depends_on:
@@ -57,7 +56,7 @@ services:
       - MYSQL_USER=vtria_user
       - MYSQL_PASSWORD=SecurePassword123!
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=SecurePassword123!" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=SecurePassword123!"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -67,7 +66,6 @@ services:
 
 volumes:
   mysql_data:
-
 
 networks:
   vtria-network:
