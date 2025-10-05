@@ -169,7 +169,7 @@ const EmployeeManagementMain: React.FC = () => {
       }
     } catch (error) {
       console.error('❌ Error fetching employee stats:', error);
-      console.error('📍 Error details:', error.message);
+      console.error('📍 Error details:', error instanceof Error ? error.message : String(error));
       setError('Failed to load employee statistics. Please check your connection and try again.');
       // Set default stats on error
       setStats({
