@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Node.js Express backend (MySQL) goes here.",
   "main": "index.js",
   "scripts": {

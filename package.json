@@ -1,6 +1,6 @@
 {
   "name": "vtria-erp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "VTRIA ERP System - Complete Enterprise Resource Planning Solution",
   "private": true,
   "workspaces": [
