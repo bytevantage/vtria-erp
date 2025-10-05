@@ -175,8 +175,8 @@ const CaseHistoryTracker: React.FC = () => {
             setError(null);
 
             const response = await axios.get(`${API_BASE_URL}/api/analytics/case-history`, {
-                params: { 
-                    status: statusFilter, 
+                params: {
+                    status: statusFilter,
                     dateRange,
                     compliance: complianceMode,
                     realtime: realTimeUpdates
@@ -215,7 +215,7 @@ const CaseHistoryTracker: React.FC = () => {
 
             // In a real implementation, this would call an export API
             console.log('Exporting case history:', exportData);
-            
+
             // Simulate download
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -362,8 +362,8 @@ const CaseHistoryTracker: React.FC = () => {
 
     const filteredCases = caseHistory.filter(caseItem =>
         (caseItem.case_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         caseItem.client_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         caseItem.project_name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+            caseItem.client_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            caseItem.project_name.toLowerCase().includes(searchQuery.toLowerCase())) &&
         (statusFilter === 'all' || caseItem.current_state === statusFilter)
     );
 
@@ -453,7 +453,7 @@ const CaseHistoryTracker: React.FC = () => {
                     <HistoryIcon sx={{ mr: 2, fontSize: 36 }} />
                     Case History Tracker
                 </Typography>
-                
+
                 <Box display="flex" gap={2} alignItems="center">
                     <Button
                         variant="outlined"
@@ -463,7 +463,7 @@ const CaseHistoryTracker: React.FC = () => {
                     >
                         Refresh
                     </Button>
-                    
+
                     <FormControl size="small" sx={{ minWidth: 120 }}>
                         <InputLabel>Export</InputLabel>
                         <Select
@@ -491,7 +491,7 @@ const CaseHistoryTracker: React.FC = () => {
                             </MenuItem>
                         </Select>
                     </FormControl>
-                    
+
                     <Button
                         variant="contained"
                         startIcon={<FileDownloadIcon />}
@@ -500,7 +500,7 @@ const CaseHistoryTracker: React.FC = () => {
                     >
                         Export
                     </Button>
-                    
+
                     <Button
                         variant={complianceMode ? "contained" : "outlined"}
                         startIcon={<ComplianceIcon />}
@@ -510,7 +510,7 @@ const CaseHistoryTracker: React.FC = () => {
                     >
                         Compliance
                     </Button>
-                    
+
                     <Button
                         variant={compareMode ? "contained" : "outlined"}
                         startIcon={<CompareIcon />}
@@ -672,10 +672,10 @@ const CaseHistoryTracker: React.FC = () => {
                                     {filteredCases.length} case(s) found
                                 </Typography>
                                 {complianceMode && (
-                                    <Chip 
+                                    <Chip
                                         icon={<SecurityIcon />}
-                                        label="Compliance Mode" 
-                                        color="primary" 
+                                        label="Compliance Mode"
+                                        color="primary"
                                         size="small"
                                         sx={{ mt: 0.5 }}
                                     />
@@ -683,7 +683,7 @@ const CaseHistoryTracker: React.FC = () => {
                             </Box>
                         </Grid>
                     </Grid>
-                    
+
                     {/* Advanced Filters */}
                     {showAdvancedFilters && (
                         <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid rgba(0,0,0,0.1)' }}>
@@ -749,10 +749,10 @@ const CaseHistoryTracker: React.FC = () => {
                         <TimelineIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                         Case History Details
                     </Typography>
-                    
+
                     {filteredCases.map((caseItem) => (
-                        <Accordion 
-                            key={caseItem.case_number} 
+                        <Accordion
+                            key={caseItem.case_number}
                             sx={{ mb: 2 }}
                             expanded={expandedCase === caseItem.case_number}
                             onChange={() => setExpandedCase(expandedCase === caseItem.case_number ? null : caseItem.case_number)}
@@ -951,12 +951,12 @@ const CaseHistoryTracker: React.FC = () => {
                             <CompareIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                             Case Comparison Analysis ({selectedCasesForCompare.length} cases)
                         </Typography>
-                        
+
                         <Grid container spacing={3}>
                             {selectedCasesForCompare.map((caseNumber) => {
                                 const caseItem = filteredCases.find(c => c.case_number === caseNumber);
                                 if (!caseItem) return null;
-                                
+
                                 return (
                                     <Grid item xs={12} md={4} key={caseNumber}>
                                         <Card variant="outlined" sx={{ height: '100%' }}>
@@ -967,7 +967,7 @@ const CaseHistoryTracker: React.FC = () => {
                                                 <Typography variant="body2" color="text.secondary" gutterBottom>
                                                     {caseItem.project_name}
                                                 </Typography>
-                                                
+
                                                 <Box sx={{ mt: 2 }}>
                                                     <Typography variant="body2">
                                                         <strong>Client:</strong> {caseItem.client_name}
@@ -990,7 +990,7 @@ const CaseHistoryTracker: React.FC = () => {
                                                         </Typography>
                                                     )}
                                                 </Box>
-                                                
+
                                                 <Box sx={{ mt: 2 }}>
                                                     <LinearProgress
                                                         variant="determinate"
@@ -1004,7 +1004,7 @@ const CaseHistoryTracker: React.FC = () => {
                                                         }}
                                                     />
                                                 </Box>
-                                                
+
                                                 <Button
                                                     size="small"
                                                     onClick={() => setSelectedCasesForCompare(prev => prev.filter(c => c !== caseNumber))}
@@ -1018,7 +1018,7 @@ const CaseHistoryTracker: React.FC = () => {
                                 );
                             })}
                         </Grid>
-                        
+
                         <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
                             <Button
                                 variant="contained"
