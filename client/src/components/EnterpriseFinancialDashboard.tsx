@@ -221,7 +221,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
 
   };
 
-  const fetchCashFlowData = async () => {
+const fetchCashFlowData = async () => {
   try {
     const response = await fetch('/api/financial/cash-flow', {
       headers: {
@@ -242,7 +242,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const fetchProfitLossData = async () => {
+const fetchProfitLossData = async () => {
   try {
     // Mock P&L data
     setProfitLossData([
@@ -292,7 +292,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const fetchOutstandingData = async () => {
+const fetchOutstandingData = async () => {
   try {
     // Mock outstanding data
     setOutstandingData([
@@ -334,7 +334,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const fetchFinancialAlerts = async () => {
+const fetchFinancialAlerts = async () => {
   try {
     // Mock financial alerts
     setAlerts([
@@ -383,7 +383,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const getRiskCategoryColor = (category: string) => {
+const getRiskCategoryColor = (category: string) => {
   switch (category) {
     case 'low': return 'success';
     case 'medium': return 'warning';
@@ -393,7 +393,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const getAlertSeverityColor = (severity: string) => {
+const getAlertSeverityColor = (severity: string) => {
   switch (severity) {
     case 'low': return 'info';
     case 'medium': return 'warning';
@@ -403,7 +403,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const getAlertIcon = (type: string) => {
+const getAlertIcon = (type: string) => {
   switch (type) {
     case 'overdue': return <Schedule />;
     case 'credit_limit': return <Error />;
@@ -414,7 +414,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const formatCurrency = (amount: number) => {
+const formatCurrency = (amount: number) => {
   if (amount >= 10000000) {
     return `₹${(amount / 10000000).toFixed(1)} Cr`;
   } else if (amount >= 100000) {
@@ -424,7 +424,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  const getTrendIcon = (direction?: string) => {
+const getTrendIcon = (direction?: string) => {
   switch (direction) {
     case 'up':
       return <TrendingUp fontSize="small" />;
