@@ -11,14 +11,15 @@ import {
     MenuItem,
     Alert,
     CircularProgress,
-    Container
+    Container,
+    SelectChangeEvent
 } from '@mui/material';
 import { Assignment as WarrantyIcon } from '@mui/icons-material';
 import SerialWarrantyTracker from './SerialWarrantyTracker';
 import axios from 'axios';
 
 const SerialWarrantyTrackerPage = () => {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState<any[]>([]);
     const [selectedProductId, setSelectedProductId] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -43,7 +44,7 @@ const SerialWarrantyTrackerPage = () => {
         }
     };
 
-    const handleProductChange = (event) => {
+    const handleProductChange = (event: SelectChangeEvent<string>) => {
         setSelectedProductId(event.target.value);
     };
 
@@ -60,10 +61,10 @@ const SerialWarrantyTrackerPage = () => {
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Box sx={{ mb: 4 }}>
-                <Typography 
-                    variant="h4" 
-                    component="h1" 
-                    gutterBottom 
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
                     sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
                 >
                     <WarrantyIcon fontSize="large" />
@@ -87,7 +88,7 @@ const SerialWarrantyTrackerPage = () => {
                             <Typography variant="h6" gutterBottom>
                                 Select Product for Serial & Warranty Tracking
                             </Typography>
-                            
+
                             <FormControl fullWidth sx={{ mt: 2 }}>
                                 <InputLabel id="product-select-label">
                                     Choose a Product

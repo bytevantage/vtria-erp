@@ -4961,3 +4961,58 @@
 2025-10-04T05:40:04.350Z ERROR: Failed to initialize email transporter:
 2025-10-04T05:41:17.599Z ERROR: Failed to initialize email transporter:
 2025-10-04T05:42:35.894Z ERROR: Failed to initialize email transporter:
+2025-10-05T12:15:23.701Z ERROR: Failed to initialize email transporter:
+2025-10-05T12:38:34.292Z ERROR: Authentication error:
+2025-10-05T12:38:34.399Z ERROR: Error on GET /api/estimations:
+2025-10-05T12:38:34.510Z ERROR: Authentication error:
+2025-10-05T12:38:34.519Z ERROR: Error on GET /api/sales-enquiries:
+2025-10-05T12:38:38.844Z ERROR: Authentication error:
+2025-10-05T12:38:38.889Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:38:38.999Z ERROR: Authentication error:
+2025-10-05T12:38:39.009Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:38:39.034Z ERROR: Authentication error:
+2025-10-05T12:38:39.038Z ERROR: Error on GET /api/case-management/stats/overview:
+2025-10-05T12:38:39.059Z ERROR: Authentication error:
+2025-10-05T12:38:39.067Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:38:39.092Z ERROR: Authentication error:
+2025-10-05T12:38:39.096Z ERROR: Error on GET /api/case-management/state/delivery:
+2025-10-05T12:38:39.122Z ERROR: Authentication error:
+2025-10-05T12:38:39.128Z ERROR: Error on GET /api/case-management/state/estimation:
+2025-10-05T12:38:39.148Z ERROR: Authentication error:
+2025-10-05T12:38:39.154Z ERROR: Error on GET /api/case-management/state/quotation:
+2025-10-05T12:38:39.198Z ERROR: Authentication error:
+2025-10-05T12:38:39.203Z ERROR: Error on GET /api/case-management/state/order:
+2025-10-05T12:38:39.227Z ERROR: Authentication error:
+2025-10-05T12:38:39.235Z ERROR: Error on GET /api/case-management/state/production:
+2025-10-05T12:44:18.030Z ERROR: Authentication error:
+2025-10-05T12:44:18.044Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:44:18.062Z ERROR: Authentication error:
+2025-10-05T12:44:18.067Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:44:18.214Z ERROR: Authentication error:
+2025-10-05T12:44:18.226Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:44:18.236Z ERROR: Authentication error:
+2025-10-05T12:44:18.239Z ERROR: Error on GET /api/case-management/stats/overview:
+2025-10-05T12:44:18.249Z ERROR: Authentication error:
+2025-10-05T12:44:18.255Z ERROR: Error on GET /api/case-management/state/estimation:
+2025-10-05T12:44:18.267Z ERROR: Authentication error:
+2025-10-05T12:44:18.270Z ERROR: Error on GET /api/case-management/state/delivery:
+2025-10-05T12:44:18.278Z ERROR: Authentication error:
+2025-10-05T12:44:18.281Z ERROR: Error on GET /api/case-management/state/quotation:
+2025-10-05T12:44:18.293Z ERROR: Authentication error:
+2025-10-05T12:44:18.295Z ERROR: Error on GET /api/case-management/state/production:
+2025-10-05T12:44:18.302Z ERROR: Authentication error:
+2025-10-05T12:44:18.311Z ERROR: Error on GET /api/case-management/state/order:
+2025-10-05T12:44:18.322Z ERROR: Authentication error:
+2025-10-05T12:44:18.324Z ERROR: Error on GET /api/case-management/stats/overview:
+2025-10-05T12:44:18.333Z ERROR: Authentication error:
+2025-10-05T12:44:18.336Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T12:44:18.343Z ERROR: Authentication error:
+2025-10-05T12:44:18.346Z ERROR: Error on GET /api/case-management/state/estimation:
+2025-10-05T12:44:18.353Z ERROR: Authentication error:
+2025-10-05T12:44:18.356Z ERROR: Error on GET /api/case-management/state/quotation:
+2025-10-05T12:44:18.363Z ERROR: Authentication error:
+2025-10-05T12:44:18.369Z ERROR: Error on GET /api/case-management/state/order:
+2025-10-05T12:44:18.379Z ERROR: Authentication error:
+2025-10-05T12:44:18.390Z ERROR: Error on GET /api/case-management/state/delivery:
+2025-10-05T12:44:18.409Z ERROR: Authentication error:
+2025-10-05T12:44:18.413Z ERROR: Error on GET /api/case-management/state/production:

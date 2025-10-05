@@ -14,8 +14,8 @@ RUN apk update && \
     ca-certificates \
     ttf-freefont || \
     (echo "Chromium installation failed, installing minimal dependencies" && \
-     apk add --no-cache nss freetype ca-certificates ttf-freefont && \
-     echo "Warning: Chromium not installed, PDF generation may not work")
+    apk add --no-cache nss freetype ca-certificates ttf-freefont && \
+    echo "Warning: Chromium not installed, PDF generation may not work")
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -52,8 +52,8 @@ RUN apk update && \
     ca-certificates \
     ttf-freefont || \
     (echo "Chromium installation failed, installing minimal dependencies" && \
-     apk add --no-cache nss freetype ca-certificates ttf-freefont && \
-     echo "Warning: Chromium not installed, PDF generation may not work")
+    apk add --no-cache nss freetype ca-certificates ttf-freefont && \
+    echo "Warning: Chromium not installed, PDF generation may not work")
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \

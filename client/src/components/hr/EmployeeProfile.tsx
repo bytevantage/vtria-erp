@@ -55,7 +55,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { API_BASE_URL } from '../../config';
 import authHeader from '../../services/auth-header';
 
-interface EmployeeProfileProps {}
+interface EmployeeProfileProps { }
 
 interface Employee {
   id: number;
@@ -98,11 +98,11 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
         const response = await fetch(`${API_BASE_URL}/hr/profile/${id}`, {
           headers: authHeader()
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch employee profile');
         }
-        
+
         const data = await response.json();
         setEmployee(data.data);
         setError(null);
@@ -156,14 +156,14 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
 
       const result = await response.json();
       enqueueSnackbar('Document uploaded successfully', { variant: 'success' });
-      
+
       // Refresh employee data
       if (employee) {
         const updatedEmployee = { ...employee };
         updatedEmployee.documents = [...(employee.documents || []), result.data];
         setEmployee(updatedEmployee);
       }
-      
+
       setUploadDialogOpen(false);
       setSelectedFile(null);
       setDocumentType('');
@@ -180,22 +180,22 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
     <Paper sx={{ p: 3, mb: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5">Basic Information</Typography>
-        <Button 
-          variant="outlined" 
+        <Button
+          variant="outlined"
           startIcon={editMode ? <Save /> : <Edit />}
           onClick={() => setEditMode(!editMode)}
         >
           {editMode ? 'Save Changes' : 'Edit'}
         </Button>
       </Box>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={3} display="flex" justifyContent="center">
           <Avatar sx={{ width: 150, height: 150, fontSize: '3rem' }}>
             {employee?.first_name?.[0]}{employee?.last_name?.[0]}
           </Avatar>
         </Grid>
-        
+
         <Grid item xs={12} md={9}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -266,7 +266,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
                 <DatePicker
                   label="Hire Date"
                   value={employee?.hire_date ? new Date(employee.hire_date) : null}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   disabled
                   slotProps={{
                     textField: {
@@ -287,15 +287,15 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
     <Paper sx={{ p: 3, mb: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5">Documents</Typography>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           startIcon={<Add />}
           onClick={() => setUploadDialogOpen(true)}
         >
           Upload Document
         </Button>
       </Box>
-      
+
       <TableContainer>
         <Table>
           <TableHead>
@@ -317,25 +317,25 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
                 <TableCell>{format(new Date(doc.created_at), 'MMM dd, yyyy')}</TableCell>
                 <TableCell>
                   {doc.is_verified ? (
-                    <Chip 
-                      icon={<CheckCircle fontSize="small" />} 
-                      label="Verified" 
-                      color="success" 
-                      size="small" 
+                    <Chip
+                      icon={<CheckCircle fontSize="small" />}
+                      label="Verified"
+                      color="success"
+                      size="small"
                     />
                   ) : (
-                    <Chip 
-                      icon={<Warning fontSize="small" />} 
-                      label="Pending" 
-                      color="warning" 
-                      size="small" 
+                    <Chip
+                      icon={<Warning fontSize="small" />}
+                      label="Pending"
+                      color="warning"
+                      size="small"
                     />
                   )}
                 </TableCell>
                 <TableCell>
-                  <Button 
-                    size="small" 
-                    href={`${API_BASE_URL}${doc.file_path}`} 
+                  <Button
+                    size="small"
+                    href={`${API_BASE_URL}${doc.file_path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -365,11 +365,11 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
           Add Skill
         </Button>
       </Box>
-      
+
       <Grid container spacing={2}>
         {employee?.skills?.map((skill) => (
           <Grid item key={skill.id}>
-            <Chip 
+            <Chip
               label={`${skill.skill_name} (${skill.proficiency_level})`}
               color="primary"
               variant="outlined"
@@ -388,7 +388,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
   const renderLeaveBalance = () => (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h5" gutterBottom>Leave Balance</Typography>
-      
+
       <Grid container spacing={3}>
         {employee?.leaveBalances?.map((balance) => (
           <Grid item xs={12} sm={6} md={4} key={balance.leave_type_id}>
@@ -417,7 +417,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
             </Card>
           </Grid>
         ))}
-        
+
         {(!employee?.leaveBalances || employee.leaveBalances.length === 0) && (
           <Grid item xs={12}>
             <Typography color="textSecondary">No leave balance information available</Typography>
@@ -435,7 +435,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
           Add Contact
         </Button>
       </Box>
-      
+
       <Grid container spacing={3}>
         {employee?.emergencyContacts?.map((contact) => (
           <Grid item xs={12} sm={6} key={contact.id}>
@@ -451,10 +451,10 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
                       {contact.phone}
                     </Typography>
                     {contact.is_primary && (
-                      <Chip 
-                        label="Primary Contact" 
-                        color="primary" 
-                        size="small" 
+                      <Chip
+                        label="Primary Contact"
+                        color="primary"
+                        size="small"
                         sx={{ mt: 1 }}
                       />
                     )}
@@ -467,7 +467,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
             </Card>
           </Grid>
         ))}
-        
+
         {(!employee?.emergencyContacts || employee.emergencyContacts.length === 0) && (
           <Grid item xs={12}>
             <Typography color="textSecondary">No emergency contacts added</Typography>
@@ -508,10 +508,10 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
         </Typography>
         <Divider />
       </Box>
-      
-      <Tabs 
-        value={tabValue} 
-        onChange={handleTabChange} 
+
+      <Tabs
+        value={tabValue}
+        onChange={handleTabChange}
         sx={{ mb: 3 }}
         variant="scrollable"
         scrollButtons="auto"
@@ -522,7 +522,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
         <Tab label="Leave" icon={<Event />} iconPosition="start" />
         <Tab label="Emergency Contacts" icon={<ContactEmergency />} iconPosition="start" />
       </Tabs>
-      
+
       {tabValue === 0 && (
         <>
           {renderBasicInfo()}
@@ -530,15 +530,15 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
           {renderLeaveBalance()}
         </>
       )}
-      
+
       {tabValue === 1 && renderDocuments()}
       {tabValue === 2 && renderSkills()}
       {tabValue === 3 && renderLeaveBalance()}
       {tabValue === 4 && renderEmergencyContacts()}
-      
+
       {/* Upload Document Dialog */}
-      <Dialog 
-        open={uploadDialogOpen} 
+      <Dialog
+        open={uploadDialogOpen}
         onClose={() => !uploading && setUploadDialogOpen(false)}
         maxWidth="sm"
         fullWidth
@@ -570,7 +570,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
               Supported formats: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
             </Typography>
           </Box>
-          
+
           <TextField
             select
             label="Document Type"
@@ -588,7 +588,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
             <MenuItem value="offer_letter">Offer Letter</MenuItem>
             <MenuItem value="other">Other</MenuItem>
           </TextField>
-          
+
           <TextField
             label="Document Number (Optional)"
             value={documentNumber}
@@ -597,7 +597,7 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
             margin="normal"
             disabled={uploading}
           />
-          
+
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Expiry Date (Optional)"
@@ -614,13 +614,13 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
           </LocalizationProvider>
         </DialogContent>
         <DialogActions>
-          <Button 
+          <Button
             onClick={() => setUploadDialogOpen(false)}
             disabled={uploading}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleUploadDocument}
             variant="contained"
             color="primary"

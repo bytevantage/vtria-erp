@@ -71,56 +71,56 @@ export interface Manufacturer {
 
 export interface Product {
   id: number;
-  
+
   // Basic Information
   name: string;
   product_code: string; // VTRIA's internal code
   manufacturer_part_code?: string; // Manufacturer's part number
-  
+
   // Classification
   category_id: number;
   subcategory_id?: number;
   manufacturer_id?: number;
-  
+
   // Physical Properties
   unit_id: number;
   weight?: number;
   dimensions?: string; // L×W×H format
-  
+
   // Pricing Information
   mrp?: number;
   last_purchase_price?: number;
   last_purchase_date?: string;
   vendor_discount_percentage: number;
-  
+
   // Tax Information
   hsn_code?: string;
   gst_rate: number;
-  
+
   // Warranty Information (Template)
   has_warranty: boolean;
   warranty_period_months: number;
   warranty_type: 'manufacturer' | 'dealer' | 'comprehensive' | 'none';
-  
+
   // Additional Information
   description?: string;
   specifications?: Record<string, any>; // JSON specifications
   image_url?: string;
   manual_url?: string;
-  
+
   // Status and Tracking
   is_active: boolean;
   is_serialized: boolean; // Whether this product requires serial number tracking
   min_stock_level: number;
   max_stock_level: number;
   reorder_point: number;
-  
+
   // Relations
   category?: ProductCategory;
   subcategory?: ProductCategory;
   manufacturer?: Manufacturer;
   unit?: UnitOfMeasurement;
-  
+
   // Audit
   created_by?: number;
   updated_by?: number;
@@ -136,30 +136,30 @@ export interface InventoryStock {
   id: number;
   product_id: number;
   location_id: number;
-  
+
   // Quantity Information
   available_quantity: number;
   reserved_quantity: number;
   damaged_quantity: number;
   total_quantity: number;
-  
+
   // Cost Information
   average_cost: number;
   last_cost: number;
-  
+
   // Stock Levels
   min_level: number;
   max_level: number;
   reorder_level: number;
-  
+
   // Tracking
   last_movement_date?: string;
   last_stocktake_date?: string;
-  
+
   // Relations
   product?: Product;
   location?: Location;
-  
+
   created_at: string;
   updated_at: string;
 }
@@ -168,91 +168,91 @@ export interface InventorySerialNumber {
   id: number;
   product_id: number;
   location_id: number;
-  
+
   // Serial Information
   serial_number: string;
   batch_number?: string;
-  
+
   // Warranty Information (Instance-specific)
   warranty_start_date?: string;
   warranty_end_date?: string;
   warranty_status: 'active' | 'expired' | 'void';
-  
+
   // Status Tracking
   status: 'available' | 'reserved' | 'sold' | 'damaged' | 'returned' | 'under_repair';
   condition_status: 'new' | 'used' | 'refurbished' | 'damaged';
-  
+
   // Purchase Information
   purchase_date?: string;
   purchase_price?: number;
   supplier_id?: number;
   grn_id?: number;
-  
+
   // Sales Information
   sale_date?: string;
   sales_order_id?: number;
   customer_id?: number;
-  
+
   // Service Information
   last_service_date?: string;
   next_service_due?: string;
   service_notes?: string;
-  
+
   // Reference Information
   reference_type?: string;
   reference_id?: number;
-  
+
   // Relations
   product?: Product;
   location?: Location;
   supplier?: Supplier;
   customer?: Client;
-  
+
   created_at: string;
   updated_at: string;
 }
 
 export interface InventoryMovement {
   id: number;
-  
+
   // Basic Information
   movement_date: string;
   movement_type: 'inward' | 'outward' | 'transfer' | 'adjustment' | 'damage' | 'return';
-  
+
   // Product and Location
   product_id: number;
   from_location_id?: number;
   to_location_id?: number;
-  
+
   // Quantity and Cost
   quantity: number;
   unit_cost?: number;
   total_cost?: number;
-  
+
   // Reference Information
   reference_type?: string; // 'purchase', 'sale', 'manufacturing', 'adjustment', 'transfer'
   reference_id?: number;
   reference_number?: string;
-  
+
   // Serial Number (for serialized items)
   serial_number?: string;
-  
+
   // Additional Information
   reason?: string;
   notes?: string;
-  
+
   // User Information
   created_by: number;
   approved_by?: number;
   approved_at?: string;
-  
+
   // Relations
   product?: Product;
   from_location?: Location;
   to_location?: Location;
   created_by_user?: User;
   approved_by_user?: User;
-  
+
   created_at: string;
 }
 
@@ -268,18 +268,18 @@ export interface InventoryProductCosting {
   product_id: number;
   location_id: number;
   valuation_method_id: number;
-  
+
   // Costing Information
   standard_cost?: number;
   average_cost?: number;
   last_cost?: number;
   fifo_cost?: number;
-  
+
   // Calculation Date
   calculated_at: string;
   valid_from?: string;
   valid_to?: string;
-  
+
   // Relations
   product?: Product;
   location?: Location;
@@ -602,7 +602,9 @@ export interface EnquiryState {
   loading: boolean;
   error: string | null;
   fetchEnquiries: () => Promise<void>;
+  fetchEnquiryById: (id: number) => Promise<void>;
   createEnquiry: (data: CreateEnquiryForm) => Promise<void>;
   updateEnquiry: (id: number, data: Partial<SalesEnquiry>) => Promise<void>;
+  deleteEnquiry: (id: number) => Promise<void>;
   setCurrentEnquiry: (enquiry: SalesEnquiry | null) => void;
 }

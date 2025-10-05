@@ -124,6 +124,7 @@ interface EmployeeSpecialization {
     specialization_id: number;
     specialization_name: string;
     category: string;
+    industry_domain: string;
     proficiency_level: 'learning' | 'competent' | 'proficient' | 'expert' | 'master';
     years_of_experience: number;
     projects_completed: number;
@@ -199,18 +200,18 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
     const [profile, setProfile] = useState<TechnicianProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
+
     // Master data
     const [skillsMaster, setSkillsMaster] = useState<Skill[]>([]);
     const [certificationsMaster, setCertificationsMaster] = useState<Certification[]>([]);
     const [specializationsMaster, setSpecializationsMaster] = useState<Specialization[]>([]);
-    
+
     // Dialog states
     const [skillDialog, setSkillDialog] = useState(false);
     const [certificationDialog, setCertificationDialog] = useState(false);
     const [specializationDialog, setSpecializationDialog] = useState(false);
     const [experienceDialog, setExperienceDialog] = useState(false);
-    
+
     // Form states
     const [newSkill, setNewSkill] = useState({
         skill_id: '',
@@ -221,7 +222,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
         usage_frequency: 'rarely' as const,
         assessment_notes: ''
     });
-    
+
     const [newCertification, setNewCertification] = useState({
         certification_id: '',
         certificate_number: '',
@@ -232,7 +233,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
         training_duration_days: 0,
         employer_sponsored: true
     });
-    
+
     const [newSpecialization, setNewSpecialization] = useState({
         specialization_id: '',
         proficiency_level: 'competent' as const,
@@ -242,7 +243,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
         currently_working_on: false,
         assessment_notes: ''
     });
-    
+
     const [experienceData, setExperienceData] = useState<EmployeeExperience>({
         total_experience_years: 0,
         relevant_experience_years: 0,
@@ -273,7 +274,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
             const response = await axios.get(`${API_BASE_URL}/api/employees/${employeeId}/technician-profile`);
             if (response.data.success) {
                 setProfile(response.data.data);
-                
+
                 // Update experience data if available
                 const exp = response.data.data;
                 setExperienceData({
@@ -310,7 +311,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                 axios.get(`${API_BASE_URL}/api/employees/master/certifications`),
                 axios.get(`${API_BASE_URL}/api/employees/master/specializations`)
             ]);
-            
+
             setSkillsMaster(skillsResponse.data.data || []);
             setCertificationsMaster(certificationsResponse.data.data || []);
             setSpecializationsMaster(specializationsResponse.data.data || []);
@@ -528,7 +529,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                                 color="primary"
                                             />
                                         </Box>
-                                        
+
                                         <Box mb={2}>
                                             <Box display="flex" justifyContent="space-between" mb={1}>
                                                 <Typography variant="body2">
@@ -697,9 +698,9 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                             <Rating
                                                 value={
                                                     spec.proficiency_level === 'master' ? 5 :
-                                                    spec.proficiency_level === 'expert' ? 4 :
-                                                    spec.proficiency_level === 'proficient' ? 3 :
-                                                    spec.proficiency_level === 'competent' ? 2 : 1
+                                                        spec.proficiency_level === 'expert' ? 4 :
+                                                            spec.proficiency_level === 'proficient' ? 3 :
+                                                                spec.proficiency_level === 'competent' ? 2 : 1
                                                 }
                                                 readOnly
                                                 size="small"
@@ -908,7 +909,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={newSkill.skill_id}
                                     label="Skill"
-                                    onChange={(e) => setNewSkill({...newSkill, skill_id: e.target.value})}
+                                    onChange={(e) => setNewSkill({ ...newSkill, skill_id: e.target.value })}
                                 >
                                     {skillsMaster.map((skill) => (
                                         <MenuItem key={skill.id} value={skill.id}>
@@ -924,7 +925,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={newSkill.proficiency_level}
                                     label="Proficiency Level"
-                                    onChange={(e) => setNewSkill({...newSkill, proficiency_level: e.target.value as any})}
+                                    onChange={(e) => setNewSkill({ ...newSkill, proficiency_level: e.target.value as any })}
                                 >
                                     <MenuItem value="beginner">Beginner</MenuItem>
                                     <MenuItem value="intermediate">Intermediate</MenuItem>
@@ -939,7 +940,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Proficiency Score (0-100)"
                                 type="number"
                                 value={newSkill.proficiency_score}
-                                onChange={(e) => setNewSkill({...newSkill, proficiency_score: parseInt(e.target.value)})}
+                                onChange={(e) => setNewSkill({ ...newSkill, proficiency_score: parseInt(e.target.value) })}
                                 inputProps={{ min: 0, max: 100 }}
                             />
                         </Grid>
@@ -949,7 +950,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Years of Experience"
                                 type="number"
                                 value={newSkill.years_of_experience}
-                                onChange={(e) => setNewSkill({...newSkill, years_of_experience: parseFloat(e.target.value)})}
+                                onChange={(e) => setNewSkill({ ...newSkill, years_of_experience: parseFloat(e.target.value) })}
                                 inputProps={{ min: 0, step: 0.1 }}
                             />
                         </Grid>
@@ -959,7 +960,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={newSkill.usage_frequency}
                                     label="Usage Frequency"
-                                    onChange={(e) => setNewSkill({...newSkill, usage_frequency: e.target.value as any})}
+                                    onChange={(e) => setNewSkill({ ...newSkill, usage_frequency: e.target.value as any })}
                                 >
                                     <MenuItem value="daily">Daily</MenuItem>
                                     <MenuItem value="weekly">Weekly</MenuItem>
@@ -974,7 +975,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 control={
                                     <Switch
                                         checked={newSkill.is_certified}
-                                        onChange={(e) => setNewSkill({...newSkill, is_certified: e.target.checked})}
+                                        onChange={(e) => setNewSkill({ ...newSkill, is_certified: e.target.checked })}
                                     />
                                 }
                                 label="Is Certified"
@@ -987,7 +988,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 multiline
                                 rows={3}
                                 value={newSkill.assessment_notes}
-                                onChange={(e) => setNewSkill({...newSkill, assessment_notes: e.target.value})}
+                                onChange={(e) => setNewSkill({ ...newSkill, assessment_notes: e.target.value })}
                             />
                         </Grid>
                     </Grid>
@@ -1009,7 +1010,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={newCertification.certification_id}
                                     label="Certification"
-                                    onChange={(e) => setNewCertification({...newCertification, certification_id: e.target.value})}
+                                    onChange={(e) => setNewCertification({ ...newCertification, certification_id: e.target.value })}
                                 >
                                     {certificationsMaster.map((cert) => (
                                         <MenuItem key={cert.id} value={cert.id}>
@@ -1024,7 +1025,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 fullWidth
                                 label="Certificate Number"
                                 value={newCertification.certificate_number}
-                                onChange={(e) => setNewCertification({...newCertification, certificate_number: e.target.value})}
+                                onChange={(e) => setNewCertification({ ...newCertification, certificate_number: e.target.value })}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -1032,7 +1033,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 fullWidth
                                 label="Grade/Score"
                                 value={newCertification.grade_or_score}
-                                onChange={(e) => setNewCertification({...newCertification, grade_or_score: e.target.value})}
+                                onChange={(e) => setNewCertification({ ...newCertification, grade_or_score: e.target.value })}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -1041,7 +1042,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Obtained Date"
                                 type="date"
                                 value={newCertification.obtained_date}
-                                onChange={(e) => setNewCertification({...newCertification, obtained_date: e.target.value})}
+                                onChange={(e) => setNewCertification({ ...newCertification, obtained_date: e.target.value })}
                                 InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
@@ -1051,7 +1052,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Expiry Date"
                                 type="date"
                                 value={newCertification.expiry_date}
-                                onChange={(e) => setNewCertification({...newCertification, expiry_date: e.target.value})}
+                                onChange={(e) => setNewCertification({ ...newCertification, expiry_date: e.target.value })}
                                 InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
@@ -1061,7 +1062,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Cost Incurred (₹)"
                                 type="number"
                                 value={newCertification.cost_incurred}
-                                onChange={(e) => setNewCertification({...newCertification, cost_incurred: parseFloat(e.target.value)})}
+                                onChange={(e) => setNewCertification({ ...newCertification, cost_incurred: parseFloat(e.target.value) })}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -1070,7 +1071,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Training Duration (Days)"
                                 type="number"
                                 value={newCertification.training_duration_days}
-                                onChange={(e) => setNewCertification({...newCertification, training_duration_days: parseInt(e.target.value)})}
+                                onChange={(e) => setNewCertification({ ...newCertification, training_duration_days: parseInt(e.target.value) })}
                             />
                         </Grid>
                     </Grid>
@@ -1092,7 +1093,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={newSpecialization.specialization_id}
                                     label="Specialization"
-                                    onChange={(e) => setNewSpecialization({...newSpecialization, specialization_id: e.target.value})}
+                                    onChange={(e) => setNewSpecialization({ ...newSpecialization, specialization_id: e.target.value })}
                                 >
                                     {specializationsMaster.map((spec) => (
                                         <MenuItem key={spec.id} value={spec.id}>
@@ -1108,7 +1109,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={newSpecialization.proficiency_level}
                                     label="Proficiency Level"
-                                    onChange={(e) => setNewSpecialization({...newSpecialization, proficiency_level: e.target.value as any})}
+                                    onChange={(e) => setNewSpecialization({ ...newSpecialization, proficiency_level: e.target.value as any })}
                                 >
                                     <MenuItem value="learning">Learning</MenuItem>
                                     <MenuItem value="competent">Competent</MenuItem>
@@ -1124,7 +1125,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Years of Experience"
                                 type="number"
                                 value={newSpecialization.years_of_experience}
-                                onChange={(e) => setNewSpecialization({...newSpecialization, years_of_experience: parseFloat(e.target.value)})}
+                                onChange={(e) => setNewSpecialization({ ...newSpecialization, years_of_experience: parseFloat(e.target.value) })}
                                 inputProps={{ min: 0, step: 0.1 }}
                             />
                         </Grid>
@@ -1134,7 +1135,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Projects Completed"
                                 type="number"
                                 value={newSpecialization.projects_completed}
-                                onChange={(e) => setNewSpecialization({...newSpecialization, projects_completed: parseInt(e.target.value)})}
+                                onChange={(e) => setNewSpecialization({ ...newSpecialization, projects_completed: parseInt(e.target.value) })}
                                 inputProps={{ min: 0 }}
                             />
                         </Grid>
@@ -1143,7 +1144,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 control={
                                     <Switch
                                         checked={newSpecialization.is_primary_specialization}
-                                        onChange={(e) => setNewSpecialization({...newSpecialization, is_primary_specialization: e.target.checked})}
+                                        onChange={(e) => setNewSpecialization({ ...newSpecialization, is_primary_specialization: e.target.checked })}
                                     />
                                 }
                                 label="Primary Specialization"
@@ -1154,7 +1155,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 control={
                                     <Switch
                                         checked={newSpecialization.currently_working_on}
-                                        onChange={(e) => setNewSpecialization({...newSpecialization, currently_working_on: e.target.checked})}
+                                        onChange={(e) => setNewSpecialization({ ...newSpecialization, currently_working_on: e.target.checked })}
                                     />
                                 }
                                 label="Currently Working On"
@@ -1167,7 +1168,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 multiline
                                 rows={3}
                                 value={newSpecialization.assessment_notes}
-                                onChange={(e) => setNewSpecialization({...newSpecialization, assessment_notes: e.target.value})}
+                                onChange={(e) => setNewSpecialization({ ...newSpecialization, assessment_notes: e.target.value })}
                             />
                         </Grid>
                     </Grid>
@@ -1189,7 +1190,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Total Experience (Years)"
                                 type="number"
                                 value={experienceData.total_experience_years}
-                                onChange={(e) => setExperienceData({...experienceData, total_experience_years: parseFloat(e.target.value)})}
+                                onChange={(e) => setExperienceData({ ...experienceData, total_experience_years: parseFloat(e.target.value) })}
                                 inputProps={{ min: 0, step: 0.1 }}
                             />
                         </Grid>
@@ -1199,7 +1200,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Industry Experience (Years)"
                                 type="number"
                                 value={experienceData.industry_experience_years}
-                                onChange={(e) => setExperienceData({...experienceData, industry_experience_years: parseFloat(e.target.value)})}
+                                onChange={(e) => setExperienceData({ ...experienceData, industry_experience_years: parseFloat(e.target.value) })}
                                 inputProps={{ min: 0, step: 0.1 }}
                             />
                         </Grid>
@@ -1209,7 +1210,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Automation Experience (Years)"
                                 type="number"
                                 value={experienceData.automation_experience_years}
-                                onChange={(e) => setExperienceData({...experienceData, automation_experience_years: parseFloat(e.target.value)})}
+                                onChange={(e) => setExperienceData({ ...experienceData, automation_experience_years: parseFloat(e.target.value) })}
                                 inputProps={{ min: 0, step: 0.1 }}
                             />
                         </Grid>
@@ -1219,7 +1220,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Programming Experience (Years)"
                                 type="number"
                                 value={experienceData.programming_experience_years}
-                                onChange={(e) => setExperienceData({...experienceData, programming_experience_years: parseFloat(e.target.value)})}
+                                onChange={(e) => setExperienceData({ ...experienceData, programming_experience_years: parseFloat(e.target.value) })}
                                 inputProps={{ min: 0, step: 0.1 }}
                             />
                         </Grid>
@@ -1229,7 +1230,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Projects Led"
                                 type="number"
                                 value={experienceData.projects_led}
-                                onChange={(e) => setExperienceData({...experienceData, projects_led: parseInt(e.target.value)})}
+                                onChange={(e) => setExperienceData({ ...experienceData, projects_led: parseInt(e.target.value) })}
                                 inputProps={{ min: 0 }}
                             />
                         </Grid>
@@ -1239,7 +1240,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 label="Projects Participated"
                                 type="number"
                                 value={experienceData.projects_participated}
-                                onChange={(e) => setExperienceData({...experienceData, projects_participated: parseInt(e.target.value)})}
+                                onChange={(e) => setExperienceData({ ...experienceData, projects_participated: parseInt(e.target.value) })}
                                 inputProps={{ min: 0 }}
                             />
                         </Grid>
@@ -1249,7 +1250,7 @@ const TechnicianProfileManager: React.FC<TechnicianProfileManagerProps> = ({ emp
                                 <Select
                                     value={experienceData.seniority_level}
                                     label="Seniority Level"
-                                    onChange={(e) => setExperienceData({...experienceData, seniority_level: e.target.value as any})}
+                                    onChange={(e) => setExperienceData({ ...experienceData, seniority_level: e.target.value as any })}
                                 >
                                     <MenuItem value="trainee">Trainee</MenuItem>
                                     <MenuItem value="junior">Junior</MenuItem>

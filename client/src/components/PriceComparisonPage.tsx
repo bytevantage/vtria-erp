@@ -11,14 +11,22 @@ import {
     MenuItem,
     Alert,
     CircularProgress,
-    Container
+    Container,
+    SelectChangeEvent
 } from '@mui/material';
 import { Compare as CompareIcon } from '@mui/icons-material';
 import PurchasePriceComparison from './PurchasePriceComparison';
 import axios from 'axios';
 
+interface Estimation {
+    id: string;
+    estimation_id: string;
+    project_name?: string;
+    client_name?: string;
+}
+
 const PriceComparisonPage = () => {
-    const [estimations, setEstimations] = useState([]);
+    const [estimations, setEstimations] = useState<Estimation[]>([]);
     const [selectedEstimationId, setSelectedEstimationId] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -43,7 +51,7 @@ const PriceComparisonPage = () => {
         }
     };
 
-    const handleEstimationChange = (event) => {
+    const handleEstimationChange = (event: SelectChangeEvent<string>) => {
         setSelectedEstimationId(event.target.value);
     };
 
@@ -60,10 +68,10 @@ const PriceComparisonPage = () => {
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Box sx={{ mb: 4 }}>
-                <Typography 
-                    variant="h4" 
-                    component="h1" 
-                    gutterBottom 
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
                     sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
                 >
                     <CompareIcon fontSize="large" />
@@ -87,7 +95,7 @@ const PriceComparisonPage = () => {
                             <Typography variant="h6" gutterBottom>
                                 Select Estimation for Price Comparison
                             </Typography>
-                            
+
                             <FormControl fullWidth sx={{ mt: 2 }}>
                                 <InputLabel id="estimation-select-label">
                                     Choose an Estimation
@@ -103,7 +111,7 @@ const PriceComparisonPage = () => {
                                     </MenuItem>
                                     {estimations.map((estimation) => (
                                         <MenuItem key={estimation.id} value={estimation.id}>
-                                            {estimation.estimation_id} - {estimation.project_name || 'Untitled Project'} 
+                                            {estimation.estimation_id} - {estimation.project_name || 'Untitled Project'}
                                             {estimation.client_name && ` (${estimation.client_name})`}
                                         </MenuItem>
                                     ))}

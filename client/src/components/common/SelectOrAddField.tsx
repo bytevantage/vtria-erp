@@ -67,7 +67,7 @@ const SelectOrAddField: React.FC<SelectOrAddFieldProps> = ({
     option.value === value || option.id === value
   );
 
-  const handleAutocompleteChange = useCallback((_event: any, newValue: any) => {
+  const handleAutocompleteChange = useCallback((event: React.SyntheticEvent, newValue: Option | string | null) => {
     if (typeof newValue === 'string') {
       // User typed a new value
       if (onAddNew) {
