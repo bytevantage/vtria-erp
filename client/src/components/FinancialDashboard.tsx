@@ -501,7 +501,7 @@ const FinancialDashboard: React.FC = () => {
                 {outstandingData.filter(customer =>
                   customer.risk_category === 'high' || customer.risk_category === 'blocked'
                 ).length > 0 && (
-                    <Alert severity="error" size="small">
+                    <Alert severity="error">
                       <Typography variant="body2">
                         {outstandingData.filter(customer =>
                           customer.risk_category === 'high' || customer.risk_category === 'blocked'
@@ -516,7 +516,7 @@ const FinancialDashboard: React.FC = () => {
                 {outstandingData.filter(customer =>
                   customer.current_outstanding > customer.credit_limit * 0.8
                 ).length > 0 && (
-                    <Alert severity="warning" size="small">
+                    <Alert severity="warning">
                       <Typography variant="body2">
                         {outstandingData.filter(customer =>
                           customer.current_outstanding > customer.credit_limit * 0.8
@@ -529,7 +529,7 @@ const FinancialDashboard: React.FC = () => {
 
                 {/* Collection Performance Alert */}
                 {salesSummary.length > 0 && salesSummary[0]?.collection_percentage < 70 && (
-                  <Alert severity="info" size="small">
+                  <Alert severity="info">
                     <Typography variant="body2">
                       Current month collection rate: {salesSummary[0]?.collection_percentage.toFixed(1)}%
                       (Target: 70%+)
@@ -545,7 +545,7 @@ const FinancialDashboard: React.FC = () => {
                     customer.current_outstanding > customer.credit_limit * 0.8
                   ).length === 0 &&
                   (salesSummary.length === 0 || salesSummary[0]?.collection_percentage >= 70) && (
-                    <Alert severity="success" size="small">
+                    <Alert severity="success">
                       <Typography variant="body2">
                         All financial metrics within acceptable limits
                       </Typography>

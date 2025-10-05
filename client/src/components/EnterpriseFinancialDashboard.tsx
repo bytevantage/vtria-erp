@@ -171,6 +171,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('current_month');
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
+  const [salesSummary, setSalesSummary] = useState<any[]>([]);
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -618,6 +619,56 @@ const EnterpriseFinancialDashboard: React.FC = () => {
             </Card>
           </Grid>
         </Grid>
+
+        {/* Financial Alerts */}
+        {outstandingData.filter(customer =>
+          customer.risk_category === 'high' || customer.risk_category === 'blocked'
+        ).length > 0 && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              {outstandingData.filter(customer =>
+                customer.risk_category === 'high' || customer.risk_category === 'blocked'
+              ).length} customers have high-risk outstanding amounts requiring immediate attention.
+            </Typography>
+          </Alert>
+        )}
+
+        {outstandingData.filter(customer =>
+          customer.current_outstanding > customer.credit_limit * 0.8
+        ).length > 0 && (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              {outstandingData.filter(customer =>
+                customer.current_outstanding > customer.credit_limit * 0.8
+              ).length} customers are approaching their credit limits.
+            </Typography>
+          </Alert>
+        )}
+
+        {/* Collection Performance Alert */}
+        {salesSummary.length > 0 && salesSummary[0]?.collection_percentage < 70 && (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              Current month collection rate: {salesSummary[0]?.collection_percentage.toFixed(1)}% (Target: 70%+)
+            </Typography>
+          </Alert>
+        )}
+
+        {/* Success Alert */}
+        {outstandingData.length > 0 &&
+         (outstandingData.filter(customer =>
+           customer.risk_category === 'high' || customer.risk_category === 'blocked'
+         ).length === 0) &&
+         (outstandingData.filter(customer =>
+           customer.current_outstanding > customer.credit_limit * 0.8
+         ).length === 0) &&
+         (salesSummary.length === 0 || salesSummary[0]?.collection_percentage >= 70) && (
+          <Alert severity="success" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              All financial metrics within acceptable limits
+            </Typography>
+          </Alert>
+        )}
       </TabPanel>
 
       {/* Cash Flow Tab */}
