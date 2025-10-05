@@ -372,7 +372,7 @@ const CaseHistoryTracker: React.FC = () => {
             <Timeline position="alternate">
                 {caseItem.state_transitions.map((transition, index) => (
                     <TimelineItem key={index}>
-                        <TimelineOppositeContent sx={{ m: 'auto 0' }} align="right" variant="body2" color="text.secondary">
+                        <TimelineOppositeContent sx={{ m: 'auto 0', textAlign: 'right' }}>
                             {new Date(transition.transition_date).toLocaleDateString('en-IN')}
                             <br />
                             <Typography variant="caption">
