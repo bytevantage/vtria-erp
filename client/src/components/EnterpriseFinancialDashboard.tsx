@@ -219,7 +219,9 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-const fetchCashFlowData = async () => {
+  };
+
+  const fetchCashFlowData = async () => {
   try {
     const response = await fetch('/api/financial/cash-flow', {
       headers: {
@@ -240,7 +242,7 @@ const fetchCashFlowData = async () => {
   }
 };
 
-const fetchProfitLossData = async () => {
+  const fetchProfitLossData = async () => {
   try {
     // Mock P&L data
     setProfitLossData([
@@ -290,7 +292,7 @@ const fetchProfitLossData = async () => {
   }
 };
 
-const fetchOutstandingData = async () => {
+  const fetchOutstandingData = async () => {
   try {
     // Mock outstanding data
     setOutstandingData([
@@ -332,7 +334,7 @@ const fetchOutstandingData = async () => {
   }
 };
 
-const fetchFinancialAlerts = async () => {
+  const fetchFinancialAlerts = async () => {
   try {
     // Mock financial alerts
     setAlerts([
@@ -381,7 +383,7 @@ const fetchFinancialAlerts = async () => {
   }
 };
 
-const getRiskCategoryColor = (category: string) => {
+  const getRiskCategoryColor = (category: string) => {
   switch (category) {
     case 'low': return 'success';
     case 'medium': return 'warning';
@@ -391,7 +393,7 @@ const getRiskCategoryColor = (category: string) => {
   }
 };
 
-const getAlertSeverityColor = (severity: string) => {
+  const getAlertSeverityColor = (severity: string) => {
   switch (severity) {
     case 'low': return 'info';
     case 'medium': return 'warning';
@@ -401,7 +403,7 @@ const getAlertSeverityColor = (severity: string) => {
   }
 };
 
-const getAlertIcon = (type: string) => {
+  const getAlertIcon = (type: string) => {
   switch (type) {
     case 'overdue': return <Schedule />;
     case 'credit_limit': return <Error />;
@@ -412,7 +414,7 @@ const getAlertIcon = (type: string) => {
   }
 };
 
-const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number) => {
   if (amount >= 10000000) {
     return `₹${(amount / 10000000).toFixed(1)} Cr`;
   } else if (amount >= 100000) {
@@ -422,7 +424,7 @@ const formatCurrency = (amount: number) => {
   }
 };
 
-const getTrendIcon = (direction?: string) => {
+  const getTrendIcon = (direction?: string) => {
   switch (direction) {
     case 'up':
       return <TrendingUp fontSize="small" />;
@@ -433,7 +435,7 @@ const getTrendIcon = (direction?: string) => {
   }
 };
 
-return (
+  return (
   <Box sx={{ p: 3 }}>
     {/* Header */}
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
