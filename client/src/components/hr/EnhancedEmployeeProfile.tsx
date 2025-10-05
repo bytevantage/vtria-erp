@@ -5,7 +5,7 @@ import {
   Button, IconButton, LinearProgress, Alert, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, MenuItem, Card, CardContent,
   CardHeader, Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, FormControl, InputLabel, Select, FormHelperText
+  TableRow, FormControl, InputLabel, Select, FormHelperText, SelectChangeEvent
 } from '@mui/material';
 import {
   Person, Work, School, Event, ContactEmergency, Edit, Save, Cancel,
@@ -170,7 +170,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
   };
   
   // Handle select change
-  const handleSelectChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
     if (!employee) return;
     
     const name = e.target.name as string;
