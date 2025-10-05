@@ -114,7 +114,7 @@ const EnhancedCaseHistoryTracker = () => {
         axios.get(`${API_BASE_URL}/api/audit/case/${caseId}`),
         axios.get(`${API_BASE_URL}/api/audit/scope-changes/${caseId}`)
       ]);
-      
+
       if (auditResponse.data.success) {
         setCaseAuditTrail(auditResponse.data.data);
       }
@@ -189,7 +189,7 @@ const EnhancedCaseHistoryTracker = () => {
         <Button onClick={() => setApprovalDialog({ open: false, auditId: null, action: '' })}>
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={() => {
             const notes = document.getElementById('approval-notes').value;
             if (approvalDialog.action === 'reject' && !notes.trim()) {
@@ -358,22 +358,22 @@ const EnhancedCaseHistoryTracker = () => {
                         <Box key={entry.id} sx={{ display: 'flex', gap: 2, position: 'relative' }}>
                           {/* Timeline-like visual indicator */}
                           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 24 }}>
-                            <Box 
-                              sx={{ 
-                                width: 12, 
-                                height: 12, 
-                                borderRadius: '50%', 
+                            <Box
+                              sx={{
+                                width: 12,
+                                height: 12,
+                                borderRadius: '50%',
                                 bgcolor: `${getActionColor(entry.action)}.main`,
                                 border: 2,
                                 borderColor: 'background.paper',
                                 boxShadow: 1
-                              }} 
+                              }}
                             />
                             {index < caseAuditTrail.length - 1 && (
                               <Box sx={{ width: 2, height: 40, bgcolor: 'divider', mt: 1 }} />
                             )}
                           </Box>
-                          
+
                           {/* Content */}
                           <Box sx={{ flex: 1, pb: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -422,12 +422,12 @@ const EnhancedCaseHistoryTracker = () => {
                               {change.value_difference > 0 ? '+' : ''}{formatCurrency(change.value_difference)}
                             </Typography>
                           )}
-                          <Chip 
-                            label={change.approval_status} 
-                            size="small" 
+                          <Chip
+                            label={change.approval_status}
+                            size="small"
                             color={
                               change.approval_status === 'approved' ? 'success' :
-                              change.approval_status === 'rejected' ? 'error' : 'warning'
+                                change.approval_status === 'rejected' ? 'error' : 'warning'
                             }
                             sx={{ mt: 1 }}
                           />
@@ -511,7 +511,7 @@ const EnhancedCaseHistoryTracker = () => {
 
         <TabPanel value={tabValue} index={3}>
           {/* High Value Changes */}
-          <Typography variant="h6" gutterBottom>High Value Changes (>{formatCurrency(50000)})</Typography>
+          <Typography variant="h6" gutterBottom>High Value Changes (&gt;{formatCurrency(50000)})</Typography>
           {highValueChanges.length === 0 ? (
             <Alert severity="info">No high value changes in the selected period</Alert>
           ) : (
@@ -541,8 +541,8 @@ const EnhancedCaseHistoryTracker = () => {
                       <TableCell>{change.case_number}</TableCell>
                       <TableCell>{change.client_name}</TableCell>
                       <TableCell align="right">
-                        <Typography 
-                          variant="body2" 
+                        <Typography
+                          variant="body2"
                           fontWeight="bold"
                           color={change.value_difference > 0 ? 'error.main' : 'success.main'}
                         >
@@ -555,12 +555,12 @@ const EnhancedCaseHistoryTracker = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                          label={change.approval_status} 
-                          size="small" 
+                        <Chip
+                          label={change.approval_status}
+                          size="small"
                           color={
                             change.approval_status === 'approved' ? 'success' :
-                            change.approval_status === 'rejected' ? 'error' : 'warning'
+                              change.approval_status === 'rejected' ? 'error' : 'warning'
                           }
                         />
                       </TableCell>

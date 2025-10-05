@@ -33,6 +33,13 @@ import {
   Timeline as TimelineIcon,
   Analytics as AnalyticsIcon,
   Settings as SettingsIcon,
+  SmartToy as AIIcon,
+  AutoFixHigh as SmartIcon,
+  Gavel as BiddingIcon,
+  AccountBalance as FinanceIcon,
+  People as PeopleIcon,
+  Inventory as InventoryIcon,
+  Assignment as ManufacturingIcon,
 } from '@mui/icons-material';
 
 const About = () => {
@@ -167,21 +174,291 @@ Website: www.bytevantage.in
                     <strong>Product:</strong> VTRIA ERP System
                   </Typography>
                   <Typography variant="body1" paragraph>
-                    <strong>Version:</strong> 1.0.0
+                    <strong>Version:</strong> 1.1.0
                   </Typography>
                   <Typography variant="body1" paragraph>
-                    <strong>Technology:</strong> React.js, Node.js, MySQL
+                    <strong>Technology:</strong> React.js, TypeScript, Node.js, MySQL
                   </Typography>
                   <Typography variant="body1" paragraph>
                     <strong>Deployment:</strong> Docker Containerized
                   </Typography>
+                  <Typography variant="body1" paragraph>
+                    <strong>Components:</strong> 380+ React Components
+                  </Typography>
                   <Box sx={{ mt: 2 }}>
                     <Chip label="Manufacturing ERP" sx={{ mr: 1, mb: 1 }} />
-                    <Chip label="Case Management" sx={{ mr: 1, mb: 1 }} />
-                    <Chip label="Inventory Control" sx={{ mr: 1, mb: 1 }} />
-                    <Chip label="Financial Management" sx={{ mr: 1, mb: 1 }} />
+                    <Chip label="AI-Powered Analytics" sx={{ mr: 1, mb: 1 }} color="primary" />
+                    <Chip label="Smart Inventory" sx={{ mr: 1, mb: 1 }} color="secondary" />
+                    <Chip label="Competitive Bidding" sx={{ mr: 1, mb: 1 }} color="success" />
+                    <Chip label="HR Management" sx={{ mr: 1, mb: 1 }} color="warning" />
+                    <Chip label="Financial Analytics" sx={{ mr: 1, mb: 1 }} color="info" />
+                    <Chip label="Mobile Attendance" sx={{ mr: 1, mb: 1 }} color="error" />
                   </Box>
                 </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Enhanced Features & AI Capabilities */}
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <SmartIcon sx={{ mr: 1 }} />
+            AI-Powered Enterprise Features
+          </Typography>
+
+          <Grid container spacing={3}>
+            {/* Smart Inventory Management */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'primary.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <AIIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Smart Allocation Engine</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="AI-Powered Inventory Allocation"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Context-aware batch selection based on business scenarios
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Smart Cost Optimization"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated FIFO, warranty, and performance-based allocation
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Predictive Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Allocation recommendations with cost impact analysis
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Competitive Bidding System */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'success.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <BiddingIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Competitive Bidding</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Multi-Supplier RFQ Management"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated RFQ distribution to multiple suppliers
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Price Comparison Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Real-time bid comparison with savings calculation
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Supplier Intelligence"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Performance tracking and market competitiveness analysis
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Enterprise Financial Dashboard */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'warning.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <FinanceIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Financial Analytics</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Real-Time KPI Dashboard"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Cash flow, P&L, and customer outstanding tracking
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Cost Optimization Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated cost analysis and savings identification
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Financial Forecasting"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Predictive financial modeling and trend analysis
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Advanced HR Management */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'info.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <PeopleIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Smart HR Management</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Multi-Modal Attendance"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Biometric, GPS, QR Code, and photo-based check-ins
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Enhanced Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Attendance patterns, productivity metrics, and insights
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Mobile-First Design"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Dedicated mobile interfaces for employee self-service
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Master Inventory Dashboard */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'secondary.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <InventoryIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Advanced Inventory</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Serial Number Tracking"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Complete lifecycle tracking with batch management
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Smart Procurement Alerts"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated reorder points and stock optimization
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Warranty Management"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Warranty expiry tracking and lifecycle analytics
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Manufacturing Workflow */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'error.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <ManufacturingIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Manufacturing Excellence</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Bill of Materials (BOM)"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Multi-level BOM management with cost tracking
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Production Planning"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Resource allocation and production scheduling
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Quality Control"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Integrated quality management and compliance tracking
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
               </Paper>
             </Grid>
           </Grid>
@@ -337,47 +614,47 @@ Website: www.bytevantage.in
             </AccordionDetails>
           </Accordion>
 
-          {/* Advanced Features */}
+          {/* AI & Smart Features */}
           <Accordion sx={{ mb: 2 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
-                <SettingsIcon sx={{ mr: 1 }} />
-                Advanced Features & Capabilities
+                <AIIcon sx={{ mr: 1 }} />
+                AI-Powered Intelligence & Smart Features
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle1" gutterBottom>Business Intelligence</Typography>
+                  <Typography variant="subtitle1" gutterBottom>Smart Allocation Engine</Typography>
                   <List dense>
                     <ListItem>
-                      <ListItemText primary="Real-Time Analytics" secondary="Performance metrics and KPIs" />
+                      <ListItemText primary="Context-Aware Allocation" secondary="AI chooses optimal batches based on business scenarios (estimation/manufacturing/sales)" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="SLA Monitoring" secondary="Service level agreement tracking" />
+                      <ListItemText primary="Multi-Factor Optimization" secondary="Balances cost, FIFO, warranty, and performance metrics automatically" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Profit Analysis" secondary="Cost vs revenue optimization" />
+                      <ListItemText primary="Predictive Recommendations" secondary="Cost impact analysis and alternative strategy suggestions" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Resource Utilization" secondary="Team productivity metrics" />
+                      <ListItemText primary="Customer Tier Intelligence" secondary="VIP/Standard/New customer prioritization in allocation decisions" />
                     </ListItem>
                   </List>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle1" gutterBottom>Automation Features</Typography>
+                  <Typography variant="subtitle1" gutterBottom>Price Intelligence & Competitive Analysis</Typography>
                   <List dense>
                     <ListItem>
-                      <ListItemText primary="Workflow Automation" secondary="Predefined process templates" />
+                      <ListItemText primary="Market Price Analytics" secondary="Real-time competitive pricing analysis with variance tracking" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Document Generation" secondary="Automated PDF creation" />
+                      <ListItemText primary="Supplier Performance Scoring" secondary="Automated rating based on delivery time, price competitiveness" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Email Notifications" secondary="Automated stakeholder alerts" />
+                      <ListItemText primary="Cost Savings Identification" secondary="Automatic detection of savings opportunities with alerts" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Inventory Allocation" secondary="Smart stock management" />
+                      <ListItemText primary="Procurement Intelligence" secondary="Smart supplier matching and negotiation assistance" />
                     </ListItem>
                   </List>
                 </Grid>
@@ -385,21 +662,177 @@ Website: www.bytevantage.in
 
               <Divider sx={{ my: 2 }} />
 
-              <Typography variant="subtitle1" gutterBottom>Security & Compliance</Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="JWT Authentication" secondary="Secure token-based authentication" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="Role-Based Access Control" secondary="Granular user permissions" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="Audit Logging" secondary="Complete activity tracking" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="Data Encryption" secondary="Protected sensitive information" />
-                </ListItem>
-              </List>
+              <Typography variant="subtitle1" gutterBottom>Advanced Analytics & Insights</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Financial KPI Dashboard" secondary="Cash flow, P&L, customer outstanding analytics" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Inventory Performance Analytics" secondary="Batch performance scoring and optimization metrics" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="HR Analytics" secondary="Attendance patterns, productivity metrics, suspicious activity detection" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Manufacturing Intelligence" secondary="Production efficiency, resource utilization analytics" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Competitive Bidding Intelligence" secondary="Supplier performance analytics, market competitiveness scoring" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Predictive Maintenance" secondary="Warranty tracking, lifecycle management, expiry predictions" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Enhanced HR & Employee Management */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <PeopleIcon sx={{ mr: 1 }} />
+                Enhanced HR & Employee Management
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Multi-Modal Attendance System</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Biometric Integration" secondary="Fingerprint and facial recognition support" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="GPS-Based Check-in" secondary="Location validation with mobile GPS tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="QR Code Attendance" secondary="Contactless check-in with QR code scanning" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Photo Verification" secondary="Selfie-based attendance with validation" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Web & Admin Entry" secondary="Manual entry options with audit trails" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Advanced Analytics & Management</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Suspicious Activity Detection" secondary="AI-powered anomaly detection in attendance patterns" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Productivity Analytics" secondary="Work hours analysis, late arrival tracking, efficiency metrics" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Leave Management" secondary="Automated leave applications, approvals, and balance tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Mobile-First Experience" secondary="Dedicated mobile interfaces for employee self-service" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Bulk Operations" secondary="Mass attendance imports and batch processing capabilities" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Advanced Features */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <SettingsIcon sx={{ mr: 1 }} />
+                Enterprise-Grade Features & Capabilities
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Competitive Bidding & Procurement</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Multi-Supplier RFQ Management" secondary="Automated RFQ distribution to multiple suppliers" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Real-Time Bid Comparison" secondary="Side-by-side analysis with automatic savings calculation" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Supplier Intelligence Dashboard" secondary="Performance metrics, response rates, and competitiveness analysis" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Automated Winner Processing" secondary="Convert winning bids to purchase requisitions automatically" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Advanced Manufacturing & BOM</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Multi-Level BOM Management" secondary="Complex bill of materials with nested components" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Production Planning" secondary="Resource allocation and production scheduling optimization" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Cost Tracking & Analysis" secondary="Real-time cost analysis and manufacturing expense tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Quality Control Integration" secondary="Quality management and compliance tracking workflows" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="subtitle1" gutterBottom>Security & Infrastructure</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="JWT Authentication" secondary="Secure token-based authentication with refresh tokens" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Role-Based Access Control" secondary="Granular permissions with department-level security" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Complete Audit Logging" secondary="Activity tracking across all modules with timestamps" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Docker Containerization" secondary="Production-ready deployment with environment isolation" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="API Documentation" secondary="Comprehensive Swagger/OpenAPI documentation" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="TypeScript Integration" secondary="Type-safe development with 380+ React components" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
             </AccordionDetails>
           </Accordion>
 

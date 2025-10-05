@@ -72,7 +72,7 @@ interface Employee {
 
 const AttendanceManagement: React.FC = () => {
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-  
+
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);

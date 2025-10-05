@@ -70,7 +70,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 const CasePerformanceDashboard: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [tabValue, setTabValue] = useState(0);
-    
+
     // Data states
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [slaCompliance, setSlaCompliance] = useState<any[]>([]);
@@ -78,11 +78,11 @@ const CasePerformanceDashboard: React.FC = () => {
     const [notificationQueue, setNotificationQueue] = useState<any[]>([]);
     const [escalationRules, setEscalationRules] = useState<any[]>([]);
     const [escalationHistory, setEscalationHistory] = useState<any[]>([]);
-    
+
     // Filter states
     const [periodFilter, setPeriodFilter] = useState('30');
     const [stateFilter, setStateFilter] = useState('');
-    
+
     // Dialog states
     const [notificationDialog, setNotificationDialog] = useState(false);
     const [escalationDialog, setEscalationDialog] = useState(false);
@@ -152,7 +152,7 @@ const CasePerformanceDashboard: React.FC = () => {
 
     const handleTestNotification = async () => {
         if (!selectedCase) return;
-        
+
         try {
             await axios.post(`${API_BASE_URL}/api/case-management/notifications/test/${selectedCase}`, {
                 template_type: 'sla_warning'
@@ -183,7 +183,7 @@ const CasePerformanceDashboard: React.FC = () => {
                     </CardContent>
                 </Card>
             </Grid>
-            
+
             <Grid item xs={12} md={3}>
                 <Card>
                     <CardContent>
@@ -201,7 +201,7 @@ const CasePerformanceDashboard: React.FC = () => {
                     </CardContent>
                 </Card>
             </Grid>
-            
+
             <Grid item xs={12} md={3}>
                 <Card>
                     <CardContent>
@@ -219,7 +219,7 @@ const CasePerformanceDashboard: React.FC = () => {
                     </CardContent>
                 </Card>
             </Grid>
-            
+
             <Grid item xs={12} md={3}>
                 <Card>
                     <CardContent>
@@ -227,7 +227,7 @@ const CasePerformanceDashboard: React.FC = () => {
                             <EscalateIcon color="warning" fontSize="large" />
                             <Box>
                                 <Typography variant="h4" color="warning.main">
-                                    {dashboardData?.escalations_by_state?.reduce((sum: number, item: any) => 
+                                    {dashboardData?.escalations_by_state?.reduce((sum: number, item: any) =>
                                         sum + item.escalation_count, 0) || 0}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
@@ -243,11 +243,11 @@ const CasePerformanceDashboard: React.FC = () => {
 
     const renderSLAComplianceChart = () => (
         <Card sx={{ mb: 3 }}>
-            <CardHeader 
+            <CardHeader
                 title="SLA Compliance by State"
                 action={
-                    <Button 
-                        size="small" 
+                    <Button
+                        size="small"
                         startIcon={<RefreshIcon />}
                         onClick={fetchSLACompliance}
                     >
@@ -299,11 +299,11 @@ const CasePerformanceDashboard: React.FC = () => {
 
     const renderNotificationStats = () => (
         <Card>
-            <CardHeader 
+            <CardHeader
                 title="Notification Queue Status"
                 action={
-                    <Button 
-                        variant="outlined" 
+                    <Button
+                        variant="outlined"
                         size="small"
                         onClick={() => setNotificationDialog(true)}
                         startIcon={<NotificationsIcon />}
@@ -330,20 +330,20 @@ const CasePerformanceDashboard: React.FC = () => {
                                 <TableRow key={notification.id}>
                                     <TableCell>{notification.case_number}</TableCell>
                                     <TableCell>
-                                        <Chip 
-                                            label={notification.template_name} 
+                                        <Chip
+                                            label={notification.template_name}
                                             size="small"
                                             variant="outlined"
                                         />
                                     </TableCell>
                                     <TableCell>{notification.recipient_name || notification.recipient_email}</TableCell>
                                     <TableCell>
-                                        <Chip 
+                                        <Chip
                                             label={notification.status}
                                             color={
                                                 notification.status === 'sent' ? 'success' :
-                                                notification.status === 'failed' ? 'error' :
-                                                'default'
+                                                    notification.status === 'failed' ? 'error' :
+                                                        'default'
                                             }
                                             size="small"
                                         />
@@ -391,14 +391,14 @@ const CasePerformanceDashboard: React.FC = () => {
                                     <TableCell>{rule.state_name || 'All'}</TableCell>
                                     <TableCell>{rule.hours_overdue || 'Immediate'}</TableCell>
                                     <TableCell>
-                                        <Chip 
-                                            label={rule.escalate_to_role} 
+                                        <Chip
+                                            label={rule.escalate_to_role}
                                             color="primary"
                                             size="small"
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <Chip 
+                                        <Chip
                                             label={rule.auto_reassign ? 'Yes' : 'No'}
                                             color={rule.auto_reassign ? 'success' : 'default'}
                                             size="small"
@@ -415,7 +415,7 @@ const CasePerformanceDashboard: React.FC = () => {
 
     const renderPerformanceMetrics = () => (
         <Card>
-            <CardHeader 
+            <CardHeader
                 title="Case Performance Metrics"
                 subheader={`Last ${periodFilter} days`}
                 action={
@@ -541,8 +541,8 @@ const CasePerformanceDashboard: React.FC = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setNotificationDialog(false)}>Cancel</Button>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={handleTestNotification}
                         disabled={!selectedCase}
                     >

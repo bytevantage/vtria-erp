@@ -123,13 +123,13 @@ const EnterpriseProductManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
-  
+
   // Dialog states
   const [openProductDialog, setOpenProductDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editMode, setEditMode] = useState(false);
-  
+
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
@@ -201,7 +201,7 @@ const EnterpriseProductManagement: React.FC = () => {
           sortOrder
         }
       });
-      
+
       if (response.data.success) {
         setProducts(response.data.data);
         setError(null);
@@ -232,9 +232,9 @@ const EnterpriseProductManagement: React.FC = () => {
       setLoading(true);
       const url = editMode ? `${API_BASE_URL}/api/products/${selectedProduct?.id}` : `${API_BASE_URL}/api/products`;
       const method = editMode ? 'put' : 'post';
-      
+
       const response = await axios[method](url, formData);
-      
+
       if (response.data.success) {
         await fetchProducts();
         await fetchDashboardData();
@@ -329,19 +329,19 @@ const EnterpriseProductManagement: React.FC = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.product_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.make?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = !filterCategory || 
+
+    const matchesCategory = !filterCategory ||
       product.category_name === filterCategory;
-    
-    const matchesStatus = filterStatus === 'all' || 
+
+    const matchesStatus = filterStatus === 'all' ||
       (filterStatus === 'low_stock' && product.stock_status !== 'In Stock') ||
       (filterStatus === 'serial_required' && product.serial_number_required) ||
       (filterStatus === 'warranty' && (product.warranty_period || 0) > 0);
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
@@ -368,7 +368,7 @@ const EnterpriseProductManagement: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={3}>
           <Card>
             <CardContent>
@@ -388,7 +388,7 @@ const EnterpriseProductManagement: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={3}>
           <Card>
             <CardContent>
@@ -408,7 +408,7 @@ const EnterpriseProductManagement: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={3}>
           <Card>
             <CardContent>
@@ -509,7 +509,7 @@ const EnterpriseProductManagement: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
@@ -636,8 +636,8 @@ const EnterpriseProductManagement: React.FC = () => {
                     </Typography>
                     {product.description && (
                       <Typography variant="caption" color="text.secondary">
-                        {product.description.length > 50 
-                          ? `${product.description.substring(0, 50)}...` 
+                        {product.description.length > 50
+                          ? `${product.description.substring(0, 50)}...`
                           : product.description}
                       </Typography>
                     )}
@@ -659,10 +659,10 @@ const EnterpriseProductManagement: React.FC = () => {
                 <TableCell>
                   <Box>
                     <Typography variant="body2" fontWeight="bold" color="success.main">
-                      MRP: ₹{parseFloat(product.mrp || '0').toLocaleString('en-IN')}
+                      MRP: ₹{(Number(product.mrp) || 0).toLocaleString('en-IN')}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Last: ₹{parseFloat(product.last_purchase_price || '0').toLocaleString('en-IN')}
+                      Last: ₹{(Number(product.last_purchase_price) || 0).toLocaleString('en-IN')}
                     </Typography>
                     <Typography variant="caption" display="block" color="text.secondary">
                       GST: {product.gst_rate || 18}%
@@ -671,7 +671,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box>
-                    <Chip 
+                    <Chip
                       label={`${product.total_stock || 0} ${product.unit}`}
                       color={getStockStatusColor(product.stock_status)}
                       size="small"
@@ -681,7 +681,7 @@ const EnterpriseProductManagement: React.FC = () => {
                       Reorder: {product.reorder_level || 0}
                     </Typography>
                     {product.abc_classification && (
-                      <Chip 
+                      <Chip
                         label={`ABC: ${product.abc_classification}`}
                         color={getABCClassificationColor(product.abc_classification)}
                         size="small"
@@ -693,16 +693,16 @@ const EnterpriseProductManagement: React.FC = () => {
                 <TableCell>
                   <Box display="flex" flexDirection="column" gap={1}>
                     {product.serial_number_required && (
-                      <Chip 
+                      <Chip
                         icon={<BarcodeIcon />}
-                        label="Serial Tracking" 
-                        size="small" 
+                        label="Serial Tracking"
+                        size="small"
                         color="primary"
                         variant="outlined"
                       />
                     )}
                     {(product.warranty_period || 0) > 0 && (
-                      <Chip 
+                      <Chip
                         icon={<SecurityIcon />}
                         label={`${product.warranty_period} ${product.warranty_period_type}`}
                         size="small"
@@ -715,8 +715,8 @@ const EnterpriseProductManagement: React.FC = () => {
                 <TableCell>
                   <Box display="flex" gap={1}>
                     <Tooltip title="View Details">
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         color="primary"
                         onClick={() => {
                           setSelectedProduct(product);
@@ -727,8 +727,8 @@ const EnterpriseProductManagement: React.FC = () => {
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit Product">
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         color="secondary"
                         onClick={() => handleEditProduct(product)}
                       >
@@ -796,7 +796,7 @@ const EnterpriseProductManagement: React.FC = () => {
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2">High-Value Products (>₹10k)</Typography>
+                  <Typography variant="body2">High-Value Products (&gt;₹10k)</Typography>
                   <Typography variant="h6">
                     {products.filter(p => (p.mrp || 0) > 10000).length}
                   </Typography>
@@ -831,7 +831,7 @@ const EnterpriseProductManagement: React.FC = () => {
                       const totalValue = categoryProducts.reduce((sum, p) => sum + (p.total_stock || 0) * (p.mrp || 0), 0);
                       const avgPrice = categoryProducts.length > 0 ? categoryProducts.reduce((sum, p) => sum + (p.mrp || 0), 0) / categoryProducts.length : 0;
                       const lowStockCount = categoryProducts.filter(p => p.stock_status !== 'In Stock').length;
-                      
+
                       return (
                         <TableRow key={category.id}>
                           <TableCell>{category.display_name}</TableCell>
@@ -890,49 +890,49 @@ const EnterpriseProductManagement: React.FC = () => {
       )}
 
       {/* Enhanced Tabs */}
-      <Tabs 
-        value={activeTab} 
+      <Tabs
+        value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
         sx={{ mb: 3 }}
       >
-        <Tab 
+        <Tab
           label={
             <Box display="flex" alignItems="center" gap={1}>
               <DashboardIcon />
               Dashboard
             </Box>
-          } 
+          }
         />
-        <Tab 
+        <Tab
           label={
             <Box display="flex" alignItems="center" gap={1}>
               <InventoryIcon />
               Products
               <Chip label={products.length} size="small" />
             </Box>
-          } 
+          }
         />
-        <Tab 
+        <Tab
           label={
             <Box display="flex" alignItems="center" gap={1}>
               <AnalyticsIcon />
               Analytics
             </Box>
-          } 
+          }
         />
-        <Tab 
+        <Tab
           label={
             <Box display="flex" alignItems="center" gap={1}>
               <WarningIcon />
               Alerts
-              <Badge 
-                badgeContent={products.filter(p => p.stock_status !== 'In Stock').length} 
+              <Badge
+                badgeContent={products.filter(p => p.stock_status !== 'In Stock').length}
                 color="error"
               >
                 <span></span>
               </Badge>
             </Box>
-          } 
+          }
         />
       </Tabs>
 
@@ -980,7 +980,7 @@ const EnterpriseProductManagement: React.FC = () => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             label={product.stock_status}
                             color={getStockStatusColor(product.stock_status)}
                             size="small"
@@ -1014,23 +1014,23 @@ const EnterpriseProductManagement: React.FC = () => {
               </Typography>
               <Divider />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Product Name"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Product Code"
                 value={formData.product_code}
-                onChange={(e) => setFormData({...formData, product_code: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
                 required
               />
             </Grid>
@@ -1040,7 +1040,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 fullWidth
                 label="Make"
                 value={formData.make}
-                onChange={(e) => setFormData({...formData, make: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, make: e.target.value })}
               />
             </Grid>
 
@@ -1049,7 +1049,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 fullWidth
                 label="Model"
                 value={formData.model}
-                onChange={(e) => setFormData({...formData, model: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
               />
             </Grid>
 
@@ -1058,7 +1058,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 fullWidth
                 label="Part Code"
                 value={formData.part_code}
-                onChange={(e) => setFormData({...formData, part_code: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, part_code: e.target.value })}
               />
             </Grid>
 
@@ -1076,7 +1076,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 <Select
                   value={formData.category_id}
                   label="Category"
-                  onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 >
                   {categories.map((category) => (
                     <MenuItem key={category.id} value={category.id}>
@@ -1093,7 +1093,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 <Select
                   value={formData.unit}
                   label="Unit"
-                  onChange={(e) => setFormData({...formData, unit: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 >
                   {units.map((unit) => (
                     <MenuItem key={unit} value={unit}>
@@ -1109,7 +1109,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 fullWidth
                 label="HSN Code"
                 value={formData.hsn_code}
-                onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
               />
             </Grid>
 
@@ -1127,7 +1127,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="MRP"
                 type="number"
                 value={formData.mrp}
-                onChange={(e) => setFormData({...formData, mrp: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, mrp: e.target.value })}
                 required
                 InputProps={{
                   startAdornment: <InputAdornment position="start">₹</InputAdornment>,
@@ -1141,7 +1141,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="Vendor Discount %"
                 type="number"
                 value={formData.vendor_discount}
-                onChange={(e) => setFormData({...formData, vendor_discount: parseFloat(e.target.value) || 0})}
+                onChange={(e) => setFormData({ ...formData, vendor_discount: parseFloat(e.target.value) || 0 })}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
@@ -1154,7 +1154,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="Last Purchase Price"
                 type="number"
                 value={formData.last_purchase_price}
-                onChange={(e) => setFormData({...formData, last_purchase_price: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, last_purchase_price: e.target.value })}
                 InputProps={{
                   startAdornment: <InputAdornment position="start">₹</InputAdornment>,
                 }}
@@ -1167,7 +1167,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="GST Rate %"
                 type="number"
                 value={formData.gst_rate}
-                onChange={(e) => setFormData({...formData, gst_rate: parseFloat(e.target.value) || 18})}
+                onChange={(e) => setFormData({ ...formData, gst_rate: parseFloat(e.target.value) || 18 })}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
@@ -1188,7 +1188,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="Minimum Stock Level"
                 type="number"
                 value={formData.min_stock_level}
-                onChange={(e) => setFormData({...formData, min_stock_level: parseInt(e.target.value) || 0})}
+                onChange={(e) => setFormData({ ...formData, min_stock_level: parseInt(e.target.value) || 0 })}
               />
             </Grid>
 
@@ -1198,7 +1198,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="Maximum Stock Level"
                 type="number"
                 value={formData.max_stock_level}
-                onChange={(e) => setFormData({...formData, max_stock_level: parseInt(e.target.value) || 0})}
+                onChange={(e) => setFormData({ ...formData, max_stock_level: parseInt(e.target.value) || 0 })}
               />
             </Grid>
 
@@ -1208,7 +1208,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="Reorder Level"
                 type="number"
                 value={formData.reorder_level}
-                onChange={(e) => setFormData({...formData, reorder_level: parseInt(e.target.value) || 0})}
+                onChange={(e) => setFormData({ ...formData, reorder_level: parseInt(e.target.value) || 0 })}
               />
             </Grid>
 
@@ -1226,7 +1226,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 label="Warranty Period"
                 type="number"
                 value={formData.warranty_period}
-                onChange={(e) => setFormData({...formData, warranty_period: parseInt(e.target.value) || 0})}
+                onChange={(e) => setFormData({ ...formData, warranty_period: parseInt(e.target.value) || 0 })}
               />
             </Grid>
 
@@ -1236,7 +1236,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 <Select
                   value={formData.warranty_period_type}
                   label="Warranty Type"
-                  onChange={(e) => setFormData({...formData, warranty_period_type: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, warranty_period_type: e.target.value })}
                 >
                   {warrantyTypes.map((type) => (
                     <MenuItem key={type} value={type}>
@@ -1252,7 +1252,7 @@ const EnterpriseProductManagement: React.FC = () => {
                 control={
                   <Switch
                     checked={formData.serial_number_required}
-                    onChange={(e) => setFormData({...formData, serial_number_required: e.target.checked})}
+                    onChange={(e) => setFormData({ ...formData, serial_number_required: e.target.checked })}
                   />
                 }
                 label="Requires Serial Number Tracking"
@@ -1266,15 +1266,15 @@ const EnterpriseProductManagement: React.FC = () => {
                 multiline
                 rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             variant="contained"
             disabled={loading}
           >
@@ -1312,7 +1312,7 @@ const EnterpriseProductManagement: React.FC = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Typography variant="h6" gutterBottom color="success.main">
-                  ₹{parseFloat(selectedProduct.mrp || '0').toLocaleString('en-IN')}
+                  ₹{(Number(selectedProduct.mrp) || 0).toLocaleString('en-IN')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" gutterBottom>MRP</Typography>
                 <Divider sx={{ my: 2 }} />
@@ -1320,7 +1320,7 @@ const EnterpriseProductManagement: React.FC = () => {
                   <strong>Vendor Discount:</strong> {selectedProduct.vendor_discount || 0}%
                 </Typography>
                 <Typography variant="body2" gutterBottom>
-                  <strong>Last Purchase Price:</strong> ₹{parseFloat(selectedProduct.last_purchase_price || '0').toLocaleString('en-IN')}
+                  <strong>Last Purchase Price:</strong> ₹{(Number(selectedProduct.last_purchase_price) || 0).toLocaleString('en-IN')}
                 </Typography>
                 <Typography variant="body2" gutterBottom>
                   <strong>GST Rate:</strong> {selectedProduct.gst_rate || 18}%
@@ -1329,9 +1329,9 @@ const EnterpriseProductManagement: React.FC = () => {
                   <strong>Current Stock:</strong> {selectedProduct.total_stock || 0} {selectedProduct.unit}
                 </Typography>
                 <Typography variant="body2" gutterBottom>
-                  <strong>Stock Status:</strong> 
-                  <Chip 
-                    label={selectedProduct.stock_status || 'Unknown'} 
+                  <strong>Stock Status:</strong>
+                  <Chip
+                    label={selectedProduct.stock_status || 'Unknown'}
                     color={getStockStatusColor(selectedProduct.stock_status)}
                     size="small"
                     sx={{ ml: 1 }}
@@ -1353,15 +1353,15 @@ const EnterpriseProductManagement: React.FC = () => {
                 <Divider sx={{ my: 2 }} />
                 <Box display="flex" gap={1} flexWrap="wrap">
                   {selectedProduct.serial_number_required && (
-                    <Chip 
+                    <Chip
                       icon={<BarcodeIcon />}
-                      label="Serial Tracking Required" 
+                      label="Serial Tracking Required"
                       color="primary"
                       variant="outlined"
                     />
                   )}
                   {(selectedProduct.warranty_period || 0) > 0 && (
-                    <Chip 
+                    <Chip
                       icon={<SecurityIcon />}
                       label={`Warranty: ${selectedProduct.warranty_period} ${selectedProduct.warranty_period_type}`}
                       color="secondary"
@@ -1369,7 +1369,7 @@ const EnterpriseProductManagement: React.FC = () => {
                     />
                   )}
                   {selectedProduct.abc_classification && (
-                    <Chip 
+                    <Chip
                       label={`ABC Classification: ${selectedProduct.abc_classification}`}
                       color={getABCClassificationColor(selectedProduct.abc_classification)}
                       variant="outlined"
@@ -1383,7 +1383,7 @@ const EnterpriseProductManagement: React.FC = () => {
         <DialogActions>
           <Button onClick={() => setOpenViewDialog(false)}>Close</Button>
           {selectedProduct && (
-            <Button 
+            <Button
               variant="contained"
               onClick={() => {
                 setOpenViewDialog(false);

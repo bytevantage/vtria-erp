@@ -361,7 +361,7 @@ const EnterpriseAuditDashboard = () => {
                   </Typography>
                   <Typography variant="body1">High Value Changes</Typography>
                   <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                    > ₹50,000
+                    &gt; ₹50,000
                   </Typography>
                 </Box>
                 <TrendingUpIcon sx={{ fontSize: 48, opacity: 0.7 }} />

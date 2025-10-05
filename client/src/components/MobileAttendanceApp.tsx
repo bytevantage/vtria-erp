@@ -31,7 +31,7 @@ import {
   Wifi,
   WifiOff,
   BatteryFull,
-  Signal,
+  NetworkCell,
   Close,
   History,
   Person,
@@ -156,7 +156,7 @@ const MobileAttendanceApp: React.FC = () => {
       } else {
         // Fallback to mock data for demo
         setEmployee({
-          id: 1,
+          id: null,
           name: 'Demo User',
           employee_id: 'DEMO/001',
           department: 'Demo Department',
@@ -167,7 +167,7 @@ const MobileAttendanceApp: React.FC = () => {
       console.error('Error loading employee data:', error);
       // Fallback to mock data
       setEmployee({
-        id: 1,
+        id: null,
         name: 'Demo User',
         employee_id: 'DEMO/001',
         department: 'Demo Department',
@@ -281,7 +281,7 @@ const MobileAttendanceApp: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        
+
         if (action === 'check_in') {
           setAttendanceStatus({
             isCheckedIn: true,
@@ -298,7 +298,7 @@ const MobileAttendanceApp: React.FC = () => {
             totalHours: result.data.total_hours || 0
           }));
         }
-        
+
         setLocationError(''); // Clear any previous errors
       } else {
         const error = await response.json();

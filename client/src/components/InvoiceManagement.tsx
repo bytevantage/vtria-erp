@@ -49,6 +49,7 @@ interface Invoice {
   due_date: string;
   customer_id: number;
   customer_name: string;
+  customer_email?: string;
   customer_gstin?: string;
   subtotal: number;
   discount_amount: number;
@@ -61,15 +62,22 @@ interface Invoice {
   days_overdue?: number;
   sales_order_id?: number;
   sales_order_number?: string;
+  payment_terms?: string;
+  reference_number?: string;
+  notes?: string;
+  items?: InvoiceItem[];
 }
 
 interface SalesOrder {
   id: number;
   sales_order_id: string;
   case_number: string;
+  client_id: number;
   client_name: string;
   project_name?: string;
   total_amount: number;
+  advance_amount?: number;
+  balance_amount?: number;
   status: string;
   expected_delivery_date?: string;
   created_at: string;
@@ -185,11 +193,11 @@ const InvoiceManagement: React.FC = () => {
       queryParams.append('limit', pagination.limit.toString());
 
       const { data, error } = await api.get(`/api/financial/invoices?${queryParams}`);
-      
+
       if (error) {
         throw new Error(error);
       }
-      
+
       setInvoices(data.data || []);
       setPagination(prev => ({ ...prev, ...data.pagination }));
     } catch (error) {
@@ -205,7 +213,7 @@ const InvoiceManagement: React.FC = () => {
     try {
       // Fetch only confirmed and delivered sales orders that are eligible for invoicing
       const { data, error } = await api.get('/api/sales-orders/approved');
-      
+
       if (error) {
         setSalesOrdersError('Failed to fetch approved sales orders');
         setApprovedSalesOrders([]);
@@ -229,7 +237,7 @@ const InvoiceManagement: React.FC = () => {
         sales_order_id: salesOrderId,
         reference_id: selectedOrder.id,
         reference_number: selectedOrder.sales_order_id,
-        customer_id: selectedOrder.client_id,
+        customer_id: String(selectedOrder.client_id),
         customer_name: selectedOrder.client_name,
         // Set due date to 30 days from now if not already set
         due_date: newInvoice.due_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -238,7 +246,7 @@ const InvoiceManagement: React.FC = () => {
       // Fetch sales order details including items
       try {
         const { data, error } = await api.get(`/api/sales-orders/${selectedOrder.id}`);
-        
+
         if (!error && data.success && data.data) {
           const salesOrderData = data.data;
 
@@ -260,7 +268,7 @@ const InvoiceManagement: React.FC = () => {
               const itemTotal = quantity * unitPrice;
               const cgstAmount = (itemTotal * cgstRate) / 100;
               const sgstAmount = (itemTotal * sgstRate) / 100;
-              
+
               return {
                 product_name: item.item_name || item.product_name || item.description || '',
                 description: item.description || item.item_name || '',
@@ -367,7 +375,7 @@ const InvoiceManagement: React.FC = () => {
 
     try {
       const { error } = await api.delete(`/api/financial/invoices/${invoiceId}`);
-      
+
       if (!error) {
         fetchInvoices(); // Refresh the invoice list
         fetchApprovedSalesOrders(); // Refresh sales orders as the deleted invoice may make a sales order available again
@@ -385,11 +393,11 @@ const InvoiceManagement: React.FC = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editInvoice, setEditInvoice] = useState<Invoice | null>(null);
-  
+
   // Payment Recording Dialog
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null);
-  
+
   // Current user context (this would normally come from auth context)
   const currentUser = { role: 'user', id: 1 };
 
@@ -442,7 +450,7 @@ const InvoiceManagement: React.FC = () => {
                 <div><strong>Customer:</strong> ${invoice.customer_name}</div>
                 <div><strong>Date:</strong> ${new Date(invoice.invoice_date).toLocaleDateString()}</div>
                 <div><strong>Due Date:</strong> ${new Date(invoice.due_date).toLocaleDateString()}</div>
-                <div><strong>Total Amount:</strong> ₹${parseFloat(invoice.total_amount).toLocaleString()}</div>
+                <div><strong>Total Amount:</strong> ₹${(Number(invoice.total_amount) || 0).toLocaleString()}</div>
                 <div><strong>Payment Status:</strong> ${invoice.payment_status}</div>
                 <div><strong>Status:</strong> ${invoice.status}</div>
               </div>
@@ -462,7 +470,7 @@ const InvoiceManagement: React.FC = () => {
     const invoice = invoices.find(inv => inv.id === invoiceId);
     if (invoice && invoice.customer_email) {
       const subject = `Invoice ${invoice.invoice_number}`;
-      const body = `Please find attached invoice ${invoice.invoice_number} for ₹${parseFloat(invoice.total_amount).toLocaleString()}.`;
+      const body = `Please find attached invoice ${invoice.invoice_number} for ₹${(Number(invoice.total_amount) || 0).toLocaleString()}.`;
       window.location.href = `mailto:${invoice.customer_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     } else {
       alert('Customer email not available');
@@ -480,7 +488,7 @@ const InvoiceManagement: React.FC = () => {
   const handlePaymentRecorded = (paymentData: any) => {
     // Refresh the invoices list to reflect updated balance
     fetchInvoices();
-    
+
     // Show success message
     setError(null);
     // Note: Success message is handled by the PaymentRecordingDialog component
@@ -804,7 +812,7 @@ const InvoiceManagement: React.FC = () => {
                       <TableCell>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                           <Tooltip title="View Invoice">
-                            <IconButton 
+                            <IconButton
                               size="small"
                               onClick={() => handleViewInvoice(invoice.id)}
                             >
@@ -812,7 +820,7 @@ const InvoiceManagement: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Edit Invoice">
-                            <IconButton 
+                            <IconButton
                               size="small"
                               onClick={() => handleEditInvoice(invoice.id)}
                             >
@@ -820,7 +828,7 @@ const InvoiceManagement: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Print Invoice">
-                            <IconButton 
+                            <IconButton
                               size="small"
                               onClick={() => handlePrintInvoice(invoice.id)}
                             >
@@ -828,7 +836,7 @@ const InvoiceManagement: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Email Invoice">
-                            <IconButton 
+                            <IconButton
                               size="small"
                               onClick={() => handleEmailInvoice(invoice.id)}
                             >
@@ -836,8 +844,8 @@ const InvoiceManagement: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Delete Invoice">
-                            <IconButton 
-                              size="small" 
+                            <IconButton
+                              size="small"
                               color="error"
                               onClick={() => handleDeleteInvoice(invoice.id)}
                             >
@@ -851,6 +859,7 @@ const InvoiceManagement: React.FC = () => {
                               color="primary"
                               onClick={() => handleRecordPayment(invoice.id)}
                               startIcon={<PaymentIcon />}
+                              endIcon={null}
                               requirePermission={true}
                               userRole={currentUser.role}
                               allowedRoles={['admin', 'manager', 'accountant', 'user']}
@@ -941,9 +950,9 @@ const InvoiceManagement: React.FC = () => {
                             {order.sales_order_id} - {order.client_name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            Total: ₹{parseFloat(order.total_amount).toLocaleString()} | 
-                            Advance: ₹{parseFloat(order.advance_amount || 0).toLocaleString()} | 
-                            Balance: ₹{parseFloat(order.balance_amount).toLocaleString()}
+                            Total: ₹{(Number(order.total_amount) || 0).toLocaleString()} |
+                            Advance: ₹{(Number(order.advance_amount) || 0).toLocaleString()} |
+                            Balance: ₹{(Number(order.balance_amount) || 0).toLocaleString()}
                           </Typography>
                         </Box>
                       </MenuItem>
@@ -1172,7 +1181,7 @@ const InvoiceManagement: React.FC = () => {
                 <Typography variant="body2"><strong>Reference:</strong> {selectedInvoice.reference_number}</Typography>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="body2"><strong>Status:</strong> 
+                <Typography variant="body2"><strong>Status:</strong>
                   <Chip size="small" label={selectedInvoice.status} sx={{ ml: 1 }} />
                 </Typography>
               </Grid>
@@ -1206,14 +1215,14 @@ const InvoiceManagement: React.FC = () => {
                 <Box sx={{ border: 1, borderColor: 'divider', p: 2, mt: 2 }}>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
-                      <Typography variant="body2">Subtotal: ₹{parseFloat(selectedInvoice.subtotal).toLocaleString()}</Typography>
-                      <Typography variant="body2">Tax: ₹{parseFloat(selectedInvoice.total_tax_amount).toLocaleString()}</Typography>
-                      <Typography variant="h6"><strong>Total: ₹{parseFloat(selectedInvoice.total_amount).toLocaleString()}</strong></Typography>
+                      <Typography variant="body2">Subtotal: ₹{(Number(selectedInvoice.subtotal) || 0).toLocaleString()}</Typography>
+                      <Typography variant="body2">Tax: ₹{(Number(selectedInvoice.total_tax_amount) || 0).toLocaleString()}</Typography>
+                      <Typography variant="h6"><strong>Total: ₹{(Number(selectedInvoice.total_amount) || 0).toLocaleString()}</strong></Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="body2">Paid: ₹{parseFloat(selectedInvoice.paid_amount).toLocaleString()}</Typography>
-                      <Typography variant="body2" color={parseFloat(selectedInvoice.balance_amount) > 0 ? 'error.main' : 'success.main'}>
-                        <strong>Balance: ₹{parseFloat(selectedInvoice.balance_amount).toLocaleString()}</strong>
+                      <Typography variant="body2">Paid: ₹{(Number(selectedInvoice.paid_amount) || 0).toLocaleString()}</Typography>
+                      <Typography variant="body2" color={(Number(selectedInvoice.balance_amount) || 0) > 0 ? 'error.main' : 'success.main'}>
+                        <strong>Balance: ₹{(Number(selectedInvoice.balance_amount) || 0).toLocaleString()}</strong>
                       </Typography>
                     </Grid>
                   </Grid>
@@ -1250,7 +1259,7 @@ const InvoiceManagement: React.FC = () => {
                   onChange={(e) => setEditInvoice({ ...editInvoice, invoice_number: e.target.value })}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel>Invoice Type</InputLabel>
@@ -1313,7 +1322,7 @@ const InvoiceManagement: React.FC = () => {
                   <Select
                     value={editInvoice.status}
                     label="Status"
-                    onChange={(e) => setEditInvoice({ ...editInvoice, status: e.target.value })}
+                    onChange={(e) => setEditInvoice({ ...editInvoice, status: e.target.value as Invoice['status'] })}
                   >
                     <MenuItem value="draft">Draft</MenuItem>
                     <MenuItem value="sent">Sent</MenuItem>
@@ -1341,17 +1350,17 @@ const InvoiceManagement: React.FC = () => {
                 <Box sx={{ border: 1, borderColor: 'divider', p: 2 }}>
                   <Grid container spacing={2}>
                     <Grid item xs={6} md={3}>
-                      <Typography variant="body2">Subtotal: ₹{parseFloat(editInvoice.subtotal || '0').toLocaleString()}</Typography>
+                      <Typography variant="body2">Subtotal: ₹{(Number(editInvoice.subtotal) || 0).toLocaleString()}</Typography>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                      <Typography variant="body2">Tax: ₹{parseFloat(editInvoice.total_tax_amount || '0').toLocaleString()}</Typography>
+                      <Typography variant="body2">Tax: ₹{(Number(editInvoice.total_tax_amount) || 0).toLocaleString()}</Typography>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                      <Typography variant="body2"><strong>Total: ₹{parseFloat(editInvoice.total_amount || '0').toLocaleString()}</strong></Typography>
+                      <Typography variant="body2"><strong>Total: ₹{(Number(editInvoice.total_amount) || 0).toLocaleString()}</strong></Typography>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                      <Typography variant="body2" color={parseFloat(editInvoice.balance_amount || '0') > 0 ? 'error.main' : 'success.main'}>
-                        <strong>Balance: ₹{parseFloat(editInvoice.balance_amount || '0').toLocaleString()}</strong>
+                      <Typography variant="body2" color={(Number(editInvoice.balance_amount) || 0) > 0 ? 'error.main' : 'success.main'}>
+                        <strong>Balance: ₹{(Number(editInvoice.balance_amount) || 0).toLocaleString()}</strong>
                       </Typography>
                     </Grid>
                   </Grid>
