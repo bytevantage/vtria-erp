@@ -267,14 +267,13 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
                   label="Hire Date"
                   value={employee?.hire_date ? new Date(employee.hire_date) : null}
                   onChange={() => {}}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      margin="normal"
-                      disabled
-                    />
-                  )}
+                  disabled
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      margin: 'normal'
+                    }
+                  }}
                 />
               </LocalizationProvider>
             </Grid>
@@ -604,14 +603,13 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = () => {
               label="Expiry Date (Optional)"
               value={expiryDate}
               onChange={(newValue) => setExpiryDate(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  fullWidth
-                  margin="normal"
-                  disabled={uploading}
-                />
-              )}
+              disabled={uploading}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  margin: 'normal'
+                }
+              }}
             />
           </LocalizationProvider>
         </DialogContent>
