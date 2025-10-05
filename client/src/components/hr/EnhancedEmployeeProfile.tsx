@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import {
   Person, Work, School, Event, ContactEmergency, Edit, Save, Cancel,
-  Add, FileUpload, CheckCircle, Warning, Delete, Email, Phone, Home
+  Add, FileUpload, CheckCircle, Warning, Delete, Email, Phone, Home, Description
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -83,15 +83,15 @@ const EnhancedEmployeeProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  
+
   // State
   const [tabValue, setTabValue] = useState(0);
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [departments, setDepartments] = useState<{id: number, name: string}[]>([]);
-  
+  const [departments, setDepartments] = useState<{ id: number, name: string }[]>([]);
+
   // Document upload state
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -99,7 +99,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
   const [documentNumber, setDocumentNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState<Date | null>(null);
   const [uploading, setUploading] = useState(false);
-  
+
   // New emergency contact state
   const [newEmergencyContact, setNewEmergencyContact] = useState<Partial<EmergencyContact>>({
     name: '',
@@ -110,7 +110,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
     is_primary: false
   });
   const [emergencyContactDialogOpen, setEmergencyContactDialogOpen] = useState(false);
-  
+
   // New skill state
   const [newSkill, setNewSkill] = useState<Partial<Skill>>({
     skill_name: '',
@@ -128,74 +128,74 @@ const EnhancedEmployeeProfile: React.FC = () => {
           fetch(`${API_BASE_URL}/hr/employees/${id}`, { headers: authHeader() }),
           fetch(`${API_BASE_URL}/departments`, { headers: authHeader() })
         ]);
-        
+
         if (!employeeRes.ok) throw new Error('Failed to fetch employee data');
         if (!deptRes.ok) throw new Error('Failed to fetch departments');
-        
+
         const employeeData = await employeeRes.json();
         const deptData = await deptRes.json();
-        
+
         setEmployee(employeeData.data);
         setDepartments(deptData.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching employee data:', error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : String(error));
         setLoading(false);
       }
     };
-    
+
     fetchEmployeeData();
   }, [id]);
-  
+
   // Handle tab change
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-  
+
   // Toggle edit mode
   const toggleEditMode = () => {
     setEditMode(!editMode);
   };
-  
+
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!employee) return;
-    
+
     const { name, value } = e.target;
     setEmployee({
       ...employee,
       [name]: value
     });
   };
-  
+
   // Handle select change
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     if (!employee) return;
-    
+
     const name = e.target.name as string;
     const value = e.target.value;
-    
+
     setEmployee({
       ...employee,
       [name]: value
     });
   };
-  
+
   // Handle date change
   const handleDateChange = (date: Date | null, field: string) => {
     if (!employee) return;
-    
+
     setEmployee({
       ...employee,
       [field]: date ? format(date, 'yyyy-MM-dd') : null
     });
   };
-  
+
   // Save employee data
   const saveEmployeeData = async () => {
     if (!employee) return;
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/hr/employees/${employee.id}`, {
         method: 'PUT',
@@ -205,9 +205,9 @@ const EnhancedEmployeeProfile: React.FC = () => {
         },
         body: JSON.stringify(employee)
       });
-      
+
       if (!response.ok) throw new Error('Failed to update employee data');
-      
+
       enqueueSnackbar('Employee data updated successfully', { variant: 'success' });
       setEditMode(false);
     } catch (error) {
@@ -215,14 +215,14 @@ const EnhancedEmployeeProfile: React.FC = () => {
       enqueueSnackbar('Failed to update employee data', { variant: 'error' });
     }
   };
-  
+
   // Handle document upload
   const handleDocumentUpload = async () => {
     if (!selectedFile || !documentType) {
       enqueueSnackbar('Please select a file and document type', { variant: 'warning' });
       return;
     }
-    
+
     const formData = new FormData();
     formData.append('document', selectedFile);
     formData.append('document_type', documentType);
@@ -230,7 +230,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
     if (expiryDate) {
       formData.append('expiry_date', format(expiryDate, 'yyyy-MM-dd'));
     }
-    
+
     try {
       setUploading(true);
       const response = await fetch(`${API_BASE_URL}/hr/employees/${id}/documents`, {
@@ -241,11 +241,11 @@ const EnhancedEmployeeProfile: React.FC = () => {
         },
         body: formData
       });
-      
+
       if (!response.ok) throw new Error('Failed to upload document');
-      
+
       const result = await response.json();
-      
+
       // Update the employee's documents list
       if (employee) {
         setEmployee({
@@ -253,7 +253,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           documents: [...(employee.documents || []), result.data]
         });
       }
-      
+
       enqueueSnackbar('Document uploaded successfully', { variant: 'success' });
       setUploadDialogOpen(false);
       setSelectedFile(null);
@@ -267,19 +267,19 @@ const EnhancedEmployeeProfile: React.FC = () => {
       setUploading(false);
     }
   };
-  
+
   // Handle delete document
   const handleDeleteDocument = async (docId: number) => {
     if (!confirm('Are you sure you want to delete this document?')) return;
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/hr/employees/documents/${docId}`, {
         method: 'DELETE',
         headers: authHeader()
       });
-      
+
       if (!response.ok) throw new Error('Failed to delete document');
-      
+
       // Update the employee's documents list
       if (employee) {
         setEmployee({
@@ -287,24 +287,24 @@ const EnhancedEmployeeProfile: React.FC = () => {
           documents: (employee.documents || []).filter(doc => doc.id !== docId)
         });
       }
-      
+
       enqueueSnackbar('Document deleted successfully', { variant: 'success' });
     } catch (error) {
       console.error('Error deleting document:', error);
       enqueueSnackbar('Failed to delete document', { variant: 'error' });
     }
   };
-  
+
   // Handle emergency contact input change
   const handleEmergencyContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    
+
     setNewEmergencyContact({
       ...newEmergencyContact,
       [name]: type === 'checkbox' ? checked : value
     });
   };
-  
+
   // Save emergency contact
   const saveEmergencyContact = async () => {
     try {
@@ -316,11 +316,11 @@ const EnhancedEmployeeProfile: React.FC = () => {
         },
         body: JSON.stringify(newEmergencyContact)
       });
-      
+
       if (!response.ok) throw new Error('Failed to save emergency contact');
-      
+
       const result = await response.json();
-      
+
       // Update the employee's emergency contacts list
       if (employee) {
         setEmployee({
@@ -328,7 +328,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           emergency_contacts: [...(employee.emergency_contacts || []), result.data]
         });
       }
-      
+
       enqueueSnackbar('Emergency contact added successfully', { variant: 'success' });
       setEmergencyContactDialogOpen(false);
       setNewEmergencyContact({
@@ -344,17 +344,17 @@ const EnhancedEmployeeProfile: React.FC = () => {
       enqueueSnackbar('Failed to save emergency contact', { variant: 'error' });
     }
   };
-  
+
   // Handle skill input change
   const handleSkillChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     setNewSkill({
       ...newSkill,
       [name]: name === 'years_of_experience' ? parseInt(value) || 0 : value
     });
   };
-  
+
   // Save skill
   const saveSkill = async () => {
     try {
@@ -366,11 +366,11 @@ const EnhancedEmployeeProfile: React.FC = () => {
         },
         body: JSON.stringify(newSkill)
       });
-      
+
       if (!response.ok) throw new Error('Failed to save skill');
-      
+
       const result = await response.json();
-      
+
       // Update the employee's skills list
       if (employee) {
         setEmployee({
@@ -378,7 +378,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           skills: [...(employee.skills || []), result.data]
         });
       }
-      
+
       enqueueSnackbar('Skill added successfully', { variant: 'success' });
       setSkillDialogOpen(false);
       setNewSkill({
@@ -391,19 +391,19 @@ const EnhancedEmployeeProfile: React.FC = () => {
       enqueueSnackbar('Failed to save skill', { variant: 'error' });
     }
   };
-  
+
   // Delete skill
   const deleteSkill = async (skillId: number) => {
     if (!confirm('Are you sure you want to delete this skill?')) return;
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/hr/employees/skills/${skillId}`, {
         method: 'DELETE',
         headers: authHeader()
       });
-      
+
       if (!response.ok) throw new Error('Failed to delete skill');
-      
+
       // Update the employee's skills list
       if (employee) {
         setEmployee({
@@ -411,14 +411,14 @@ const EnhancedEmployeeProfile: React.FC = () => {
           skills: (employee.skills || []).filter(skill => skill.id !== skillId)
         });
       }
-      
+
       enqueueSnackbar('Skill deleted successfully', { variant: 'success' });
     } catch (error) {
       console.error('Error deleting skill:', error);
       enqueueSnackbar('Failed to delete skill', { variant: 'error' });
     }
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -428,7 +428,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
       </Box>
     );
   }
-  
+
   // Render error state
   if (error || !employee) {
     return (
@@ -439,7 +439,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
       </Box>
     );
   }
-  
+
   // Render the employee profile
   return (
     <Box p={3}>
@@ -457,13 +457,13 @@ const EnhancedEmployeeProfile: React.FC = () => {
               {employee.designation} • {employee.department_name}
             </Typography>
             <Box mt={1}>
-              <Chip 
-                label={employee.status === 'active' ? 'Active' : employee.status === 'on_leave' ? 'On Leave' : 'Inactive'} 
+              <Chip
+                label={employee.status === 'active' ? 'Active' : employee.status === 'on_leave' ? 'On Leave' : 'Inactive'}
                 color={employee.status === 'active' ? 'success' : employee.status === 'on_leave' ? 'warning' : 'default'}
                 size="small"
                 sx={{ mr: 1 }}
               />
-              <Chip 
+              <Chip
                 label={`Employee ID: ${employee.employee_id}`}
                 variant="outlined"
                 size="small"
@@ -504,7 +504,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           )}
         </Box>
       </Box>
-      
+
       {/* Tabs */}
       <Paper sx={{ mb: 3 }}>
         <Tabs
@@ -523,7 +523,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           <Tab label="Employment Details" icon={<Work />} />
         </Tabs>
       </Paper>
-      
+
       {/* Tab Content */}
       <Box mt={2}>
         {/* Profile Tab */}
@@ -531,7 +531,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>Personal Information</Typography>
             <Divider sx={{ mb: 3 }} />
-            
+
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <TextField
@@ -598,14 +598,13 @@ const EnhancedEmployeeProfile: React.FC = () => {
                     value={employee.date_of_birth ? new Date(employee.date_of_birth) : null}
                     onChange={(date) => handleDateChange(date, 'date_of_birth')}
                     disabled={!editMode}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        margin="normal"
-                        disabled={!editMode}
-                      />
-                    )}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        margin: "normal",
+                        disabled: !editMode
+                      }
+                    }}
                   />
                 </LocalizationProvider>
               </Grid>
@@ -614,7 +613,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
                   <InputLabel>Department</InputLabel>
                   <Select
                     name="department_id"
-                    value={employee.department_id || ''}
+                    value={String(employee.department_id || '')}
                     onChange={handleSelectChange}
                     label="Department"
                   >
@@ -644,14 +643,13 @@ const EnhancedEmployeeProfile: React.FC = () => {
                     value={employee.hire_date ? new Date(employee.hire_date) : null}
                     onChange={(date) => handleDateChange(date, 'hire_date')}
                     disabled={!editMode}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        margin="normal"
-                        disabled={!editMode}
-                      />
-                    )}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        margin: "normal",
+                        disabled: !editMode
+                      }
+                    }}
                   />
                 </LocalizationProvider>
               </Grid>
@@ -673,7 +671,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
             </Grid>
           </Paper>
         )}
-        
+
         {/* Documents Tab */}
         {tabValue === 1 && (
           <Paper sx={{ p: 3 }}>
@@ -688,7 +686,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
                 Upload Document
               </Button>
             </Box>
-            
+
             {employee.documents && employee.documents.length > 0 ? (
               <TableContainer>
                 <Table>
@@ -748,7 +746,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
             )}
           </Paper>
         )}
-        
+
         {/* Emergency Contacts Tab */}
         {tabValue === 2 && (
           <Paper sx={{ p: 3 }}>
@@ -763,7 +761,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
                 Add Contact
               </Button>
             </Box>
-            
+
             {employee.emergency_contacts && employee.emergency_contacts.length > 0 ? (
               <Grid container spacing={3}>
                 {employee.emergency_contacts.map((contact) => (
@@ -823,7 +821,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
             )}
           </Paper>
         )}
-        
+
         {/* Skills & Qualifications Tab */}
         {tabValue === 3 && (
           <Paper sx={{ p: 3 }}>
@@ -838,7 +836,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
                 Add Skill
               </Button>
             </Box>
-            
+
             {employee.skills && employee.skills.length > 0 ? (
               <TableContainer>
                 <Table>
@@ -857,20 +855,20 @@ const EnhancedEmployeeProfile: React.FC = () => {
                         <TableCell>
                           <Box display="flex" alignItems="center">
                             <Box width={100} mr={1}>
-                              <LinearProgress 
-                                variant="determinate" 
-                                value={skill.proficiency === 'beginner' ? 25 : 
-                                       skill.proficiency === 'intermediate' ? 50 :
-                                       skill.proficiency === 'advanced' ? 75 : 100}
+                              <LinearProgress
+                                variant="determinate"
+                                value={skill.proficiency === 'beginner' ? 25 :
+                                  skill.proficiency === 'intermediate' ? 50 :
+                                    skill.proficiency === 'advanced' ? 75 : 100}
                                 sx={{
                                   height: 8,
                                   borderRadius: 4,
                                   backgroundColor: '#e0e0e0',
                                   '& .MuiLinearProgress-bar': {
-                                    backgroundColor: 
+                                    backgroundColor:
                                       skill.proficiency === 'beginner' ? '#ff9800' :
-                                      skill.proficiency === 'intermediate' ? '#ffc107' :
-                                      skill.proficiency === 'advanced' ? '#4caf50' : '#2196f3'
+                                        skill.proficiency === 'intermediate' ? '#ffc107' :
+                                          skill.proficiency === 'advanced' ? '#4caf50' : '#2196f3'
                                   }
                                 }}
                               />
@@ -884,8 +882,8 @@ const EnhancedEmployeeProfile: React.FC = () => {
                           {skill.years_of_experience} {skill.years_of_experience === 1 ? 'year' : 'years'}
                         </TableCell>
                         <TableCell>
-                          <IconButton 
-                            size="small" 
+                          <IconButton
+                            size="small"
                             color="error"
                             onClick={() => deleteSkill(skill.id)}
                           >
@@ -906,13 +904,13 @@ const EnhancedEmployeeProfile: React.FC = () => {
             )}
           </Paper>
         )}
-        
+
         {/* Leave Balance Tab */}
         {tabValue === 4 && (
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>Leave Balance</Typography>
             <Divider sx={{ mb: 3 }} />
-            
+
             {employee.leave_balance && employee.leave_balance.length > 0 ? (
               <TableContainer>
                 <Table>
@@ -950,26 +948,26 @@ const EnhancedEmployeeProfile: React.FC = () => {
                 </Typography>
               </Box>
             )}
-            
+
             <Box mt={3}>
               <Button
                 variant="outlined"
                 color="primary"
                 startIcon={<Add />}
-                onClick={() => {}}
+                onClick={() => { }}
               >
                 Request Leave
               </Button>
             </Box>
           </Paper>
         )}
-        
+
         {/* Employment Details Tab */}
         {tabValue === 5 && (
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>Employment Details</Typography>
             <Divider sx={{ mb: 3 }} />
-            
+
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <TextField
@@ -1019,7 +1017,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   label="Years of Service"
-                  value={employee.hire_date ? 
+                  value={employee.hire_date ?
                     new Date().getFullYear() - new Date(employee.hire_date).getFullYear() + ' years' : ''}
                   fullWidth
                   margin="normal"
@@ -1027,22 +1025,22 @@ const EnhancedEmployeeProfile: React.FC = () => {
                 />
               </Grid>
             </Grid>
-            
+
             <Box mt={4}>
               <Typography variant="subtitle1" gutterBottom>Performance Reviews</Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <Box textAlign="center" py={4}>
                 <Typography variant="body1" color="textSecondary">
                   No performance reviews found.
                 </Typography>
               </Box>
             </Box>
-            
+
             <Box mt={4}>
               <Typography variant="subtitle1" gutterBottom>Training & Development</Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <Box textAlign="center" py={4}>
                 <Typography variant="body1" color="textSecondary">
                   No training records found.
@@ -1052,7 +1050,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
           </Paper>
         )}
       </Box>
-      
+
       {/* Document Upload Dialog */}
       <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Upload Document</DialogTitle>
@@ -1089,13 +1087,12 @@ const EnhancedEmployeeProfile: React.FC = () => {
                 label="Expiry Date (Optional)"
                 value={expiryDate}
                 onChange={(newValue) => setExpiryDate(newValue)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    margin="normal"
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    margin: "normal"
+                  }
+                }}
               />
             </LocalizationProvider>
           </Box>
@@ -1123,9 +1120,9 @@ const EnhancedEmployeeProfile: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={handleDocumentUpload} 
-            variant="contained" 
+          <Button
+            onClick={handleDocumentUpload}
+            variant="contained"
             color="primary"
             disabled={!selectedFile || !documentType || uploading}
           >
@@ -1133,12 +1130,12 @@ const EnhancedEmployeeProfile: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Add Emergency Contact Dialog */}
-      <Dialog 
-        open={emergencyContactDialogOpen} 
-        onClose={() => setEmergencyContactDialogOpen(false)} 
-        maxWidth="sm" 
+      <Dialog
+        open={emergencyContactDialogOpen}
+        onClose={() => setEmergencyContactDialogOpen(false)}
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>Add Emergency Contact</DialogTitle>
@@ -1203,9 +1200,9 @@ const EnhancedEmployeeProfile: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEmergencyContactDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={saveEmergencyContact} 
-            variant="contained" 
+          <Button
+            onClick={saveEmergencyContact}
+            variant="contained"
             color="primary"
             disabled={!newEmergencyContact.name || !newEmergencyContact.relationship || !newEmergencyContact.phone}
           >
@@ -1213,12 +1210,12 @@ const EnhancedEmployeeProfile: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Add Skill Dialog */}
-      <Dialog 
-        open={skillDialogOpen} 
-        onClose={() => setSkillDialogOpen(false)} 
-        maxWidth="sm" 
+      <Dialog
+        open={skillDialogOpen}
+        onClose={() => setSkillDialogOpen(false)}
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>Add Skill</DialogTitle>
@@ -1237,7 +1234,7 @@ const EnhancedEmployeeProfile: React.FC = () => {
             <Select
               name="proficiency"
               value={newSkill.proficiency || 'intermediate'}
-              onChange={(e) => setNewSkill({...newSkill, proficiency: e.target.value as any})}
+              onChange={(e) => setNewSkill({ ...newSkill, proficiency: e.target.value as any })}
               label="Proficiency Level"
             >
               <MenuItem value="beginner">Beginner</MenuItem>
@@ -1259,9 +1256,9 @@ const EnhancedEmployeeProfile: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSkillDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={saveSkill} 
-            variant="contained" 
+          <Button
+            onClick={saveSkill}
+            variant="contained"
             color="primary"
             disabled={!newSkill.skill_name}
           >
