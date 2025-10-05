@@ -5091,3 +5091,11 @@
 2025-10-05T16:27:43.213Z ERROR: Failed to initialize email transporter:
 2025-10-05T16:27:59.823Z ERROR: Error fetching manufacturing cases:
 2025-10-05T16:27:59.870Z ERROR: Error fetching manufacturing cases:
+2025-10-05T17:09:31.610Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:10:27.478Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:12:10.657Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:12:36.748Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:14:33.949Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:20:18.800Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:23:06.419Z ERROR: Authentication error:
+2025-10-05T17:23:06.558Z ERROR: Error on GET /api/case-management/state/enquiry:

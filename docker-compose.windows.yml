@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   api:
     build:
       context: ./api
       target: production
     ports:
-      - "3001:3001"
+      - "5000:3001"
     environment:
       - NODE_ENV=production
       - PORT=3001
@@ -56,10 +54,11 @@ services:
       - MYSQL_USER=vtria_user
       - MYSQL_PASSWORD=SecurePassword123!
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=SecurePassword123!"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=SecureRootPassword123!"]
       interval: 30s
-      timeout: 10s
-      retries: 5
+      timeout: 20s
+      retries: 10
+      start_period: 60s
     restart: unless-stopped
     networks:
       - vtria-network
