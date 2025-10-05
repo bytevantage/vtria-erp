@@ -4,14 +4,15 @@ import { User, Location } from '../../types';
 
 describe('useAppStore', () => {
   beforeEach(() => {
-    useAppStore.getState().setUser(null);
-    useAppStore.getState().setCurrentLocation(null);
-    useAppStore.getState().setPermissions([]);
+    const store = useAppStore();
+    store.setUser(null);
+    store.setCurrentLocation(null);
+    store.setPermissions([]);
   });
 
   it('should initialize with empty state', () => {
     const { result } = renderHook(() => useAppStore());
-    
+
     expect(result.current.user).toBeNull();
     expect(result.current.currentLocation).toBeNull();
     expect(result.current.permissions).toEqual([]);
@@ -57,8 +58,9 @@ describe('useAppStore', () => {
 
 describe('usePermissions', () => {
   beforeEach(() => {
-    useAppStore.getState().setUser(null);
-    useAppStore.getState().setPermissions([]);
+    const store = useAppStore();
+    store.setUser(null);
+    store.setPermissions([]);
   });
 
   it('should return correct permissions for director', () => {
@@ -72,7 +74,8 @@ describe('usePermissions', () => {
       updated_at: '2024-01-01',
     };
 
-    useAppStore.getState().setUser(mockUser);
+    const store = useAppStore();
+    store.setUser(mockUser);
 
     const { result } = renderHook(() => usePermissions());
 
@@ -92,8 +95,9 @@ describe('usePermissions', () => {
       updated_at: '2024-01-01',
     };
 
-    useAppStore.getState().setUser(mockUser);
-    useAppStore.getState().setPermissions(['create_estimation', 'view_products']);
+    const store = useAppStore();
+    store.setUser(mockUser);
+    store.setPermissions(['create_estimation', 'view_products']);
 
     const { result } = renderHook(() => usePermissions());
 

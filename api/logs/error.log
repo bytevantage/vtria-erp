@@ -5099,3 +5099,6 @@
 2025-10-05T17:20:18.800Z ERROR: Failed to initialize email transporter:
 2025-10-05T17:23:06.419Z ERROR: Authentication error:
 2025-10-05T17:23:06.558Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-05T17:28:58.143Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:31:23.998Z ERROR: Failed to initialize email transporter:
+2025-10-05T17:49:11.343Z ERROR: Failed to initialize email transporter:
