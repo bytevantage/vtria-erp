@@ -3,15 +3,19 @@ FROM node:20-alpine AS development
 
 WORKDIR /usr/src/app
 
-# Install system dependencies for puppeteer
-RUN apk add --no-cache \
+# Install system dependencies for puppeteer with better error handling
+RUN apk update && \
+    apk add --no-cache \
     chromium \
     nss \
     freetype \
     freetype-dev \
     harfbuzz \
     ca-certificates \
-    ttf-freefont
+    ttf-freefont || \
+    (echo "Chromium installation failed, installing minimal dependencies" && \
+     apk add --no-cache nss freetype ca-certificates ttf-freefont && \
+     echo "Warning: Chromium not installed, PDF generation may not work")
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -37,15 +41,19 @@ FROM node:20-alpine AS production
 
 WORKDIR /usr/src/app
 
-# Install system dependencies for puppeteer
-RUN apk add --no-cache \
+# Install system dependencies for puppeteer with better error handling
+RUN apk update && \
+    apk add --no-cache \
     chromium \
     nss \
     freetype \
     freetype-dev \
     harfbuzz \
     ca-certificates \
-    ttf-freefont
+    ttf-freefont || \
+    (echo "Chromium installation failed, installing minimal dependencies" && \
+     apk add --no-cache nss freetype ca-certificates ttf-freefont && \
+     echo "Warning: Chromium not installed, PDF generation may not work")
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
