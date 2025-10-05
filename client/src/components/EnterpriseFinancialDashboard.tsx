@@ -214,11 +214,6 @@ const EnterpriseFinancialDashboard: React.FC = () => {
       console.error('Error fetching KPI data:', error);
       setKpiData([]);
     }
-  } catch (error) {
-    console.error('Error fetching KPI data:', error);
-  }
-};
-
   };
 
   const fetchCashFlowData = async () => {
@@ -240,7 +235,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
     console.error('Error fetching cash flow data:', error);
     setCashFlowData([]);
   }
-};
+  };
 
   const fetchProfitLossData = async () => {
   try {
@@ -290,7 +285,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   } catch (error) {
     console.error('Error fetching P&L data:', error);
   }
-};
+  };
 
   const fetchOutstandingData = async () => {
   try {
@@ -332,7 +327,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   } catch (error) {
     console.error('Error fetching outstanding data:', error);
   }
-};
+  };
 
   const fetchFinancialAlerts = async () => {
   try {
@@ -381,7 +376,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   } catch (error) {
     console.error('Error fetching alerts:', error);
   }
-};
+  };
 
   const getRiskCategoryColor = (category: string) => {
   switch (category) {
@@ -391,7 +386,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
     case 'blocked': return 'error';
     default: return 'default';
   }
-};
+  };
 
   const getAlertSeverityColor = (severity: string) => {
   switch (severity) {
@@ -401,7 +396,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
     case 'critical': return 'error';
     default: return 'default';
   }
-};
+  };
 
   const getAlertIcon = (type: string) => {
   switch (type) {
@@ -412,7 +407,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
     case 'budget': return <Assessment />;
     default: return <Info />;
   }
-};
+  };
 
   const formatCurrency = (amount: number) => {
   if (amount >= 10000000) {
@@ -422,7 +417,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   } else {
     return `₹${amount.toLocaleString('en-IN')}`;
   }
-};
+  };
 
   const getTrendIcon = (direction?: string) => {
   switch (direction) {
@@ -435,8 +430,8 @@ const EnterpriseFinancialDashboard: React.FC = () => {
   }
 };
 
-  return (
-    <Box sx={{ p: 3 }}>
+return (
+  <Box sx={{ p: 3 }}>
     {/* Header */}
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
       <Box>
