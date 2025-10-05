@@ -11,8 +11,11 @@ coverage/
 build/
 dist/
 
-# Environment
+# Environment (allow templates and production examples)
 .env
+.env.local
+!.env.production
+!.env.local.example
 .env.*
 !.env.example
 
