@@ -94,6 +94,27 @@ export const AuthProvider = ({ children }) => {
   // Fetch user profile
   const fetchUserProfile = async (token) => {
     try {
+      // Development mode bypass
+      if (process.env.NODE_ENV === 'development' && token.includes('dev-bypass-token')) {
+        console.log('Development mode: Using bypass user profile');
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: {
+            user: {
+              id: 1,
+              email: 'demo@vtria.com',
+              first_name: 'Demo',
+              last_name: 'User',
+              full_name: 'Demo User',
+              role: 'director',
+              user_role: 'director'
+            },
+            token
+          }
+        });
+        return;
+      }
+
       const response = await axios.get('/api/auth/me');
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,
@@ -130,6 +151,36 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+
+      // Development mode bypass
+      if (process.env.NODE_ENV === 'development' || process.env.REACT_APP_BYPASS_AUTH === 'true') {
+        console.log('Development mode: Using bypass authentication');
+        const devToken = 'dev-bypass-token-' + Date.now();
+        const devUser = {
+          id: 1,
+          email: email || 'demo@vtria.com',
+          first_name: 'Demo',
+          last_name: 'User',
+          full_name: 'Demo User',
+          role: 'director',
+          user_role: 'director'
+        };
+
+        // Store token
+        localStorage.setItem('vtria_token', devToken);
+
+        // Set axios default header
+        axios.defaults.headers.common['Authorization'] = `Bearer ${devToken}`;
+
+        // Update state
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: { user: devUser, token: devToken }
+        });
+
+        toast.success(`Welcome back, ${devUser.first_name}! (Development Mode)`);
+        return { success: true };
+      }
 
       // Make API call to validate license
       const response = await axios.post('/api/auth/login', {

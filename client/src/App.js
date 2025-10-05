@@ -374,27 +374,39 @@ function App() {
                   <Route path="/mobile-attendance" element={<MobileAttendanceApp />} />
 
                   {/* Reporting & Analytics Routes */}
-                  <Route path="/case-dashboard" element={<CaseDashboard />} />
+                  <Route path="/case-dashboard" element={
+                    <ProtectedRoute>
+                      <CaseDashboard />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/enterprise-case-dashboard" element={
-                    <ErrorBoundary fallback={<div>Error loading enterprise case dashboard. Please try again.</div>}>
-                      <UnifiedEnterpriseDashboard />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading enterprise case dashboard. Please try again.</div>}>
+                        <UnifiedEnterpriseDashboard />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/case-history-tracker" element={<Navigate to="/enterprise-case-dashboard" replace />} />
                   <Route path="/price-comparison" element={
-                    <ErrorBoundary fallback={<div>Error loading price comparison analytics. Please try again.</div>}>
-                      <PriceComparisonAnalytics />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading price comparison analytics. Please try again.</div>}>
+                        <PriceComparisonAnalytics />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/technician-dashboard" element={
-                    <ErrorBoundary fallback={<div>Error loading technician dashboard. Please try again.</div>}>
-                      <EnterpriseTechnicianDashboard />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading technician dashboard. Please try again.</div>}>
+                        <EnterpriseTechnicianDashboard />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/assignee-report" element={
-                    <ErrorBoundary fallback={<div>Error loading assignee report. Please try again.</div>}>
-                      <EnterpriseAssigneeReport />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading assignee report. Please try again.</div>}>
+                        <EnterpriseAssigneeReport />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
 
                   {/* Admin Routes */}
