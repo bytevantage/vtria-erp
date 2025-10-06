@@ -18,7 +18,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LicenseProvider, useLicense } from './contexts/LicenseContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LicenseValidation from './components/LicenseValidation';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -99,6 +99,7 @@ function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
   const {
     isLicenseValid,
     licenseInfo,
@@ -199,6 +200,14 @@ function App() {
                         onClick={clearLicense}
                       >
                         Change License
+                      </Button>
+                      <Button
+                        color="inherit"
+                        size="small"
+                        startIcon={<ExitToAppIcon />}
+                        onClick={logout}
+                      >
+                        Logout
                       </Button>
                     </>
                   ) : (

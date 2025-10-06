@@ -115,7 +115,7 @@ const ProductionManagement = () => {
         }, {});
 
         const enhancedData = {
-          ...dashData.data,
+          ...dashResponse.data,
           manufacturing_cases_count: cases.length,
           manufacturing_case_stats: Object.entries(caseStats).map(([status, count]) => ({
             status,

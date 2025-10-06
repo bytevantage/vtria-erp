@@ -609,13 +609,6 @@ const CaseDashboard = () => {
                 </Alert>
             )}
 
-            {/* Debug Info */}
-            {debugInfo && (
-                <Alert severity="info" sx={{ mt: 2, mb: 3 }}>
-                    Debug: {debugInfo}
-                </Alert>
-            )}
-
             {/* Statistics Cards */}
             <Grid container spacing={3} sx={{ mb: 3 }}>
                 {caseStates.map(state => (
