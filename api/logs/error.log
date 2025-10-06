@@ -5279,3 +5279,34 @@
 2025-10-06T10:48:12.091Z ERROR: Authentication error:
 2025-10-06T10:48:12.097Z ERROR: Error on GET /api/production/master/categories:
 2025-10-06T11:00:58.909Z ERROR: Failed to initialize email transporter:
+2025-10-06T12:33:58.208Z ERROR: Authentication error:
+2025-10-06T12:33:58.269Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:33:58.285Z ERROR: Authentication error:
+2025-10-06T12:33:58.292Z ERROR: Error on GET /api/inventory-enhanced/dashboard:
+2025-10-06T12:34:05.194Z ERROR: Authentication error:
+2025-10-06T12:34:05.201Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:10.226Z ERROR: Authentication error:
+2025-10-06T12:34:10.230Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:10.694Z ERROR: Authentication error:
+2025-10-06T12:34:10.698Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:10.851Z ERROR: Authentication error:
+2025-10-06T12:34:10.856Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:11.374Z ERROR: Authentication error:
+2025-10-06T12:34:11.380Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:11.600Z ERROR: Authentication error:
+2025-10-06T12:34:11.603Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:11.826Z ERROR: Authentication error:
+2025-10-06T12:34:11.835Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:17.667Z ERROR: Authentication error:
+2025-10-06T12:34:17.670Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:17.709Z ERROR: Authentication error:
+2025-10-06T12:34:17.712Z ERROR: Error on POST /api/inventory-enhanced/categories:
+2025-10-06T12:34:19.748Z ERROR: Authentication error:
+2025-10-06T12:34:19.750Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:34:19.772Z ERROR: Authentication error:
+2025-10-06T12:34:19.776Z ERROR: Error on POST /api/inventory-enhanced/categories:
+2025-10-06T12:35:10.731Z ERROR: Error on GET /api/auth/meFailed:
+2025-10-06T12:35:32.349Z ERROR: Authentication error:
+2025-10-06T12:35:32.352Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T12:35:32.379Z ERROR: Authentication error:
+2025-10-06T12:35:32.386Z ERROR: Error on GET /api/inventory-enhanced/dashboard:

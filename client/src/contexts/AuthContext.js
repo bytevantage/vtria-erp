@@ -91,6 +91,34 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Add axios interceptor to handle 401 responses
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          // Token is invalid or expired, logout user
+          console.log('401 error detected, logging out user');
+          localStorage.removeItem('vtria_token');
+          delete axios.defaults.headers.common['Authorization'];
+          dispatch({ type: AUTH_ACTIONS.LOGOUT });
+          toast.error('Session expired. Please log in again.');
+
+          // Force redirect to login after a short delay
+          setTimeout(() => {
+            window.location.href = '/vtria-erp/login';
+          }, 1000);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup interceptor on unmount
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
   // Fetch user profile
   const fetchUserProfile = async (token) => {
     try {

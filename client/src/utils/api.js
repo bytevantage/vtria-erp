@@ -28,6 +28,7 @@ export const apiRequest = async (method, endpoint, data = null, options = {}) =>
             config.headers['Content-Type'] = 'application/json';
         }
 
+        // Use the global axios instance so interceptors are applied
         const response = await axios(config);
         return response.data;
     } catch (error) {

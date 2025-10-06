@@ -500,6 +500,12 @@ const EnterpriseInventoryManagement = () => {
       logger.error('Failed to add category:', error);
       logger.error('Error details:', error.response?.data);
 
+      // Don't show error for authentication issues - interceptor handles logout
+      if (error.response?.status === 401) {
+        // Authentication error - interceptor will handle logout and redirect
+        return;
+      }
+
       // Better error message for duplicate entries
       if (error.response?.data?.error?.includes('Duplicate entry')) {
         setError(`Category "${categoryForm.category_name}" already exists. Please use a different name.`);
