@@ -219,7 +219,16 @@ export default function Sidebar({ isLicenseValid }: SidebarProps) {
   return (
     <div>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div">
+        <Typography 
+          variant="h6" 
+          component="div"
+          sx={{ 
+            textAlign: 'center',
+            lineHeight: 1.2,
+            fontWeight: 600,
+            color: 'primary.main'
+          }}
+        >
           VTRIA Engineering Solutions
         </Typography>
       </Toolbar>

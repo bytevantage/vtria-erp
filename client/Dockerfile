@@ -43,6 +43,10 @@ FROM nginx:alpine AS production
 # Copy built files to nginx
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
+# Copy logo to the vtria-erp subdirectory for proper path access
+RUN mkdir -p /usr/share/nginx/html/vtria-erp && \
+    cp /usr/share/nginx/html/vtria_logo.jpg /usr/share/nginx/html/vtria-erp/vtria_logo.jpg 2>/dev/null || true
+
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
