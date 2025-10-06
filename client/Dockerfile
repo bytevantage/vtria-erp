@@ -10,6 +10,7 @@ RUN npm install --legacy-peer-deps
 # Copy source code and public files
 COPY public/ ./public/
 COPY src/ ./src/
+COPY config-overrides.js ./
 COPY .env* ./
 
 # Expose development port
@@ -18,8 +19,8 @@ EXPOSE 3000
 # Start in development mode
 CMD ["npm", "start"]
 
-# Stage 2: Production
-FROM node:20-alpine AS production
+# Stage 2: Build for Production
+FROM node:20-alpine AS build
 
 WORKDIR /usr/src/app
 
@@ -30,17 +31,17 @@ COPY package*.json ./
 # Use npm install if no lock file exists, otherwise use npm ci
 RUN if [ -f package-lock.json ]; then npm ci; else npm install && npm shrinkwrap; fi
 
-# Copy source code
+# Copy source code and configuration files
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Use nginx to serve the static files
-FROM nginx:alpine
+# Stage 3: Production with Nginx
+FROM nginx:alpine AS production
 
 # Copy built files to nginx
-COPY --from=production /usr/src/app/build /usr/share/nginx/html
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

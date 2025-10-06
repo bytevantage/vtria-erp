@@ -8,8 +8,6 @@ services:
     volumes:
       - ./api:/usr/src/app
       - /usr/src/app/node_modules
-      - ./uploads:/var/www/vtria-erp/uploads
-      - ./logs:/var/log/vtria-erp
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - PORT=3001
@@ -18,27 +16,38 @@ services:
       - DB_USER=vtria_user
       - DB_PASS=dev_password
       - DB_NAME=vtria_erp
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - JWT_SECRET=dev_secret_key_change_in_production
-      - BYPASS_AUTH=false
+      - JWT_SECRET=dev_jwt_secret_key_not_for_production
+      - JWT_EXPIRATION=24h
+      - BYPASS_AUTH=true
+      - LOG_LEVEL=debug
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
+    restart: unless-stopped
+    networks:
+      - vtria-network
 
   client:
     build:
       context: ./client
-      target: production
+      target: development
     ports:
-      - "3000:80"
+      - "3000:3000"
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+      - DOCKER_ENV=true
+      - SKIP_PREFLIGHT_CHECK=true
+      - TSC_COMPILE_ON_ERROR=true
     depends_on:
       - api
     restart: unless-stopped
+    networks:
+      - vtria-network
 
   db:
     image: mysql:8.0
@@ -48,24 +57,30 @@ services:
       - mysql_data:/var/lib/mysql
       - ./sql/schema:/docker-entrypoint-initdb.d
     environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_ROOT_PASSWORD=dev_root_password
       - MYSQL_DATABASE=vtria_erp
       - MYSQL_USER=vtria_user
       - MYSQL_PASSWORD=dev_password
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=dev_password" ]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=dev_root_password"]
+      interval: 30s
+      timeout: 10s
       retries: 5
+    restart: unless-stopped
+    networks:
+      - vtria-network
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - vtria-network
 
 volumes:
   mysql_data:
-  redis_data:
+
+networks:
+  vtria-network:
+    driver: bridge
