@@ -5,18 +5,12 @@ const API_BASE_URL = process.env.DOCKER_ENV === 'true'
     ? '' // Use proxy when in Docker (empty string means relative URLs)
     : ''; // Use proxy in local development too - setupProxy.js handles forwarding
 
-const getAuthHeader = () => {
-    const token = localStorage.getItem('vtria_token');
-    return token ? { 'Authorization': `Bearer ${token}` } : {};
-};
-
 export const apiRequest = async (method, endpoint, data = null, options = {}) => {
     try {
         const config = {
             method,
             url: `${API_BASE_URL}${endpoint}`,
             headers: {
-                ...getAuthHeader(),
                 ...options.headers
             },
             ...options
@@ -28,7 +22,7 @@ export const apiRequest = async (method, endpoint, data = null, options = {}) =>
             config.headers['Content-Type'] = 'application/json';
         }
 
-        // Use the global axios instance so interceptors are applied
+        // Use the global axios instance so AuthContext interceptors handle authentication
         const response = await axios(config);
         return response.data;
     } catch (error) {

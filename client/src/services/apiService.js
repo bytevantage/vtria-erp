@@ -24,13 +24,13 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     // Add license key to headers
     const licenseKey = process.env.REACT_APP_LICENSE_KEY || localStorage.getItem('vtria_license_key');
     if (licenseKey) {
       config.headers['X-License-Key'] = licenseKey;
     }
-    
+
     return config;
   },
   (error) => {
