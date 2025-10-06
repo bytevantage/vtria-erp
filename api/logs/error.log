@@ -5322,3 +5322,7 @@
 2025-10-06T13:12:39.493Z ERROR: Error on GET /api/inventory-enhanced/dashboard:
 2025-10-06T13:12:39.520Z ERROR: Authentication error:
 2025-10-06T13:12:39.523Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T14:28:11.577Z ERROR: Authentication error:
+2025-10-06T14:28:11.590Z ERROR: Error on GET /api/inventory-enhanced/categories/main:
+2025-10-06T14:29:53.526Z ERROR: Authentication error:
+2025-10-06T14:29:53.550Z ERROR: Error on GET /api/inventory-enhanced/categories/main:

@@ -227,9 +227,6 @@ const EnterpriseInventoryManagement = () => {
 
   const loadCategories = async () => {
     try {
-      // Always ensure we have a valid demo JWT token
-      localStorage.setItem('vtria_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkRlbW8gVXNlciIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxOTk5OTk5OTk5fQ.demo_signature');
-
       console.log('🔄 Loading categories...');
       const response = await api.get('/api/inventory-enhanced/categories/main');
       const categoriesData = response?.data || response || [];
