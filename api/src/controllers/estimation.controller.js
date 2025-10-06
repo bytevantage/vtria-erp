@@ -23,17 +23,17 @@ async function generateSmartPricingSuggestions(enquiry_id, estimation_id, connec
         // Get common electrical components that might be relevant
         const [commonProducts] = await connection.execute(`
             SELECT DISTINCT p.id, p.name, p.category, p.unit,
-                   AVG(vph.unit_price) as avg_price,
-                   MIN(vph.unit_price) as min_price,
-                   MAX(vph.unit_price) as max_price,
+                   AVG(vph.price) as avg_price,
+                   MIN(vph.price) as min_price,
+                   MAX(vph.price) as max_price,
                    COUNT(vph.id) as price_count,
-                   s.name as best_supplier_name
+                   s.supplier_name as best_supplier_name
             FROM products p
             JOIN vendor_price_history vph ON p.id = vph.product_id
             JOIN suppliers s ON vph.supplier_id = s.id
             WHERE vph.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
             AND p.category IN ('Electrical Panel', 'Generator', 'UPS', 'Switchgear', 'Cables', 'Protection Equipment')
-            GROUP BY p.id, p.name, p.category, p.unit, s.name
+            GROUP BY p.id, p.name, p.category, p.unit, s.supplier_name
             HAVING price_count >= 2
             ORDER BY p.category, avg_price ASC
             LIMIT 20
@@ -169,7 +169,8 @@ exports.createEstimation = async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        const { enquiry_id, created_by = 1 } = req.body;
+        const { enquiry_id } = req.body;
+        const created_by = req.user?.id || 1; // Get from authenticated user
 
         // Get enquiry details and check if case exists
         const [enquiryResult] = await db.execute(
