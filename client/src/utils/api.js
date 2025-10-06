@@ -6,10 +6,8 @@ const API_BASE_URL = process.env.DOCKER_ENV === 'true'
     : ''; // Use proxy in local development too - setupProxy.js handles forwarding
 
 const getAuthHeader = () => {
-    // Temporarily bypass auth for debugging
-    // const token = localStorage.getItem('vtria_token');
-    // return token ? { 'Authorization': `Bearer ${token}` } : {};
-    return {}; // No auth header needed when BYPASS_AUTH=true
+    const token = localStorage.getItem('vtria_token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
 export const apiRequest = async (method, endpoint, data = null, options = {}) => {

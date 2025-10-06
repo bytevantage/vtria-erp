@@ -5265,3 +5265,17 @@
 2025-10-06T09:41:02.852Z ERROR: Failed to initialize email transporter:
 2025-10-06T09:41:26.147Z ERROR: Authentication error:
 2025-10-06T09:41:26.177Z ERROR: Error on GET /api/quotations/enhanced/all:
+2025-10-06T10:47:52.006Z ERROR: Failed to initialize email transporter:
+2025-10-06T10:48:11.973Z ERROR: Authentication error:
+2025-10-06T10:48:11.985Z ERROR: Error on GET /api/production/dashboard:
+2025-10-06T10:48:11.998Z ERROR: Authentication error:
+2025-10-06T10:48:12.007Z ERROR: Error on GET /api/production/cases:
+2025-10-06T10:48:12.024Z ERROR: Authentication error:
+2025-10-06T10:48:12.029Z ERROR: Error on GET /api/production/cases:
+2025-10-06T10:48:12.058Z ERROR: Authentication error:
+2025-10-06T10:48:12.062Z ERROR: Error on GET /api/production/master/manufacturing-units:
+2025-10-06T10:48:12.076Z ERROR: Authentication error:
+2025-10-06T10:48:12.081Z ERROR: Error on GET /api/production/master/operations:
+2025-10-06T10:48:12.091Z ERROR: Authentication error:
+2025-10-06T10:48:12.097Z ERROR: Error on GET /api/production/master/categories:
+2025-10-06T11:00:58.909Z ERROR: Failed to initialize email transporter:

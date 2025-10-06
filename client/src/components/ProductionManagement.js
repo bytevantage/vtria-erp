@@ -102,20 +102,13 @@ const ProductionManagement = () => {
   const fetchDashboardData = async () => {
     try {
       const [dashResponse, casesResponse] = await Promise.all([
-        fetch(`${process.env.REACT_APP_API_URL}/api/production/dashboard`),
-        fetch('/api/production/cases', {
-          headers: { 'Authorization': 'Bearer demo-token' }
-        })
+        api.get('/api/production/dashboard'),
+        api.get('/api/production/cases')
       ]);
 
-      const [dashData, casesData] = await Promise.all([
-        dashResponse.json(),
-        casesResponse.json()
-      ]);
-
-      if (dashData.success && casesData.success) {
+      if (dashResponse.success && casesResponse.success) {
         // Calculate manufacturing case statistics
-        const cases = casesData.data;
+        const cases = casesResponse.data;
         const caseStats = cases.reduce((acc, case_) => {
           acc[case_.status] = (acc[case_.status] || 0) + 1;
           return acc;
@@ -142,10 +135,9 @@ const ProductionManagement = () => {
 
   const fetchManufacturingUnits = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/production/master/manufacturing-units`);
-      const data = await response.json();
-      if (data.success) {
-        setManufacturingUnits(data.data);
+      const response = await api.get('/api/production/master/manufacturing-units');
+      if (response.success) {
+        setManufacturingUnits(response.data);
       }
     } catch (error) {
       console.error('Error fetching manufacturing units:', error);
@@ -154,10 +146,9 @@ const ProductionManagement = () => {
 
   const fetchOperations = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/production/master/operations`);
-      const data = await response.json();
-      if (data.success) {
-        setOperations(data.data);
+      const response = await api.get('/api/production/master/operations');
+      if (response.success) {
+        setOperations(response.data);
       }
     } catch (error) {
       console.error('Error fetching operations:', error);
@@ -166,10 +157,9 @@ const ProductionManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/production/master/categories`);
-      const data = await response.json();
-      if (data.success) {
-        setCategories(data.data);
+      const response = await api.get('/api/production/master/categories');
+      if (response.success) {
+        setCategories(response.data);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -194,20 +184,15 @@ const ProductionManagement = () => {
 
   const fetchManufacturingCases = async () => {
     try {
-      const response = await fetch('/api/production/cases', {
-        headers: {
-          'Authorization': 'Bearer demo-token'
-        }
-      });
-      const data = await response.json();
+      const response = await api.get('/api/production/cases');
 
-      console.log('Manufacturing Cases Response:', data);
+      console.log('Manufacturing Cases Response:', response);
 
-      if (data.success) {
-        console.log('Manufacturing Cases Fetched:', data.data);
-        setManufacturingCases(data.data);
+      if (response.success) {
+        console.log('Manufacturing Cases Fetched:', response.data);
+        setManufacturingCases(response.data);
       } else {
-        console.warn('API response not successful:', data);
+        console.warn('API response not successful:', response);
         setManufacturingCases([]);
       }
     } catch (error) {
