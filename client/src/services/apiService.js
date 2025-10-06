@@ -42,11 +42,12 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('vtria_token');
-      window.location.href = '/login';
-    }
+    // Let AuthContext handle 401 responses globally
+    // if (error.response?.status === 401) {
+    //   // Token expired or invalid
+    //   localStorage.removeItem('vtria_token');
+    //   window.location.href = '/login';
+    // }
     return Promise.reject(error);
   }
 );

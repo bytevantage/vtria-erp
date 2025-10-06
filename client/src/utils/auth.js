@@ -40,7 +40,7 @@ export const isAuthenticated = () => {
 export const handleAuthError = (error) => {
   if (error.response?.status === 401) {
     localStorage.removeItem('vtria_token');
-    window.location.href = '/login';
+    window.location.href = '/vtria-erp/login';
   }
   throw error;
 };
