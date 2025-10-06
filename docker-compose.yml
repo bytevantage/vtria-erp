@@ -21,7 +21,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=dev_secret_key_change_in_production
-      - BYPASS_AUTH=false
+      - BYPASS_AUTH=true
     depends_on:
       db:
         condition: service_healthy

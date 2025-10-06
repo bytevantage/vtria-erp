@@ -5110,3 +5110,6 @@
 2025-10-06T03:30:13.093Z ERROR: Failed to initialize email transporter:
 2025-10-06T03:58:42.341Z ERROR: Failed to initialize email transporter:
 2025-10-06T04:13:08.310Z ERROR: Failed to initialize email transporter:
+2025-10-06T04:32:57.275Z ERROR: Failed to initialize email transporter:
+2025-10-06T04:33:05.364Z ERROR: Error on GET /api/health:
+2025-10-06T04:34:31.328Z ERROR: Failed to initialize email transporter:
