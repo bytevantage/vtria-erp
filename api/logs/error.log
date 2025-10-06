@@ -5336,3 +5336,8 @@
 2025-10-06T18:08:00.494Z ERROR: Failed to initialize email transporter:
 2025-10-06T18:13:23.206Z ERROR: Failed to initialize email transporter:
 2025-10-06T18:13:29.513Z ERROR: Failed to initialize email transporter:
+2025-10-06T18:16:44.518Z ERROR: Failed to initialize email transporter:
+2025-10-06T18:20:29.646Z ERROR: Authentication error:
+2025-10-06T18:20:29.656Z ERROR: Error on POST /api/estimations/4/approve:
+2025-10-06T18:34:21.668Z ERROR: Authentication error:
+2025-10-06T18:34:21.752Z ERROR: Error on POST /api/estimations/4/approve:

@@ -592,7 +592,7 @@ const Estimation = () => {
         return;
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('vtria_token');
       await axios.post(`${API_BASE_URL}/api/estimations/${estimationId}/approve`, {}, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -615,7 +615,7 @@ const Estimation = () => {
     if (!rejectingEstimation) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('vtria_token');
       await axios.post(`${API_BASE_URL}/api/estimations/${rejectingEstimation.id}/reject`, {
         reason: rejectionReason
       }, {
@@ -636,7 +636,7 @@ const Estimation = () => {
 
   const handleReturnToDraft = async (estimationId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('vtria_token');
       await axios.post(`${API_BASE_URL}/api/estimations/${estimationId}/return-to-draft`, {}, {
         headers: {
           'Authorization': `Bearer ${token}`
