@@ -629,7 +629,7 @@ const PurchaseOrders = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || 'test'}`
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token') || 'test'}`
         }
       });
 

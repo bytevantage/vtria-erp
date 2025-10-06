@@ -59,13 +59,13 @@ const SerialWarrantyTracker = ({ productId }) => {
     const [warrantyReport, setWarrantyReport] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
+
     // Dialog states
     const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
     const [warrantyDialogOpen, setWarrantyDialogOpen] = useState(false);
     const [claimDialogOpen, setClaimDialogOpen] = useState(false);
     const [selectedSerial, setSelectedSerial] = useState(null);
-    
+
     // Form data
     const [generateForm, setGenerateForm] = useState({
         product_id: productId || '',
@@ -75,7 +75,7 @@ const SerialWarrantyTracker = ({ productId }) => {
         warranty_months: 12,
         location_id: 1
     });
-    
+
     const [claimForm, setClaimForm] = useState({
         serial_number: '',
         customer_name: '',
@@ -99,7 +99,7 @@ const SerialWarrantyTracker = ({ productId }) => {
     const fetchSerialNumbers = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/serial-warranty/serial-numbers/product/${productId}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setSerialNumbers(response.data.data);
         } catch (err) {
@@ -110,7 +110,7 @@ const SerialWarrantyTracker = ({ productId }) => {
     const fetchWarrantyClaims = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/serial-warranty/warranty-claims`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setWarrantyClaims(response.data.data);
         } catch (err) {
@@ -123,7 +123,7 @@ const SerialWarrantyTracker = ({ productId }) => {
     const fetchWarrantyReport = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/serial-warranty/warranty-expiry-report`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setWarrantyReport(response.data.data);
         } catch (err) {
@@ -134,9 +134,9 @@ const SerialWarrantyTracker = ({ productId }) => {
     const handleGenerateSerials = async () => {
         try {
             await axios.post(`${API_BASE_URL}/api/serial-warranty/serial-numbers/generate`, generateForm, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setGenerateDialogOpen(false);
             setGenerateForm({
                 product_id: productId || '',
@@ -146,7 +146,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                 warranty_months: 12,
                 location_id: 1
             });
-            
+
             fetchSerialNumbers();
         } catch (err) {
             setError('Failed to generate serial numbers');
@@ -156,9 +156,9 @@ const SerialWarrantyTracker = ({ productId }) => {
     const handleCreateClaim = async () => {
         try {
             await axios.post(`${API_BASE_URL}/api/serial-warranty/warranty-claims`, claimForm, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setClaimDialogOpen(false);
             setClaimForm({
                 serial_number: '',
@@ -169,7 +169,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                 claim_type: 'repair',
                 priority: 'normal'
             });
-            
+
             fetchWarrantyClaims();
         } catch (err) {
             setError('Failed to create warranty claim');
@@ -179,7 +179,7 @@ const SerialWarrantyTracker = ({ productId }) => {
     const handleWarrantyLookup = async (serialNumber) => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/serial-warranty/warranty/${serialNumber}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setSelectedSerial(response.data.data);
             setWarrantyDialogOpen(true);
@@ -244,20 +244,20 @@ const SerialWarrantyTracker = ({ productId }) => {
                             </TableCell>
                             <TableCell>{serial.batch_number || '-'}</TableCell>
                             <TableCell>
-                                {serial.manufacturing_date ? 
-                                    new Date(serial.manufacturing_date).toLocaleDateString('en-IN') : 
+                                {serial.manufacturing_date ?
+                                    new Date(serial.manufacturing_date).toLocaleDateString('en-IN') :
                                     '-'
                                 }
                             </TableCell>
                             <TableCell>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography variant="body2">
-                                        {serial.warranty_expiry_date ? 
-                                            new Date(serial.warranty_expiry_date).toLocaleDateString('en-IN') : 
+                                        {serial.warranty_expiry_date ?
+                                            new Date(serial.warranty_expiry_date).toLocaleDateString('en-IN') :
                                             '-'
                                         }
                                     </Typography>
-                                    <Chip 
+                                    <Chip
                                         label={serial.warranty_status}
                                         color={getWarrantyStatusColor(serial.warranty_status)}
                                         size="small"
@@ -265,7 +265,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                                 </Box>
                             </TableCell>
                             <TableCell>
-                                <Chip 
+                                <Chip
                                     label={serial.status}
                                     color={getStatusColor(serial.status)}
                                     size="small"
@@ -274,7 +274,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             <TableCell>{serial.location_name || '-'}</TableCell>
                             <TableCell>{serial.customer_name || '-'}</TableCell>
                             <TableCell>
-                                <IconButton 
+                                <IconButton
                                     size="small"
                                     onClick={() => handleWarrantyLookup(serial.serial_number)}
                                 >
@@ -339,21 +339,21 @@ const SerialWarrantyTracker = ({ productId }) => {
                                 <Chip label={claim.claim_type} size="small" />
                             </TableCell>
                             <TableCell>
-                                <Chip 
+                                <Chip
                                     label={claim.priority}
                                     color={claim.priority === 'urgent' ? 'error' : claim.priority === 'high' ? 'warning' : 'default'}
                                     size="small"
                                 />
                             </TableCell>
                             <TableCell>
-                                <Chip 
+                                <Chip
                                     label={claim.status}
                                     color={getClaimStatusColor(claim.status)}
                                     size="small"
                                 />
                             </TableCell>
                             <TableCell>
-                                <Chip 
+                                <Chip
                                     label={claim.warranty_valid ? 'Valid' : 'Expired'}
                                     color={claim.warranty_valid ? 'success' : 'error'}
                                     size="small"
@@ -411,7 +411,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                                 {new Date(item.warranty_expiry_date).toLocaleDateString('en-IN')}
                             </TableCell>
                             <TableCell>
-                                <Typography 
+                                <Typography
                                     variant="body2"
                                     color={item.days_remaining < 0 ? 'error.main' : item.days_remaining < 30 ? 'warning.main' : 'text.primary'}
                                 >
@@ -419,7 +419,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                                 </Typography>
                             </TableCell>
                             <TableCell>
-                                <Chip 
+                                <Chip
                                     label={item.warranty_status}
                                     color={getWarrantyStatusColor(item.warranty_status)}
                                     size="small"
@@ -444,7 +444,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             label="Quantity"
                             type="number"
                             value={generateForm.quantity}
-                            onChange={(e) => setGenerateForm({...generateForm, quantity: parseInt(e.target.value)})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, quantity: parseInt(e.target.value) })}
                             inputProps={{ min: 1, max: 1000 }}
                         />
                     </Grid>
@@ -454,7 +454,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             label="Warranty Months"
                             type="number"
                             value={generateForm.warranty_months}
-                            onChange={(e) => setGenerateForm({...generateForm, warranty_months: parseInt(e.target.value)})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, warranty_months: parseInt(e.target.value) })}
                             inputProps={{ min: 1, max: 60 }}
                         />
                     </Grid>
@@ -463,7 +463,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             fullWidth
                             label="Batch Number"
                             value={generateForm.batch_number}
-                            onChange={(e) => setGenerateForm({...generateForm, batch_number: e.target.value})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, batch_number: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -472,7 +472,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             label="Manufacturing Date"
                             type="date"
                             value={generateForm.manufacturing_date}
-                            onChange={(e) => setGenerateForm({...generateForm, manufacturing_date: e.target.value})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, manufacturing_date: e.target.value })}
                             InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
@@ -497,7 +497,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             fullWidth
                             label="Serial Number"
                             value={claimForm.serial_number}
-                            onChange={(e) => setClaimForm({...claimForm, serial_number: e.target.value})}
+                            onChange={(e) => setClaimForm({ ...claimForm, serial_number: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -505,7 +505,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             fullWidth
                             label="Customer Name"
                             value={claimForm.customer_name}
-                            onChange={(e) => setClaimForm({...claimForm, customer_name: e.target.value})}
+                            onChange={(e) => setClaimForm({ ...claimForm, customer_name: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -513,7 +513,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             fullWidth
                             label="Customer Phone"
                             value={claimForm.customer_phone}
-                            onChange={(e) => setClaimForm({...claimForm, customer_phone: e.target.value})}
+                            onChange={(e) => setClaimForm({ ...claimForm, customer_phone: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -522,7 +522,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             label="Customer Email"
                             type="email"
                             value={claimForm.customer_email}
-                            onChange={(e) => setClaimForm({...claimForm, customer_email: e.target.value})}
+                            onChange={(e) => setClaimForm({ ...claimForm, customer_email: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -530,7 +530,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             <InputLabel>Claim Type</InputLabel>
                             <Select
                                 value={claimForm.claim_type}
-                                onChange={(e) => setClaimForm({...claimForm, claim_type: e.target.value})}
+                                onChange={(e) => setClaimForm({ ...claimForm, claim_type: e.target.value })}
                             >
                                 <MenuItem value="repair">Repair</MenuItem>
                                 <MenuItem value="replacement">Replacement</MenuItem>
@@ -543,7 +543,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             <InputLabel>Priority</InputLabel>
                             <Select
                                 value={claimForm.priority}
-                                onChange={(e) => setClaimForm({...claimForm, priority: e.target.value})}
+                                onChange={(e) => setClaimForm({ ...claimForm, priority: e.target.value })}
                             >
                                 <MenuItem value="low">Low</MenuItem>
                                 <MenuItem value="normal">Normal</MenuItem>
@@ -559,7 +559,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                             multiline
                             rows={4}
                             value={claimForm.issue_description}
-                            onChange={(e) => setClaimForm({...claimForm, issue_description: e.target.value})}
+                            onChange={(e) => setClaimForm({ ...claimForm, issue_description: e.target.value })}
                             placeholder="Describe the issue in detail..."
                         />
                     </Grid>
@@ -589,8 +589,8 @@ const SerialWarrantyTracker = ({ productId }) => {
                                     <Typography><strong>SKU:</strong> {selectedSerial.product_info.product_sku}</Typography>
                                     <Typography><strong>Manufacturing Date:</strong> {new Date(selectedSerial.product_info.manufacturing_date).toLocaleDateString('en-IN')}</Typography>
                                     <Typography><strong>Warranty Expiry:</strong> {new Date(selectedSerial.product_info.warranty_expiry_date).toLocaleDateString('en-IN')}</Typography>
-                                    <Typography><strong>Status:</strong> 
-                                        <Chip 
+                                    <Typography><strong>Status:</strong>
+                                        <Chip
                                             label={selectedSerial.product_info.warranty_status}
                                             color={getWarrantyStatusColor(selectedSerial.product_info.warranty_status)}
                                             size="small"
@@ -624,7 +624,7 @@ const SerialWarrantyTracker = ({ productId }) => {
                                                         primary={`Claim #${claim.claim_number} - ${claim.claim_type}`}
                                                         secondary={`${claim.issue_description} | Status: ${claim.status} | ${new Date(claim.claim_date).toLocaleDateString('en-IN')}`}
                                                     />
-                                                    <Chip 
+                                                    <Chip
                                                         label={claim.status}
                                                         color={getClaimStatusColor(claim.status)}
                                                         size="small"
@@ -685,26 +685,26 @@ const SerialWarrantyTracker = ({ productId }) => {
             )}
 
             <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} sx={{ mb: 3 }}>
-                <Tab 
+                <Tab
                     label={
                         <Badge badgeContent={serialNumbers.length} color="primary">
                             Serial Numbers
                         </Badge>
-                    } 
+                    }
                 />
-                <Tab 
+                <Tab
                     label={
                         <Badge badgeContent={warrantyClaims.filter(c => c.status === 'open').length} color="error">
                             Warranty Claims
                         </Badge>
-                    } 
+                    }
                 />
-                <Tab 
+                <Tab
                     label={
                         <Badge badgeContent={warrantyReport.filter(w => w.warranty_status === 'expiring_soon').length} color="warning">
                             Warranty Report
                         </Badge>
-                    } 
+                    }
                 />
             </Tabs>
 

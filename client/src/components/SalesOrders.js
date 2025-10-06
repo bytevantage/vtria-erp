@@ -404,7 +404,7 @@ const SalesOrders = () => {
   const handleDownloadPDF = async (orderId) => {
     try {
       setError('');
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('vtria_token');
 
       // Generate PDF
       const response = await axios.post(`${API_BASE_URL}/api/pdf/sales-order/${orderId}`, {}, {

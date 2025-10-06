@@ -19,10 +19,10 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
-const PDFGenerator = ({ 
-    documentType, 
-    documentId, 
-    documentNumber, 
+const PDFGenerator = ({
+    documentType,
+    documentId,
+    documentNumber,
     buttonText = "Generate PDF",
     variant = "contained",
     size = "medium",
@@ -59,7 +59,7 @@ const PDFGenerator = ({
 
             const response = await axios.post(`${API_BASE_URL}${endpoint}`, {}, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -119,8 +119,8 @@ const PDFGenerator = ({
 
             {/* Error Alert */}
             {error && (
-                <Alert 
-                    severity="error" 
+                <Alert
+                    severity="error"
                     sx={{ mt: 1 }}
                     onClose={() => setError(null)}
                 >
@@ -129,8 +129,8 @@ const PDFGenerator = ({
             )}
 
             {/* Success Dialog */}
-            <Dialog 
-                open={dialogOpen} 
+            <Dialog
+                open={dialogOpen}
                 onClose={handleClose}
                 maxWidth="sm"
                 fullWidth
@@ -141,7 +141,7 @@ const PDFGenerator = ({
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
-                
+
                 <DialogContent>
                     <Box sx={{ textAlign: 'center', py: 2 }}>
                         <PdfIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
@@ -153,7 +153,7 @@ const PDFGenerator = ({
                         </Typography>
                     </Box>
                 </DialogContent>
-                
+
                 <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
                     <Button
                         variant="outlined"

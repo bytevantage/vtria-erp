@@ -58,11 +58,11 @@ const ManufacturingWorkflowManager = () => {
     const [selectedJob, setSelectedJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
+
     // Dialog states
     const [createJobDialogOpen, setCreateJobDialogOpen] = useState(false);
     const [jobDetailsDialogOpen, setJobDetailsDialogOpen] = useState(false);
-    
+
     // Form data
     const [jobForm, setJobForm] = useState({
         sales_order_id: '',
@@ -86,7 +86,7 @@ const ManufacturingWorkflowManager = () => {
     const fetchJobs = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/manufacturing-workflow/jobs`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setJobs(response.data.data);
         } catch (err) {
@@ -104,7 +104,7 @@ const ManufacturingWorkflowManager = () => {
     const fetchJobDetails = async (jobId) => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/manufacturing-workflow/jobs/${jobId}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setSelectedJob(response.data.data);
             setJobDetailsDialogOpen(true);
@@ -116,9 +116,9 @@ const ManufacturingWorkflowManager = () => {
     const handleCreateJob = async () => {
         try {
             await axios.post(`${API_BASE_URL}/api/manufacturing-workflow/jobs`, jobForm, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setCreateJobDialogOpen(false);
             setJobForm({
                 sales_order_id: '',
@@ -132,7 +132,7 @@ const ManufacturingWorkflowManager = () => {
                 tasks: [],
                 materials: []
             });
-            
+
             fetchJobs();
         } catch (err) {
             setError('Failed to create manufacturing job');
@@ -200,38 +200,38 @@ const ManufacturingWorkflowManager = () => {
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'flex-end' }}>
                         <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Chip 
-                                label={job.status} 
+                            <Chip
+                                label={job.status}
                                 color={getStatusColor(job.status)}
                                 size="small"
                             />
-                            <Chip 
-                                label={job.priority} 
+                            <Chip
+                                label={job.priority}
                                 color={getPriorityColor(job.priority)}
                                 size="small"
                             />
                         </Box>
                     </Box>
                 </Box>
-                
+
                 <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                         Progress: {job.completed_tasks || 0} / {job.total_tasks || 0} tasks ({job.progress_percentage || 0}%)
                     </Typography>
-                    <LinearProgress 
-                        variant="determinate" 
+                    <LinearProgress
+                        variant="determinate"
                         value={job.progress_percentage || 0}
                         sx={{ height: 8, borderRadius: 4 }}
                     />
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
                         Due: {new Date(job.due_date).toLocaleDateString('en-IN')}
                     </Typography>
                     <Box>
-                        <IconButton 
-                            size="small" 
+                        <IconButton
+                            size="small"
                             title="View Details"
                             onClick={() => fetchJobDetails(job.id)}
                         >
@@ -256,7 +256,7 @@ const ManufacturingWorkflowManager = () => {
                             fullWidth
                             label="Job Title"
                             value={jobForm.job_title}
-                            onChange={(e) => setJobForm({...jobForm, job_title: e.target.value})}
+                            onChange={(e) => setJobForm({ ...jobForm, job_title: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -264,7 +264,7 @@ const ManufacturingWorkflowManager = () => {
                             fullWidth
                             label="Sales Order ID"
                             value={jobForm.sales_order_id}
-                            onChange={(e) => setJobForm({...jobForm, sales_order_id: e.target.value})}
+                            onChange={(e) => setJobForm({ ...jobForm, sales_order_id: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -272,7 +272,7 @@ const ManufacturingWorkflowManager = () => {
                             <InputLabel>Priority</InputLabel>
                             <Select
                                 value={jobForm.priority}
-                                onChange={(e) => setJobForm({...jobForm, priority: e.target.value})}
+                                onChange={(e) => setJobForm({ ...jobForm, priority: e.target.value })}
                             >
                                 <MenuItem value="low">Low</MenuItem>
                                 <MenuItem value="normal">Normal</MenuItem>
@@ -287,7 +287,7 @@ const ManufacturingWorkflowManager = () => {
                             label="Estimated Hours"
                             type="number"
                             value={jobForm.estimated_hours}
-                            onChange={(e) => setJobForm({...jobForm, estimated_hours: e.target.value})}
+                            onChange={(e) => setJobForm({ ...jobForm, estimated_hours: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -296,7 +296,7 @@ const ManufacturingWorkflowManager = () => {
                             label="Start Date"
                             type="date"
                             value={jobForm.start_date}
-                            onChange={(e) => setJobForm({...jobForm, start_date: e.target.value})}
+                            onChange={(e) => setJobForm({ ...jobForm, start_date: e.target.value })}
                             InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
@@ -306,7 +306,7 @@ const ManufacturingWorkflowManager = () => {
                             label="Due Date"
                             type="date"
                             value={jobForm.due_date}
-                            onChange={(e) => setJobForm({...jobForm, due_date: e.target.value})}
+                            onChange={(e) => setJobForm({ ...jobForm, due_date: e.target.value })}
                             InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
@@ -317,10 +317,10 @@ const ManufacturingWorkflowManager = () => {
                             multiline
                             rows={3}
                             value={jobForm.description}
-                            onChange={(e) => setJobForm({...jobForm, description: e.target.value})}
+                            onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })}
                         />
                     </Grid>
-                    
+
                     {/* Tasks Section */}
                     <Grid item xs={12}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -329,7 +329,7 @@ const ManufacturingWorkflowManager = () => {
                                 Add Task
                             </Button>
                         </Box>
-                        
+
                         {jobForm.tasks.map((task, index) => (
                             <Card key={index} sx={{ mb: 2 }}>
                                 <CardContent>
@@ -352,8 +352,8 @@ const ManufacturingWorkflowManager = () => {
                                             />
                                         </Grid>
                                         <Grid item xs={12} md={3}>
-                                            <Button 
-                                                color="error" 
+                                            <Button
+                                                color="error"
                                                 onClick={() => removeTask(index)}
                                                 fullWidth
                                             >
@@ -405,16 +405,16 @@ const ManufacturingWorkflowManager = () => {
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="body2" color="text.secondary">Status</Typography>
-                                <Chip 
-                                    label={selectedJob.job.status} 
+                                <Chip
+                                    label={selectedJob.job.status}
                                     color={getStatusColor(selectedJob.job.status)}
                                     size="small"
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="body2" color="text.secondary">Priority</Typography>
-                                <Chip 
-                                    label={selectedJob.job.priority} 
+                                <Chip
+                                    label={selectedJob.job.priority}
                                     color={getPriorityColor(selectedJob.job.priority)}
                                     size="small"
                                 />
@@ -442,8 +442,8 @@ const ManufacturingWorkflowManager = () => {
                                                 <TableRow key={task.id}>
                                                     <TableCell>{task.task_name}</TableCell>
                                                     <TableCell>
-                                                        <Chip 
-                                                            label={task.status} 
+                                                        <Chip
+                                                            label={task.status}
                                                             color={getStatusColor(task.status)}
                                                             size="small"
                                                         />
@@ -481,8 +481,8 @@ const ManufacturingWorkflowManager = () => {
                                                     <TableCell>{material.required_quantity}</TableCell>
                                                     <TableCell>{material.available_stock || 0}</TableCell>
                                                     <TableCell>
-                                                        <Chip 
-                                                            label={material.availability_status} 
+                                                        <Chip
+                                                            label={material.availability_status}
                                                             color={material.availability_status === 'available' ? 'success' : 'warning'}
                                                             size="small"
                                                         />

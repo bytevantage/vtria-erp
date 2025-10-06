@@ -57,12 +57,12 @@ const TechnicianDashboard = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
+
     // Dialog states
     const [workLogDialogOpen, setWorkLogDialogOpen] = useState(false);
     const [taskUpdateDialogOpen, setTaskUpdateDialogOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
-    
+
     // Form data
     const [workLogForm, setWorkLogForm] = useState({
         job_id: '',
@@ -72,7 +72,7 @@ const TechnicianDashboard = () => {
         issues_encountered: '',
         materials_used: []
     });
-    
+
     const [taskUpdateForm, setTaskUpdateForm] = useState({
         status: '',
         notes: '',
@@ -91,7 +91,7 @@ const TechnicianDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/manufacturing-workflow/technician/dashboard`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setDashboardData(response.data.data);
         } catch (err) {
@@ -103,11 +103,11 @@ const TechnicianDashboard = () => {
 
     const handleTaskStatusUpdate = async () => {
         try {
-            await axios.put(`${API_BASE_URL}/api/manufacturing-workflow/tasks/${selectedTask.id}/status`, 
+            await axios.put(`${API_BASE_URL}/api/manufacturing-workflow/tasks/${selectedTask.id}/status`,
                 taskUpdateForm, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setTaskUpdateDialogOpen(false);
             setSelectedTask(null);
             setTaskUpdateForm({ status: '', notes: '', actual_hours: '' });
@@ -119,11 +119,11 @@ const TechnicianDashboard = () => {
 
     const handleAddWorkLog = async () => {
         try {
-            await axios.post(`${API_BASE_URL}/api/manufacturing-workflow/jobs/${workLogForm.job_id}/work-logs`, 
+            await axios.post(`${API_BASE_URL}/api/manufacturing-workflow/jobs/${workLogForm.job_id}/work-logs`,
                 workLogForm, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setWorkLogDialogOpen(false);
             setWorkLogForm({
                 job_id: '',
@@ -173,30 +173,30 @@ const TechnicianDashboard = () => {
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Chip 
-                            label={job.status} 
+                        <Chip
+                            label={job.status}
                             color={getStatusColor(job.status)}
                             size="small"
                         />
-                        <Chip 
-                            label={job.priority} 
+                        <Chip
+                            label={job.priority}
                             color={getPriorityColor(job.priority)}
                             size="small"
                         />
                     </Box>
                 </Box>
-                
+
                 <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                         Progress: {job.completed_tasks || 0} / {job.total_tasks || 0} tasks
                     </Typography>
-                    <LinearProgress 
-                        variant="determinate" 
+                    <LinearProgress
+                        variant="determinate"
                         value={job.total_tasks ? (job.completed_tasks / job.total_tasks) * 100 : 0}
                         sx={{ height: 8, borderRadius: 4 }}
                     />
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
                         Due: {new Date(job.due_date).toLocaleDateString('en-IN')}
@@ -229,14 +229,14 @@ const TechnicianDashboard = () => {
                         <Typography variant="body2" color="text.secondary" gutterBottom>
                             {selectedTask.job_title} ({selectedTask.job_number})
                         </Typography>
-                        
+
                         <Grid container spacing={2} sx={{ mt: 2 }}>
                             <Grid item xs={12}>
                                 <FormControl fullWidth>
                                     <InputLabel>Status</InputLabel>
                                     <Select
                                         value={taskUpdateForm.status}
-                                        onChange={(e) => setTaskUpdateForm({...taskUpdateForm, status: e.target.value})}
+                                        onChange={(e) => setTaskUpdateForm({ ...taskUpdateForm, status: e.target.value })}
                                     >
                                         <MenuItem value="pending">Pending</MenuItem>
                                         <MenuItem value="in_progress">In Progress</MenuItem>
@@ -251,7 +251,7 @@ const TechnicianDashboard = () => {
                                     label="Actual Hours"
                                     type="number"
                                     value={taskUpdateForm.actual_hours}
-                                    onChange={(e) => setTaskUpdateForm({...taskUpdateForm, actual_hours: e.target.value})}
+                                    onChange={(e) => setTaskUpdateForm({ ...taskUpdateForm, actual_hours: e.target.value })}
                                     inputProps={{ step: 0.5, min: 0 }}
                                 />
                             </Grid>
@@ -262,7 +262,7 @@ const TechnicianDashboard = () => {
                                     multiline
                                     rows={3}
                                     value={taskUpdateForm.notes}
-                                    onChange={(e) => setTaskUpdateForm({...taskUpdateForm, notes: e.target.value})}
+                                    onChange={(e) => setTaskUpdateForm({ ...taskUpdateForm, notes: e.target.value })}
                                 />
                             </Grid>
                         </Grid>
@@ -289,7 +289,7 @@ const TechnicianDashboard = () => {
                             label="Hours Worked"
                             type="number"
                             value={workLogForm.hours_worked}
-                            onChange={(e) => setWorkLogForm({...workLogForm, hours_worked: e.target.value})}
+                            onChange={(e) => setWorkLogForm({ ...workLogForm, hours_worked: e.target.value })}
                             inputProps={{ step: 0.5, min: 0 }}
                         />
                     </Grid>
@@ -300,7 +300,7 @@ const TechnicianDashboard = () => {
                             multiline
                             rows={4}
                             value={workLogForm.work_description}
-                            onChange={(e) => setWorkLogForm({...workLogForm, work_description: e.target.value})}
+                            onChange={(e) => setWorkLogForm({ ...workLogForm, work_description: e.target.value })}
                             placeholder="Describe the work performed..."
                         />
                     </Grid>
@@ -311,7 +311,7 @@ const TechnicianDashboard = () => {
                             multiline
                             rows={3}
                             value={workLogForm.issues_encountered}
-                            onChange={(e) => setWorkLogForm({...workLogForm, issues_encountered: e.target.value})}
+                            onChange={(e) => setWorkLogForm({ ...workLogForm, issues_encountered: e.target.value })}
                             placeholder="Any problems or issues faced (optional)..."
                         />
                     </Grid>
@@ -433,16 +433,16 @@ const TechnicianDashboard = () => {
                                     </TableCell>
                                     <TableCell>{task.client_name}</TableCell>
                                     <TableCell>
-                                        <Chip 
-                                            label={task.status} 
+                                        <Chip
+                                            label={task.status}
                                             color={getStatusColor(task.status)}
                                             size="small"
                                         />
                                     </TableCell>
                                     <TableCell>{task.estimated_hours}h</TableCell>
                                     <TableCell>
-                                        <IconButton 
-                                            size="small" 
+                                        <IconButton
+                                            size="small"
                                             title="Update Status"
                                             onClick={() => {
                                                 setSelectedTask(task);

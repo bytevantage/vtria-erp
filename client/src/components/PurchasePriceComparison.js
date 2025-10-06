@@ -59,12 +59,12 @@ const PurchasePriceComparison = ({ estimationId }) => {
     const [analysisReport, setAnalysisReport] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
+
     // Dialog states
     const [quoteRequestDialogOpen, setQuoteRequestDialogOpen] = useState(false);
     const [recordQuoteDialogOpen, setRecordQuoteDialogOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
-    
+
     // Form data
     const [quoteRequestForm, setQuoteRequestForm] = useState({
         supplier_ids: [],
@@ -72,7 +72,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
         due_date: '',
         notes: ''
     });
-    
+
     const [supplierQuoteForm, setSupplierQuoteForm] = useState({
         request_id: '',
         supplier_id: '',
@@ -99,7 +99,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
     const fetchComparisonData = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/purchase-price-comparison/estimation/${estimationId}/comparison`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setComparisonData(response.data.data);
         } catch (err) {
@@ -110,7 +110,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
     const fetchQuoteRequests = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/purchase-price-comparison/quote-requests?estimation_id=${estimationId}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setQuoteRequests(response.data.data);
         } catch (err) {
@@ -123,7 +123,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
     const fetchAnalysisReport = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/purchase-price-comparison/estimation/${estimationId}/analysis`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setAnalysisReport(response.data.data);
         } catch (err) {
@@ -134,7 +134,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
     const fetchSuppliers = async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/vendors`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
             setSuppliers(response.data.data || []);
         } catch (err) {
@@ -158,9 +158,9 @@ const PurchasePriceComparison = ({ estimationId }) => {
             };
 
             await axios.post(`${API_BASE_URL}/api/purchase-price-comparison/quote-requests`, requestData, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setQuoteRequestDialogOpen(false);
             setQuoteRequestForm({ supplier_ids: [], items: [], due_date: '', notes: '' });
             fetchQuoteRequests();
@@ -172,9 +172,9 @@ const PurchasePriceComparison = ({ estimationId }) => {
     const handleRecordSupplierQuote = async () => {
         try {
             await axios.post(`${API_BASE_URL}/api/purchase-price-comparison/supplier-quotes`, supplierQuoteForm, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('vtria_token')}` }
             });
-            
+
             setRecordQuoteDialogOpen(false);
             setSupplierQuoteForm({
                 request_id: '',
@@ -187,7 +187,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                 items: [],
                 notes: ''
             });
-            
+
             fetchComparisonData();
             fetchQuoteRequests();
             fetchAnalysisReport();
@@ -251,7 +251,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             </TableCell>
                             <TableCell>
                                 {item.best_quote && (
-                                    <Chip 
+                                    <Chip
                                         label={`${item.best_quote.price_variance_percent}%`}
                                         color={getVarianceColor(Math.abs(item.best_quote.price_variance_percent))}
                                         size="small"
@@ -259,18 +259,18 @@ const PurchasePriceComparison = ({ estimationId }) => {
                                 )}
                             </TableCell>
                             <TableCell>
-                                <Typography 
-                                    variant="body2" 
+                                <Typography
+                                    variant="body2"
                                     color={item.potential_savings > 0 ? 'success.main' : 'text.secondary'}
                                 >
-                                    {item.potential_savings > 0 ? 
-                                        `₹${item.potential_savings.toLocaleString()}` : 
+                                    {item.potential_savings > 0 ?
+                                        `₹${item.potential_savings.toLocaleString()}` :
                                         '-'
                                     }
                                 </Typography>
                             </TableCell>
                             <TableCell>
-                                <Chip 
+                                <Chip
                                     label={item.has_quotes ? 'Quoted' : 'Pending'}
                                     color={item.has_quotes ? 'success' : 'warning'}
                                     size="small"
@@ -295,7 +295,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             <Select
                                 multiple
                                 value={quoteRequestForm.supplier_ids}
-                                onChange={(e) => setQuoteRequestForm({...quoteRequestForm, supplier_ids: e.target.value})}
+                                onChange={(e) => setQuoteRequestForm({ ...quoteRequestForm, supplier_ids: e.target.value })}
                                 renderValue={(selected) => selected.join(', ')}
                             >
                                 {suppliers.map((supplier) => (
@@ -313,7 +313,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             label="Due Date"
                             type="date"
                             value={quoteRequestForm.due_date}
-                            onChange={(e) => setQuoteRequestForm({...quoteRequestForm, due_date: e.target.value})}
+                            onChange={(e) => setQuoteRequestForm({ ...quoteRequestForm, due_date: e.target.value })}
                             InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
@@ -324,7 +324,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             multiline
                             rows={3}
                             value={quoteRequestForm.notes}
-                            onChange={(e) => setQuoteRequestForm({...quoteRequestForm, notes: e.target.value})}
+                            onChange={(e) => setQuoteRequestForm({ ...quoteRequestForm, notes: e.target.value })}
                             placeholder="Additional requirements or specifications..."
                         />
                     </Grid>
@@ -349,7 +349,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             fullWidth
                             label="Quote Number"
                             value={supplierQuoteForm.quote_number}
-                            onChange={(e) => setSupplierQuoteForm({...supplierQuoteForm, quote_number: e.target.value})}
+                            onChange={(e) => setSupplierQuoteForm({ ...supplierQuoteForm, quote_number: e.target.value })}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -358,7 +358,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             label="Quote Date"
                             type="date"
                             value={supplierQuoteForm.quote_date}
-                            onChange={(e) => setSupplierQuoteForm({...supplierQuoteForm, quote_date: e.target.value})}
+                            onChange={(e) => setSupplierQuoteForm({ ...supplierQuoteForm, quote_date: e.target.value })}
                             InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
@@ -368,7 +368,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             label="Valid Until"
                             type="date"
                             value={supplierQuoteForm.valid_until}
-                            onChange={(e) => setSupplierQuoteForm({...supplierQuoteForm, valid_until: e.target.value})}
+                            onChange={(e) => setSupplierQuoteForm({ ...supplierQuoteForm, valid_until: e.target.value })}
                             InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
@@ -377,7 +377,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             fullWidth
                             label="Payment Terms"
                             value={supplierQuoteForm.payment_terms}
-                            onChange={(e) => setSupplierQuoteForm({...supplierQuoteForm, payment_terms: e.target.value})}
+                            onChange={(e) => setSupplierQuoteForm({ ...supplierQuoteForm, payment_terms: e.target.value })}
                             placeholder="e.g., 30 days"
                         />
                     </Grid>
@@ -386,7 +386,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             fullWidth
                             label="Delivery Terms"
                             value={supplierQuoteForm.delivery_terms}
-                            onChange={(e) => setSupplierQuoteForm({...supplierQuoteForm, delivery_terms: e.target.value})}
+                            onChange={(e) => setSupplierQuoteForm({ ...supplierQuoteForm, delivery_terms: e.target.value })}
                             placeholder="e.g., FOB, CIF, etc."
                         />
                     </Grid>
@@ -397,7 +397,7 @@ const PurchasePriceComparison = ({ estimationId }) => {
                             multiline
                             rows={3}
                             value={supplierQuoteForm.notes}
-                            onChange={(e) => setSupplierQuoteForm({...supplierQuoteForm, notes: e.target.value})}
+                            onChange={(e) => setSupplierQuoteForm({ ...supplierQuoteForm, notes: e.target.value })}
                             placeholder="Additional notes about the quote..."
                         />
                     </Grid>
@@ -538,8 +538,8 @@ const PurchasePriceComparison = ({ estimationId }) => {
                                     <TableCell>{request.request_number}</TableCell>
                                     <TableCell>{request.supplier_name}</TableCell>
                                     <TableCell>
-                                        <Chip 
-                                            label={request.status} 
+                                        <Chip
+                                            label={request.status}
                                             color={request.status === 'received' ? 'success' : 'warning'}
                                             size="small"
                                         />
