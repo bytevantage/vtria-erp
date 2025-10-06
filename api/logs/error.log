@@ -5222,3 +5222,46 @@
 2025-10-06T09:25:28.388Z ERROR: Authentication error:
 2025-10-06T09:25:28.412Z ERROR: Error on GET /api/employees/master/departments:
 2025-10-06T09:25:28.636Z ERROR: ERROR 💥
+2025-10-06T09:27:08.615Z ERROR: Authentication error:
+2025-10-06T09:27:08.640Z ERROR: Error on GET /api/employees/master/departments:
+2025-10-06T09:27:08.654Z ERROR: ERROR 💥
+2025-10-06T09:27:08.865Z ERROR: Authentication error:
+2025-10-06T09:27:08.883Z ERROR: Error on GET /api/employees:
+2025-10-06T09:27:08.910Z ERROR: ERROR 💥
+2025-10-06T09:27:51.812Z ERROR: Authentication error:
+2025-10-06T09:27:51.848Z ERROR: Error on GET /api/quotations:
+2025-10-06T09:27:51.864Z ERROR: ERROR 💥
+2025-10-06T09:27:51.957Z ERROR: Authentication error:
+2025-10-06T09:27:51.988Z ERROR: Error on GET /api/sales-enquiries:
+2025-10-06T09:27:51.993Z ERROR: ERROR 💥
+2025-10-06T09:27:52.092Z ERROR: Authentication error:
+2025-10-06T09:27:52.105Z ERROR: Error on GET /api/sales-enquiries:
+2025-10-06T09:27:52.118Z ERROR: ERROR 💥
+2025-10-06T09:27:52.197Z ERROR: Authentication error:
+2025-10-06T09:27:52.212Z ERROR: Error on GET /api/estimations:
+2025-10-06T09:27:52.219Z ERROR: ERROR 💥
+2025-10-06T09:27:52.359Z ERROR: Authentication error:
+2025-10-06T09:27:52.408Z ERROR: Error on GET /api/production/cases:
+2025-10-06T09:27:52.425Z ERROR: ERROR 💥
+2025-10-06T09:33:49.439Z ERROR: Authentication error:
+2025-10-06T09:33:51.141Z ERROR: Error on GET /api/production/cases:
+2025-10-06T09:33:51.394Z ERROR: ERROR 💥
+2025-10-06T09:33:51.799Z ERROR: Authentication error:
+2025-10-06T09:33:51.814Z ERROR: Error on GET /api/production/master/manufacturing-units:
+2025-10-06T09:33:51.820Z ERROR: ERROR 💥
+2025-10-06T09:33:51.888Z ERROR: Authentication error:
+2025-10-06T09:33:51.904Z ERROR: Error on GET /api/production/master/categories:
+2025-10-06T09:33:51.908Z ERROR: ERROR 💥
+2025-10-06T09:33:51.939Z ERROR: Authentication error:
+2025-10-06T09:33:51.944Z ERROR: Error on GET /api/production/cases:
+2025-10-06T09:33:51.958Z ERROR: ERROR 💥
+2025-10-06T09:33:51.985Z ERROR: Authentication error:
+2025-10-06T09:33:52.053Z ERROR: Error on GET /api/production/dashboard:
+2025-10-06T09:33:52.094Z ERROR: ERROR 💥
+2025-10-06T09:33:52.258Z ERROR: Authentication error:
+2025-10-06T09:33:52.329Z ERROR: Error on GET /api/production/master/operations:
+2025-10-06T09:33:52.338Z ERROR: ERROR 💥
+2025-10-06T09:37:20.403Z ERROR: Failed to initialize email transporter:
+2025-10-06T09:41:02.852Z ERROR: Failed to initialize email transporter:
+2025-10-06T09:41:26.147Z ERROR: Authentication error:
+2025-10-06T09:41:26.177Z ERROR: Error on GET /api/quotations/enhanced/all:

@@ -4,6 +4,7 @@ class BaseError extends Error {
         this.statusCode = statusCode;
         this.errorCode = errorCode;
         this.name = this.constructor.name;
+        this.isOperational = true; // Mark as operational error
         Error.captureStackTrace(this, this.constructor);
     }
 }
