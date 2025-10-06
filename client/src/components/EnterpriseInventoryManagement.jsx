@@ -163,9 +163,6 @@ const EnterpriseInventoryManagement = () => {
       console.log('🔄 Starting loadInitialData...');
       setLoading(true);
 
-      // Always ensure we have a valid demo JWT token
-      localStorage.setItem('vtria_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkRlbW8gVXNlciIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxOTk5OTk5OTk5fQ.demo_signature');
-
       // Load categories and dashboard data in parallel
       console.log('📡 Making API calls for categories and dashboard...');
       const [categoriesRes, dashboardRes] = await Promise.all([
