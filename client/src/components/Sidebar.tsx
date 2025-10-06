@@ -219,10 +219,10 @@ export default function Sidebar({ isLicenseValid }: SidebarProps) {
   return (
     <div>
       <Toolbar>
-        <Typography 
-          variant="h6" 
+        <Typography
+          variant="h6"
           component="div"
-          sx={{ 
+          sx={{
             textAlign: 'center',
             lineHeight: 1.2,
             fontWeight: 600,

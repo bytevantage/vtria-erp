@@ -306,34 +306,60 @@ function App() {
                       <Estimation />
                     </ProtectedRoute>
                   } />
-                  <Route path="/quotations" element={<Quotations />} />
-                  <Route path="/sales-orders" element={<SalesOrders />} />
+                  <Route path="/quotations" element={
+                    <ProtectedRoute>
+                      <Quotations />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/sales-orders" element={
+                    <ProtectedRoute>
+                      <SalesOrders />
+                    </ProtectedRoute>
+                  } />
 
                   {/* Purchase Routes */}
-                  <Route path="/purchase-requisition" element={<PurchaseRequisition />} />
-                  <Route path="/purchase-orders" element={<PurchaseOrders />} />
-                  <Route path="/grn" element={<GoodsReceivedNote />} />
-
-
+                  <Route path="/purchase-requisition" element={
+                    <ProtectedRoute>
+                      <PurchaseRequisition />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/purchase-orders" element={
+                    <ProtectedRoute>
+                      <PurchaseOrders />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/grn" element={
+                    <ProtectedRoute>
+                      <GoodsReceivedNote />
+                    </ProtectedRoute>
+                  } />
 
                   {/* 🏆 COMPETITIVE BIDDING MANAGER */}
                   <Route path="/competitive-bidding" element={
-                    <ErrorBoundary fallback={<div>Error loading competitive bidding manager. Please try again.</div>}>
-                      <CompetitiveBiddingManager />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading competitive bidding manager. Please try again.</div>}>
+                        <CompetitiveBiddingManager />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
 
 
 
                   {/* Production/Manufacturing Routes */}
                   <Route path="/manufacturing" element={<Navigate to="/production" replace />} />
-                  <Route path="/production" element={<ProductionManagement />} />
+                  <Route path="/production" element={
+                    <ProtectedRoute>
+                      <ProductionManagement />
+                    </ProtectedRoute>
+                  } />
 
                   {/* Unified Inventory & Product Management */}
                   <Route path="/inventory" element={
-                    <ErrorBoundary fallback={<div>Error loading inventory management. Please try again.</div>}>
-                      <EnterpriseInventoryManagement />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading inventory management. Please try again.</div>}>
+                        <EnterpriseInventoryManagement />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
 
                   {/* Redirect old product routes to unified inventory */}
@@ -342,36 +368,62 @@ function App() {
 
                   {/* Financial Management Routes */}
                   <Route path="/financial-dashboard" element={
-                    <ErrorBoundary fallback={<div>Error loading financial dashboard. Please try again.</div>}>
-                      <FinancialDashboard />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading financial dashboard. Please try again.</div>}>
+                        <FinancialDashboard />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/invoice-management" element={
-                    <ErrorBoundary fallback={<div>Error loading invoice management. Please try again.</div>}>
-                      <InvoiceManagement />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading invoice management. Please try again.</div>}>
+                        <InvoiceManagement />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/payment-management" element={
-                    <ErrorBoundary fallback={<div>Error loading payment management. Please try again.</div>}>
-                      <PaymentManagement />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading payment management. Please try again.</div>}>
+                        <PaymentManagement />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/profit-calculator" element={
-                    <ErrorBoundary fallback={<div>Error loading profit calculator. Please try again.</div>}>
-                      <ProfitCalculator />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading profit calculator. Please try again.</div>}>
+                        <ProfitCalculator />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
 
                   {/* Human Resources Routes - Enabled for HR functionality */}
                   <Route path="/employee-management" element={
-                    <ErrorBoundary fallback={<div>Error loading employee management. Please try again.</div>}>
-                      <EmployeeManagement />
-                    </ErrorBoundary>
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading employee management. Please try again.</div>}>
+                        <EmployeeManagement />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
                   } />
-                  <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
-                  <Route path="/attendance-management" element={<AttendanceManagement />} />
-                  <Route path="/leave-management" element={<LeaveManagement />} />
-                  <Route path="/mobile-attendance" element={<MobileAttendanceApp />} />
+                  <Route path="/employee-dashboard" element={
+                    <ProtectedRoute>
+                      <EmployeeDashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/attendance-management" element={
+                    <ProtectedRoute>
+                      <AttendanceManagement />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/leave-management" element={
+                    <ProtectedRoute>
+                      <LeaveManagement />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/mobile-attendance" element={
+                    <ProtectedRoute>
+                      <MobileAttendanceApp />
+                    </ProtectedRoute>
+                  } />
 
                   {/* Reporting & Analytics Routes */}
                   <Route path="/case-dashboard" element={
@@ -410,11 +462,27 @@ function App() {
                   } />
 
                   {/* Admin Routes */}
-                  <Route path="/about" element={<About />} />
-                  <Route path="/clients" element={<Clients />} />
-                  <Route path="/vendors" element={<Vendors />} />
+                  <Route path="/about" element={
+                    <ProtectedRoute>
+                      <About />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/clients" element={
+                    <ProtectedRoute>
+                      <Clients />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/vendors" element={
+                    <ProtectedRoute>
+                      <Vendors />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/users" element={<Navigate to="/employee-management" replace />} />
-                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings" element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  } />
                 </Routes>
               )}
             </Box>

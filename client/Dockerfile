@@ -34,7 +34,8 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install && npm shrinkwrap
 # Copy source code and configuration files
 COPY . .
 
-# Build the application
+# Set production environment and build the application
+ENV NODE_ENV=production
 RUN npm run build
 
 # Stage 3: Production with Nginx
@@ -45,7 +46,7 @@ COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 # Copy logo to the vtria-erp subdirectory for proper path access
 RUN mkdir -p /usr/share/nginx/html/vtria-erp && \
-    cp /usr/share/nginx/html/vtria_logo.jpg /usr/share/nginx/html/vtria-erp/vtria_logo.jpg 2>/dev/null || true
+  cp /usr/share/nginx/html/vtria_logo.jpg /usr/share/nginx/html/vtria-erp/vtria_logo.jpg 2>/dev/null || true
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
