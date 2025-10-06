@@ -5124,3 +5124,101 @@
 2025-10-06T05:57:53.590Z ERROR: Failed to initialize email transporter:
 2025-10-06T06:17:44.845Z ERROR: Failed to initialize email transporter:
 2025-10-06T06:36:07.668Z ERROR: Failed to initialize email transporter:
+2025-10-06T06:48:25.029Z ERROR: Failed to initialize email transporter:
+2025-10-06T06:50:28.505Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:08:59.724Z ERROR: Authentication error:
+2025-10-06T07:09:00.478Z ERROR: Error on GET /api/employees:
+2025-10-06T07:09:00.516Z ERROR: ERROR 💥
+2025-10-06T07:09:00.723Z ERROR: Authentication error:
+2025-10-06T07:09:00.918Z ERROR: Error on GET /api/employees/master/departments:
+2025-10-06T07:09:00.930Z ERROR: ERROR 💥
+2025-10-06T07:09:06.274Z ERROR: Authentication error:
+2025-10-06T07:09:06.461Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-06T07:09:06.472Z ERROR: ERROR 💥
+2025-10-06T07:09:06.510Z ERROR: Authentication error:
+2025-10-06T07:09:06.524Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-06T07:09:06.548Z ERROR: ERROR 💥
+2025-10-06T07:09:06.693Z ERROR: Authentication error:
+2025-10-06T07:09:06.778Z ERROR: Error on GET /api/case-management/stats/overview:
+2025-10-06T07:09:06.810Z ERROR: ERROR 💥
+2025-10-06T07:09:06.936Z ERROR: Authentication error:
+2025-10-06T07:09:06.958Z ERROR: Error on GET /api/case-management/state/quotation:
+2025-10-06T07:09:07.000Z ERROR: ERROR 💥
+2025-10-06T07:09:07.079Z ERROR: Authentication error:
+2025-10-06T07:09:07.116Z ERROR: Error on GET /api/case-management/state/order:
+2025-10-06T07:09:07.157Z ERROR: ERROR 💥
+2025-10-06T07:09:07.200Z ERROR: Authentication error:
+2025-10-06T07:09:07.229Z ERROR: Error on GET /api/case-management/state/estimation:
+2025-10-06T07:09:07.250Z ERROR: ERROR 💥
+2025-10-06T07:09:07.291Z ERROR: Authentication error:
+2025-10-06T07:09:07.297Z ERROR: Error on GET /api/case-management/state/production:
+2025-10-06T07:09:07.327Z ERROR: ERROR 💥
+2025-10-06T07:09:07.374Z ERROR: Authentication error:
+2025-10-06T07:09:07.391Z ERROR: Error on GET /api/case-management/state/delivery:
+2025-10-06T07:09:07.400Z ERROR: ERROR 💥
+2025-10-06T07:10:01.863Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:12:32.729Z ERROR: Authentication error:
+2025-10-06T07:12:32.758Z ERROR: Error on GET /api/case-management/state/enquiry:
+2025-10-06T07:12:32.763Z ERROR: ERROR 💥
+2025-10-06T07:12:33.052Z ERROR: Authentication error:
+2025-10-06T07:12:33.067Z ERROR: Error on GET /api/case-management/stats/overview:
+2025-10-06T07:12:33.077Z ERROR: ERROR 💥
+2025-10-06T07:12:33.108Z ERROR: Authentication error:
+2025-10-06T07:12:33.114Z ERROR: Error on GET /api/case-management/state/estimation:
+2025-10-06T07:12:33.117Z ERROR: ERROR 💥
+2025-10-06T07:12:33.323Z ERROR: Authentication error:
+2025-10-06T07:12:33.335Z ERROR: Error on GET /api/case-management/state/quotation:
+2025-10-06T07:12:33.340Z ERROR: ERROR 💥
+2025-10-06T07:12:33.377Z ERROR: Authentication error:
+2025-10-06T07:12:33.388Z ERROR: Error on GET /api/case-management/state/production:
+2025-10-06T07:12:33.391Z ERROR: ERROR 💥
+2025-10-06T07:12:33.532Z ERROR: Authentication error:
+2025-10-06T07:12:33.538Z ERROR: Error on GET /api/case-management/state/order:
+2025-10-06T07:12:33.541Z ERROR: ERROR 💥
+2025-10-06T07:12:33.575Z ERROR: Authentication error:
+2025-10-06T07:12:33.595Z ERROR: Error on GET /api/case-management/state/delivery:
+2025-10-06T07:12:33.600Z ERROR: ERROR 💥
+2025-10-06T07:12:59.472Z ERROR: Authentication error:
+2025-10-06T07:12:59.511Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-06T07:12:59.520Z ERROR: ERROR 💥
+2025-10-06T07:12:59.584Z ERROR: Authentication error:
+2025-10-06T07:12:59.600Z ERROR: Error on GET /api/financial/invoices:
+2025-10-06T07:12:59.638Z ERROR: ERROR 💥
+2025-10-06T07:12:59.792Z ERROR: Authentication error:
+2025-10-06T07:12:59.800Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-06T07:12:59.814Z ERROR: ERROR 💥
+2025-10-06T07:13:00.075Z ERROR: Authentication error:
+2025-10-06T07:13:00.080Z ERROR: Error on GET /api/financial/invoices:
+2025-10-06T07:13:00.087Z ERROR: ERROR 💥
+2025-10-06T07:13:01.009Z ERROR: Authentication error:
+2025-10-06T07:13:01.029Z ERROR: Error on GET /api/financial/invoices:
+2025-10-06T07:13:01.052Z ERROR: ERROR 💥
+2025-10-06T07:13:01.300Z ERROR: Authentication error:
+2025-10-06T07:13:01.317Z ERROR: Error on GET /api/sales-orders/approved:
+2025-10-06T07:13:01.324Z ERROR: ERROR 💥
+2025-10-06T07:14:05.304Z ERROR: Authentication error:
+2025-10-06T07:14:05.447Z ERROR: Error on GET /api/employees:
+2025-10-06T07:14:05.459Z ERROR: ERROR 💥
+2025-10-06T07:14:05.680Z ERROR: Authentication error:
+2025-10-06T07:14:05.707Z ERROR: Error on GET /api/employees/master/departments:
+2025-10-06T07:14:05.725Z ERROR: ERROR 💥
+2025-10-06T07:27:26.586Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:32:25.262Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:33:13.787Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:35:38.944Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:40:00.283Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:40:24.167Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:40:59.436Z ERROR: Failed to initialize email transporter:
+2025-10-06T07:41:58.560Z ERROR: Failed to initialize email transporter:
+2025-10-06T08:18:13.301Z ERROR: Failed to initialize email transporter:
+2025-10-06T08:22:46.924Z ERROR: Error on GET /api/auth/login:
+2025-10-06T09:03:19.790Z ERROR: Failed to initialize email transporter:
+2025-10-06T09:05:28.085Z ERROR: Failed to initialize email transporter:
+2025-10-06T09:19:31.199Z ERROR: Failed to initialize email transporter:
+2025-10-06T09:23:14.523Z ERROR: Failed to initialize email transporter:
+2025-10-06T09:25:28.067Z ERROR: Authentication error:
+2025-10-06T09:25:28.294Z ERROR: Error on GET /api/employees:
+2025-10-06T09:25:28.309Z ERROR: ERROR 💥
+2025-10-06T09:25:28.388Z ERROR: Authentication error:
+2025-10-06T09:25:28.412Z ERROR: Error on GET /api/employees/master/departments:
+2025-10-06T09:25:28.636Z ERROR: ERROR 💥

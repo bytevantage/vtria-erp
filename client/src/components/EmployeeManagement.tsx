@@ -39,7 +39,9 @@ import {
   Divider,
   FormHelperText,
   CircularProgress,
-  SelectChangeEvent
+  SelectChangeEvent,
+  Switch,
+  Tooltip
 } from '@mui/material';
 import SelectOrAddField from './common/SelectOrAddField';
 import {
@@ -48,6 +50,8 @@ import {
   Delete,
   Search,
   FilterList,
+  Info as InfoIcon,
+  Lock,
   PersonAdd,
   Email,
   Phone,
@@ -99,6 +103,11 @@ interface Employee {
   mobile?: string;
   employee_type: 'full_time' | 'part_time' | 'contract' | 'intern' | 'consultant' | string;
   status: 'active' | 'inactive' | 'on_leave' | 'terminated' | 'probation' | string;
+  // User Account Fields
+  user_id?: number;
+  has_system_access?: boolean;
+  user_role?: 'director' | 'admin' | 'sales-admin' | 'designer' | 'accounts' | 'technician';
+  password?: string; // Only for creation/updates
   hire_date: string;
   confirmation_date?: string;
   exit_date?: string;
@@ -152,7 +161,6 @@ interface Employee {
   updated_by?: number | string;
   department_name?: string;
   manager_name?: string;
-  password?: string;
   confirm_password?: string;
   [key: string]: any; // Add index signature for dynamic access
 }
@@ -259,6 +267,10 @@ const EmployeeManagement: React.FC = () => {
     previous_employer: '',
     previous_designation: '',
     previous_salary: 0,
+    // System Access Fields
+    has_system_access: false,
+    user_role: 'technician',
+    password: '',
     bank_name: '',
     bank_account_number: '',
     bank_branch: '',
@@ -267,7 +279,6 @@ const EmployeeManagement: React.FC = () => {
     aadhar_number: '',
     uan_number: '',
     esi_number: '',
-    password: '',
     confirm_password: ''
   });
 
@@ -1331,33 +1342,116 @@ const EmployeeManagement: React.FC = () => {
               <>
                 <Grid item xs={12}>
                   <Divider sx={{ my: 2 }}>
-                    <Typography variant="subtitle2" color="textSecondary">Account Setup</Typography>
+                    <Typography variant="subtitle2" color="textSecondary">System Access & Login Account</Typography>
                   </Divider>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Password *"
-                    name="password"
-                    type="password"
-                    value={formData.password || ''}
-                    onChange={handleInputChange}
-                    error={!!formErrors.password}
-                    helperText={formErrors.password}
+
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.has_system_access || false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, has_system_access: e.target.checked }))}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2">Enable System Access</Typography>
+                        <Tooltip title="Allow this employee to log in and use the ERP system">
+                          <InfoIcon fontSize="small" color="action" />
+                        </Tooltip>
+                      </Box>
+                    }
                   />
+                  <Typography variant="caption" display="block" color="text.secondary" sx={{ ml: 3 }}>
+                    When enabled, this employee will be able to log in to the system using their email and password.
+                  </Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Confirm Password *"
-                    name="confirm_password"
-                    type="password"
-                    value={formData.confirm_password || ''}
-                    onChange={handleInputChange}
-                    error={!!formErrors.confirm_password}
-                    helperText={formErrors.confirm_password}
-                  />
-                </Grid>
+
+                {formData.has_system_access && (
+                  <>
+                    <Grid item xs={12} md={6}>
+                      <FormControl fullWidth error={!!formErrors.user_role}>
+                        <InputLabel>System Role *</InputLabel>
+                        <Select
+                          value={formData.user_role || ''}
+                          label="System Role *"
+                          onChange={(e) => setFormData(prev => ({ ...prev, user_role: e.target.value as any }))}
+                        >
+                          <MenuItem value="director">
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">Director</Typography>
+                              <Typography variant="caption" color="text.secondary">Full system access and executive controls</Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="admin">
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">Administrator</Typography>
+                              <Typography variant="caption" color="text.secondary">System administration and user management</Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="sales-admin">
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">Sales Admin</Typography>
+                              <Typography variant="caption" color="text.secondary">Sales operations and customer management</Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="designer">
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">Designer</Typography>
+                              <Typography variant="caption" color="text.secondary">Design and estimation access</Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="accounts">
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">Accounts</Typography>
+                              <Typography variant="caption" color="text.secondary">Financial and accounting operations</Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="technician">
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">Technician</Typography>
+                              <Typography variant="caption" color="text.secondary">Production and technical operations</Typography>
+                            </Box>
+                          </MenuItem>
+                        </Select>
+                        {formErrors.user_role && (
+                          <FormHelperText>{formErrors.user_role}</FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label={editingEmployee ? "New Password (leave blank to keep current)" : "Password *"}
+                        name="password"
+                        type="password"
+                        value={formData.password || ''}
+                        onChange={handleInputChange}
+                        error={!!formErrors.password}
+                        helperText={formErrors.password || (editingEmployee ? "Leave blank to keep current password" : "Minimum 6 characters")}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Lock fontSize="small" />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Alert severity="info" sx={{ mt: 1 }}>
+                        <Typography variant="body2">
+                          <strong>System Access:</strong> This employee will be able to log in using their email ({formData.email || 'employee@company.com'})
+                          and the password you set here. Their access level will be determined by their assigned role.
+                        </Typography>
+                      </Alert>
+                    </Grid>
+                  </>
+                )}
               </>
             )}
           </Grid>

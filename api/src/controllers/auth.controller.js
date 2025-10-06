@@ -89,20 +89,59 @@ exports.login = async (req, res) => {
 
 exports.me = async (req, res) => {
     try {
-        // For development mode, return mock user data
-        // In production, this would decode the JWT token and return user info
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: 'No token provided'
+            });
+        }
+
+        // Verify and decode the JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Get user from database
+        const [users] = await db.execute(
+            'SELECT id, email, full_name, user_role, status FROM users WHERE id = ? AND status = ?',
+            [decoded.id, 'active']
+        );
+
+        if (users.length === 0) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not found or inactive'
+            });
+        }
+
+        const user = users[0];
+
         res.json({
             success: true,
             data: {
                 user: {
-                    id: 1,
-                    email: 'demo@vtria.com',
-                    full_name: 'Demo User',
-                    user_role: 'admin'
+                    id: user.id,
+                    email: user.email,
+                    full_name: user.full_name,
+                    user_role: user.user_role
                 }
             }
         });
     } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid token'
+            });
+        }
+
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Token expired'
+            });
+        }
+
         res.status(500).json({
             success: false,
             message: 'Error fetching user profile',

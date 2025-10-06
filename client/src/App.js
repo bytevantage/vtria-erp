@@ -61,6 +61,9 @@ import EmployeeDashboard from './components/EmployeeDashboard';
 import AttendanceManagement from './components/AttendanceManagement';
 import LeaveManagement from './components/LeaveManagement';
 import MobileAttendanceApp from './components/MobileAttendanceApp';
+
+// User Management Component - Admin functionality
+import UserManagement from './components/UserManagement';
 // Enhanced Reporting & Analytics Components
 import CaseDashboard from './components/CaseDashboard';
 import CaseDashboardDebug from './components/CaseDashboardDebug';
@@ -462,6 +465,7 @@ function App() {
                   } />
 
                   {/* Admin Routes */}
+                  <Route path="/user-management" element={<Navigate to="/employee-management" replace />} />
                   <Route path="/about" element={
                     <ProtectedRoute>
                       <About />

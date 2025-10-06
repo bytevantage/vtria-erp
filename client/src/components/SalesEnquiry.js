@@ -163,10 +163,12 @@ const SalesEnquiry = () => {
   }, [currentUserId]);
 
   useEffect(() => {
-    fetchEnquiries();
-    fetchClients();
-    fetchUsers();
-  }, []);
+    if (authUser) {
+      fetchEnquiries();
+      fetchClients();
+      fetchUsers();
+    }
+  }, [authUser]);
 
   // Set default user when users are loaded
   useEffect(() => {

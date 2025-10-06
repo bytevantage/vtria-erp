@@ -3,7 +3,7 @@
  * Material-UI form with Formik validation
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Paper,
@@ -17,6 +17,7 @@ import {
 import { Business } from '@mui/icons-material';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const validationSchema = Yup.object({
@@ -29,14 +30,28 @@ const validationSchema = Yup.object({
 });
 
 const Login = () => {
-  const { login, loading } = useAuth();
+  const { login, loading, isAuthenticated } = useAuth();
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleSubmit = async (values) => {
     setError('');
     const result = await login(values.email, values.password);
-    
-    if (!result.success) {
+
+    if (result.success) {
+      // Navigate to dashboard or return URL after successful login
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    } else {
       setError(result.error);
     }
   };
@@ -60,7 +75,7 @@ const Login = () => {
             <Typography variant="subtitle1" color="text.secondary" gutterBottom>
               Engineering Solutions Management System
             </Typography>
-            
+
             {error && (
               <Alert severity="error" sx={{ width: '100%', mt: 2 }}>
                 {error}

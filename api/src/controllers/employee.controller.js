@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const logger = require('../utils/logger');
+const bcrypt = require('bcryptjs');
 
 class EmployeeController {
   // ====================
@@ -51,17 +52,22 @@ class EmployeeController {
         ${whereClause}
       `;
 
-      // Main query with manager information
+      // Main query with manager and user information
       const query = `
         SELECT 
           e.*,
           d.department_name,
           d.department_code,
           CONCAT(mgr.first_name, ' ', mgr.last_name) as manager_name,
-          mgr.employee_id as manager_employee_id
+          mgr.employee_id as manager_employee_id,
+          u.id as user_id,
+          u.user_role,
+          u.status as user_status,
+          CASE WHEN u.id IS NOT NULL THEN true ELSE false END as has_system_access
         FROM employees e
         LEFT JOIN departments d ON e.department_id = d.id
         LEFT JOIN employees mgr ON e.reporting_manager_id = mgr.id
+        LEFT JOIN users u ON e.user_id = u.id
         ${whereClause}
         ORDER BY e.created_at DESC
         LIMIT ? OFFSET ?
@@ -137,8 +143,12 @@ class EmployeeController {
 
   // Create new employee
   async createEmployee(req, res) {
+    const connection = await db.getConnection();
+
     try {
-      // Extract only the fields that exist in the database table
+      await connection.beginTransaction();
+
+      // Extract employee fields
       const {
         first_name,
         last_name,
@@ -158,7 +168,11 @@ class EmployeeController {
         // Map address fields
         current_address,
         emergency_contact_name,
-        emergency_contact_phone
+        emergency_contact_phone,
+        // User Account Fields
+        has_system_access = false,
+        user_role,
+        password
       } = req.body;
 
       // Use current_address as address if available
@@ -173,16 +187,47 @@ class EmployeeController {
         WHERE employee_id LIKE CONCAT('EMP/', YEAR(CURDATE()), '/%')
       `;
 
-      const [employeeIdResult] = await db.execute(employeeIdQuery);
+      const [employeeIdResult] = await connection.execute(employeeIdQuery);
       const employeeId = employeeIdResult[0].next_employee_id;
 
+      let userId = null;
+
+      // Create user account if system access is enabled
+      if (has_system_access && password && user_role && email) {
+        // Check if email already exists in users table
+        const [existingUser] = await connection.execute(
+          'SELECT id FROM users WHERE email = ?',
+          [email]
+        );
+
+        if (existingUser.length > 0) {
+          await connection.rollback();
+          return res.status(400).json({
+            success: false,
+            message: 'Email already exists in user accounts'
+          });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create user account
+        const [userResult] = await connection.execute(
+          'INSERT INTO users (email, full_name, user_role, password_hash, status) VALUES (?, ?, ?, ?, ?)',
+          [email, `${first_name} ${last_name}`, user_role, hashedPassword, status === 'active' ? 'active' : 'inactive']
+        );
+
+        userId = userResult.insertId;
+      }
+
+      // Create employee record
       const insertQuery = `
         INSERT INTO employees (
           employee_id, first_name, last_name, email, phone, employee_type, status,
           date_of_birth, gender, address, emergency_contact_name, emergency_contact_phone,
           hire_date, department_id, designation, 
-          reporting_manager_id, work_location, basic_salary, created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          reporting_manager_id, work_location, basic_salary, created_by, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       // Convert undefined values to null for SQL compatibility
@@ -205,26 +250,36 @@ class EmployeeController {
         reporting_to || null,
         work_location || null,
         basic_salary || null,
-        req.user?.id || 1
+        req.user?.id || 1,
+        userId
       ];
 
-      const [result] = await db.execute(insertQuery, parameters);
+      const [result] = await connection.execute(insertQuery, parameters);
+
+      await connection.commit();
 
       res.status(201).json({
         success: true,
-        message: 'Employee created successfully',
+        message: has_system_access ?
+          'Employee created successfully with system access' :
+          'Employee created successfully',
         data: {
           id: result.insertId,
-          employee_id: employeeId
+          employee_id: employeeId,
+          user_id: userId,
+          has_system_access
         }
       });
     } catch (error) {
+      await connection.rollback();
       logger.error('Error creating employee:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to create employee',
         error: error.message
       });
+    } finally {
+      connection.release();
     }
   }
 

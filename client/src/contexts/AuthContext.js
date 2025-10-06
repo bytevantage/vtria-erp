@@ -94,27 +94,6 @@ export const AuthProvider = ({ children }) => {
   // Fetch user profile
   const fetchUserProfile = async (token) => {
     try {
-      // Development mode bypass
-      if (process.env.NODE_ENV === 'development' && token.includes('dev-bypass-token')) {
-        console.log('Development mode: Using bypass user profile');
-        dispatch({
-          type: AUTH_ACTIONS.LOGIN_SUCCESS,
-          payload: {
-            user: {
-              id: 1,
-              email: 'demo@vtria.com',
-              first_name: 'Demo',
-              last_name: 'User',
-              full_name: 'Demo User',
-              role: 'director',
-              user_role: 'director'
-            },
-            token
-          }
-        });
-        return;
-      }
-
       const response = await axios.get('/api/auth/me');
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,
@@ -126,23 +105,15 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Failed to fetch user profile:', error);
 
-      // For development mode, if /api/auth/me doesn't exist, use mock user data
-      if (error.response && error.response.status === 404) {
-        console.log('Using mock user profile for development');
-        dispatch({
-          type: AUTH_ACTIONS.LOGIN_SUCCESS,
-          payload: {
-            user: {
-              id: 1,
-              email: 'demo@vtria.com',
-              full_name: 'Demo User',
-              user_role: 'admin'
-            },
-            token
-          }
-        });
+      // Clear invalid token and redirect to login
+      localStorage.removeItem('vtria_token');
+      delete axios.defaults.headers.common['Authorization'];
+      dispatch({ type: AUTH_ACTIONS.LOGOUT });
+
+      if (error.response && error.response.status === 401) {
+        toast.error('Session expired. Please log in again.');
       } else {
-        logout();
+        toast.error('Failed to authenticate. Please log in again.');
       }
     }
   };
@@ -151,36 +122,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
-
-      // Development mode bypass
-      if (process.env.NODE_ENV === 'development' || process.env.REACT_APP_BYPASS_AUTH === 'true') {
-        console.log('Development mode: Using bypass authentication');
-        const devToken = 'dev-bypass-token-' + Date.now();
-        const devUser = {
-          id: 1,
-          email: email || 'demo@vtria.com',
-          first_name: 'Demo',
-          last_name: 'User',
-          full_name: 'Demo User',
-          role: 'director',
-          user_role: 'director'
-        };
-
-        // Store token
-        localStorage.setItem('vtria_token', devToken);
-
-        // Set axios default header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${devToken}`;
-
-        // Update state
-        dispatch({
-          type: AUTH_ACTIONS.LOGIN_SUCCESS,
-          payload: { user: devUser, token: devToken }
-        });
-
-        toast.success(`Welcome back, ${devUser.first_name}! (Development Mode)`);
-        return { success: true };
-      }
 
       // Make API call to validate license
       const response = await axios.post('/api/auth/login', {
