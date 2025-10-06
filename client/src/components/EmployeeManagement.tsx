@@ -300,7 +300,7 @@ const EmployeeManagement: React.FC = () => {
 
       const response = await fetch(`/api/employees?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -321,7 +321,7 @@ const EmployeeManagement: React.FC = () => {
     try {
       const response = await fetch('/api/employees/master/departments', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -342,7 +342,7 @@ const EmployeeManagement: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           department_name: departmentName,
@@ -745,7 +745,7 @@ const EmployeeManagement: React.FC = () => {
       const { password, confirm_password, department_name, manager_name, ...employeeData } = formData;
 
       // Get auth token from localStorage
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('vtria_token');
 
       const response = await fetch(url, {
         method,

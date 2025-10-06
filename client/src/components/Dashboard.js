@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { api } from '../utils/api';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -37,44 +38,39 @@ const Dashboard = () => {
     try {
       // Fetch real data from API
       const [enquiriesRes, estimationsRes, quotationsRes, manufacturingRes, activityRes] = await Promise.all([
-        fetch('/api/sales-enquiries').catch(() => ({ ok: false })),
-        fetch('/api/estimations').catch(() => ({ ok: false })),
-        fetch('/api/quotations').catch(() => ({ ok: false })),
-        fetch('/api/production/cases').catch(() => ({ ok: false })),
-        fetch('/api/sales-enquiries?limit=5').catch(() => ({ ok: false })) // Use recent enquiries as activity
+        api.get('/api/sales-enquiries').catch(() => ({ success: false })),
+        api.get('/api/estimations').catch(() => ({ success: false })),
+        api.get('/api/quotations/enhanced/all').catch(() => ({ success: false })),
+        api.get('/api/production/cases').catch(() => ({ success: false })),
+        api.get('/api/sales-enquiries?limit=5').catch(() => ({ success: false })) // Use recent enquiries as activity
       ]);
 
       let totalEnquiries = 0, totalEstimations = 0, totalQuotations = 0, totalManufacturing = 0;
       let recentActivityData = [];
 
       // Process enquiries data
-      if (enquiriesRes.ok) {
-        const enquiriesData = await enquiriesRes.json();
-        totalEnquiries = enquiriesData.data ? enquiriesData.data.length : 0;
+      if (enquiriesRes.success) {
+        totalEnquiries = enquiriesRes.data ? enquiriesRes.data.length : 0;
       }
 
       // Process estimations data
-      if (estimationsRes.ok) {
-        const estimationsData = await estimationsRes.json();
-        totalEstimations = estimationsData.data ? estimationsData.data.length : 0;
+      if (estimationsRes.success) {
+        totalEstimations = estimationsRes.data ? estimationsRes.data.length : 0;
       }
 
       // Process quotations data
-      if (quotationsRes.ok) {
-        const quotationsData = await quotationsRes.json();
-        totalQuotations = quotationsData.data ? quotationsData.data.length : 0;
+      if (quotationsRes.success) {
+        totalQuotations = quotationsRes.data ? quotationsRes.data.length : 0;
       }
 
       // Process manufacturing data
-      if (manufacturingRes.ok) {
-        const manufacturingData = await manufacturingRes.json();
-        totalManufacturing = manufacturingData.data ? manufacturingData.data.length : 0;
+      if (manufacturingRes.success) {
+        totalManufacturing = manufacturingRes.data ? manufacturingRes.data.length : 0;
       }
 
       // Process recent activity data
-      if (activityRes.ok) {
-        const activityData = await activityRes.json();
-        recentActivityData = activityData.data ? activityData.data.slice(0, 5) : [];
+      if (activityRes.success) {
+        recentActivityData = activityRes.data ? activityRes.data.slice(0, 5) : [];
       }
 
       setStats({
