@@ -48,14 +48,9 @@ import {
   MonetizationOn as PriceIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import { getAuthHeaders } from '../utils/auth';
 
 const API_BASE_URL = 'http://localhost:3001';
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('vtria_token') || 'demo-token';
-  return { Authorization: `Bearer ${token}` };
-};
 
 const CompetitiveBiddingManager = () => {
   const [rfqCampaigns, setRfqCampaigns] = useState([]);

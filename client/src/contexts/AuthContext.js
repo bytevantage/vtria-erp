@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }) => {
 
           // Force redirect to login after a short delay
           setTimeout(() => {
-            window.location.href = '/vtria-erp/login';
+            window.location.href = '/login';
           }, 1000);
         }
         return Promise.reject(error);
@@ -175,7 +175,7 @@ export const AuthProvider = ({ children }) => {
         payload: { user, token }
       });
 
-      toast.success(`Welcome back, ${user.first_name}!`);
+      toast.success(`Welcome back, ${user.full_name}!`);
       return { success: true };
     } catch (error) {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });

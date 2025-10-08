@@ -1,8 +1,6 @@
--- Minimal initialization-- VTRIA ERP Database Schema Initialization
+-- VTRIA ERP Database Schema Initialization
+-- This file initializes the basic database structure for VTRIA ERP
 
--- This will be replaced by the backup restore-- This file initializes the basic database structure for VTRIA ERP
-
-SELECT 'Database initialized - ready for backup restore' as status;
 USE vtria_erp;
 
 -- Create basic tables for production
