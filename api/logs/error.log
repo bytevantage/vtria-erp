@@ -5341,3 +5341,48 @@
 2025-10-06T18:20:29.656Z ERROR: Error on POST /api/estimations/4/approve:
 2025-10-06T18:34:21.668Z ERROR: Authentication error:
 2025-10-06T18:34:21.752Z ERROR: Error on POST /api/estimations/4/approve:
+2025-10-07T10:38:38.269Z ERROR: Failed to initialize email transporter:
+2025-10-08T04:15:29.742Z ERROR: Failed to initialize email transporter:
+2025-10-08T04:15:37.374Z ERROR: Failed to initialize email transporter:
+2025-10-08T04:15:41.924Z ERROR: Authentication error:
+2025-10-08T04:15:41.937Z ERROR: Error on GET /api/inventory-enhanced/items/enhanced:
+2025-10-08T04:38:40.736Z ERROR: Failed to initialize email transporter:
+2025-10-08T04:55:55.439Z ERROR: Failed to initialize email transporter:
+2025-10-08T04:56:04.097Z ERROR: Failed to initialize email transporter:
+2025-10-08T04:56:23.183Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:33:19.675Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:40:55.692Z ERROR: Authentication error:
+2025-10-08T05:40:55.920Z ERROR: Error on GET /api/quotations/enhanced/1/bom:
+2025-10-08T05:41:05.800Z ERROR: Authentication error:
+2025-10-08T05:41:05.839Z ERROR: Error on GET /api/quotations/enhanced/1/bom:
+2025-10-08T05:42:21.319Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:48:29.714Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:48:35.154Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:50:38.391Z ERROR: Authentication error:
+2025-10-08T05:50:38.396Z ERROR: Error on GET /api/quotations/enhanced/1/bom:
+2025-10-08T05:52:38.019Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:57:48.653Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:57:55.239Z ERROR: Failed to initialize email transporter:
+2025-10-08T05:57:57.367Z ERROR: Authentication error:
+2025-10-08T05:57:57.379Z ERROR: Error on GET /api/quotations/enhanced/1/bom:
+2025-10-08T06:06:34.188Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:10:11.672Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:10:17.586Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:11:37.908Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:15:36.562Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:15:42.511Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:20:53.990Z ERROR: Failed to initialize email transporter:
+2025-10-08T06:34:03.423Z ERROR: Authentication error:
+2025-10-08T06:34:03.433Z ERROR: Error on GET /api/inventory-enhanced/items/enhanced:
+2025-10-08T07:26:59.977Z ERROR: Failed to initialize email transporter:
+2025-10-08T07:33:41.725Z ERROR: Error on HEAD /api/health:
+2025-10-08T08:20:12.891Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-08T08:22:51.361Z ERROR: Failed to initialize email transporter:
+2025-10-08T08:52:03.790Z ERROR: Failed to initialize email transporter:
+2025-10-08T10:39:38.054Z ERROR: Error on GET /api/purchase-requisition/1/items:
+2025-10-08T10:39:56.540Z ERROR: Failed to initialize email transporter:
+2025-10-08T10:40:39.892Z ERROR: Failed to initialize email transporter:
+2025-10-08T10:40:57.003Z ERROR: Failed to initialize email transporter:
+2025-10-08T10:42:21.074Z ERROR: Authentication error:
+2025-10-08T10:42:21.079Z ERROR: Error on GET /api/inventory-enhanced/items/enhanced:
+2025-10-08T10:45:04.004Z ERROR: Failed to initialize email transporter:

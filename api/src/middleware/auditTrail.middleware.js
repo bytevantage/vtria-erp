@@ -9,7 +9,7 @@ class AuditTrailService {
     constructor() {
         this.trackedTables = new Set([
             'quotations',
-            'quotation_items', 
+            'quotation_items',
             'purchase_requisitions',
             'purchase_requisition_items',
             'sales_orders',
@@ -106,7 +106,7 @@ class AuditTrailService {
     }) {
         try {
             const valueDifference = newValue && originalValue ? newValue - originalValue : null;
-            const percentageChange = originalValue && originalValue > 0 ? 
+            const percentageChange = originalValue && originalValue > 0 ?
                 ((valueDifference / originalValue) * 100) : null;
 
             const [result] = await db.execute(`
@@ -137,13 +137,13 @@ class AuditTrailService {
         const safeOldObj = oldObj || {};
         const safeNewObj = newObj || {};
         const allKeys = new Set([...Object.keys(safeOldObj), ...Object.keys(safeNewObj)]);
-        
+
         for (const key of allKeys) {
             if (safeOldObj[key] !== safeNewObj[key]) {
                 changedFields.push(key);
             }
         }
-        
+
         return changedFields;
     }
 
@@ -171,19 +171,19 @@ class AuditTrailService {
                 const oldTotal = parseFloat(oldValues?.total_amount || oldValues?.total_value || 0);
                 const newTotal = parseFloat(newValues?.total_amount || newValues?.total_value || 0);
                 const difference = Math.abs(newTotal - oldTotal);
-                
+
                 // Require approval for changes > 10% or > Rs. 50,000
                 if (difference > 50000 || (oldTotal > 0 && (difference / oldTotal) > 0.1)) {
                     return true;
                 }
             }
         }
-        
+
         // Status changes to approved/rejected require approval
         if (action === 'APPROVE' || action === 'REJECT') {
             return true;
         }
-        
+
         return false;
     }
 }
@@ -197,7 +197,7 @@ const auditTrailMiddleware = (options = {}) => {
     return async (req, res, next) => {
         const originalJson = res.json;
         const userContext = auditService.extractUserContext(req);
-        
+
         // Store original data for comparison (if available in request)
         req.auditContext = {
             ...userContext,
@@ -206,7 +206,7 @@ const auditTrailMiddleware = (options = {}) => {
         };
 
         // Override res.json to capture response data
-        res.json = function(data) {
+        res.json = function (data) {
             // Only audit successful operations
             if (data && data.success !== false && res.statusCode < 400) {
                 setImmediate(async () => {
@@ -217,7 +217,7 @@ const auditTrailMiddleware = (options = {}) => {
                     }
                 });
             }
-            
+
             return originalJson.call(this, data);
         };
 
@@ -245,7 +245,7 @@ const logScopeChange = async (scopeData) => {
 const auditQuotationChange = async (action, quotationId, oldData, newData, userContext, businessReason = null) => {
     const changedFields = auditService.findChangedFields(oldData, newData);
     const approvalRequired = auditService.requiresApproval('quotations', action, oldData, newData);
-    
+
     // Log main audit trail
     const auditId = await auditService.logAudit({
         tableName: 'quotations',
@@ -286,7 +286,7 @@ const auditQuotationChange = async (action, quotationId, oldData, newData, userC
 const auditPRChange = async (action, prId, oldData, newData, userContext, businessReason = null) => {
     const changedFields = auditService.findChangedFields(oldData, newData);
     const approvalRequired = auditService.requiresApproval('purchase_requisitions', action, oldData, newData);
-    
+
     const auditId = await auditService.logAudit({
         tableName: 'purchase_requisitions',
         recordId: prId,

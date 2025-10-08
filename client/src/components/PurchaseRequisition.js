@@ -63,6 +63,8 @@ const PurchaseRequisition = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [productSelectionModalOpen, setProductSelectionModalOpen] = useState(false);
+  const [productSelectionTarget, setProductSelectionTarget] = useState(null); // 'create' or 'edit'
 
   // Selected data
   const [selectedRequisition, setSelectedRequisition] = useState(null);
@@ -858,6 +860,40 @@ const PurchaseRequisition = () => {
     }
   };
 
+  // Product selection modal functions
+  const openProductSelectionModal = (target) => {
+    setProductSelectionTarget(target);
+    setProductSelectionModalOpen(true);
+  };
+
+  const closeProductSelectionModal = () => {
+    setProductSelectionModalOpen(false);
+    setProductSelectionTarget(null);
+  };
+
+  const handleProductSelected = (product) => {
+    if (!product) return;
+
+    const newItem = {
+      product_id: product.id,
+      item_name: product.name,
+      description: `${product.make} ${product.model}` || product.name,
+      hsn_code: product.hsn_code || '',
+      unit: product.unit || 'Nos',
+      quantity: 1,
+      estimated_price: parseFloat(product.last_purchase_price) || 0,
+      notes: ''
+    };
+
+    if (productSelectionTarget === 'create') {
+      setIndependentItems([...independentItems, newItem]);
+    } else if (productSelectionTarget === 'edit') {
+      setEditableItems([...editableItems, newItem]);
+    }
+
+    closeProductSelectionModal();
+  };
+
   const getStockStatusColor = (status) => {
     switch (status) {
       case 'sufficient': return 'success';
@@ -1364,7 +1400,7 @@ const PurchaseRequisition = () => {
               <Button
                 variant="outlined"
                 startIcon={<AddIcon />}
-                onClick={addIndependentItem}
+                onClick={() => openProductSelectionModal('create')}
                 size="small"
               >
                 Add Item
@@ -1756,7 +1792,7 @@ const PurchaseRequisition = () => {
 
               <Button
                 startIcon={<AddIcon />}
-                onClick={addNewEditableItem}
+                onClick={() => openProductSelectionModal('edit')}
                 sx={{ mt: 2 }}
               >
                 Add Item
@@ -1792,6 +1828,52 @@ const PurchaseRequisition = () => {
           <Button onClick={handleRejectConfirm} variant="contained" color="error">
             Reject
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Product Selection Modal */}
+      <Dialog
+        open={productSelectionModalOpen}
+        onClose={closeProductSelectionModal}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Select Product to Add</DialogTitle>
+        <DialogContent>
+          <Autocomplete
+            options={products}
+            getOptionLabel={(option) => `${option.name} - ${option.make || 'N/A'} [Stock: ${option.available_stock || 0}]`}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <Box>
+                  <Typography variant="body1" fontWeight="medium">
+                    {option.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {option.make} {option.model} | HSN: {option.hsn_code || 'N/A'} | Stock: {option.available_stock || 0}
+                  </Typography>
+                </Box>
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search and select product"
+                placeholder="Type to search products..."
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+            )}
+            onChange={(event, newValue) => {
+              if (newValue) {
+                handleProductSelected(newValue);
+              }
+            }}
+            noOptionsText="No products found"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeProductSelectionModal}>Cancel</Button>
         </DialogActions>
       </Dialog>
     </Box>

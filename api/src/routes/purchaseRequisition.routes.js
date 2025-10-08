@@ -7,6 +7,7 @@ router.get('/', purchaseRequisitionController.getAllPurchaseRequisitions);
 router.get('/approved', purchaseRequisitionController.getApprovedRequisitions);
 router.get('/open-quotations-grouped', purchaseRequisitionController.getOpenQuotationsWithGroupedParts);
 router.get('/:id', purchaseRequisitionController.getPurchaseRequisitionById);
+router.get('/:id/items', purchaseRequisitionController.getPurchaseRequisitionItems);
 router.post('/', purchaseRequisitionController.createPurchaseRequisition);
 router.post('/from-case', purchaseRequisitionController.createFromCase);
 router.post('/from-quotation', purchaseRequisitionController.createFromQuotation);

@@ -164,6 +164,40 @@ class PurchaseRequisitionController {
         }
     }
 
+    // Get purchase requisition items
+    async getPurchaseRequisitionItems(req, res) {
+        try {
+            const { id } = req.params;
+
+            const itemsQuery = `
+                SELECT 
+                    pri.*,
+                    p.name as product_name,
+                    p.make,
+                    p.model,
+                    p.part_code
+                FROM purchase_requisition_items pri
+                LEFT JOIN products p ON pri.product_id = p.id
+                WHERE pri.pr_id = ?
+                ORDER BY pri.id
+            `;
+
+            const [items] = await db.execute(itemsQuery, [id]);
+
+            res.json({
+                success: true,
+                data: items
+            });
+        } catch (error) {
+            console.error('Error fetching purchase requisition items:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching purchase requisition items',
+                error: error.message
+            });
+        }
+    }
+
     // Update purchase requisition status
     async updatePurchaseRequisitionStatus(req, res) {
         try {
