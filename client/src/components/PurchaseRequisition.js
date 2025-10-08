@@ -534,17 +534,42 @@ const PurchaseRequisition = () => {
       setRequisitionNotes(prData.notes || '');
 
       // Set editable items from existing PR items
-      setEditableItems(prData.items.map(item => ({
-        id: item.id,
-        item_name: item.item_name || item.product_name || 'Unknown Item',
-        description: item.description || '',
-        quantity: item.quantity,
-        estimated_price: item.estimated_price,
-        unit: item.unit || 'Nos',
-        notes: item.notes || '',
-        hsn_code: item.hsn_code || '',
-        product_id: item.product_id
-      })));
+      setEditableItems(prData.items.map(item => {
+        // Handle both new format (separate fields) and old format (everything in notes)
+        let item_name = item.item_name || item.product_name;
+        let description = item.description || '';
+        let hsn_code = item.hsn_code || '';
+        let unit = item.unit || 'Nos';
+        let notes = item.notes || '';
+
+        // If item_name is still empty and we have notes in old format, parse it
+        if ((!item_name || item_name === 'Unknown Item') && notes) {
+          // Parse old format: "Item Name - Description (HSN: XXX, Unit: XXX)"
+          const notesMatch = notes.match(/^(.+?)\s*-\s*(.+?)\s*\(HSN:\s*(.+?),\s*Unit:\s*(.+?)\)$/);
+          if (notesMatch) {
+            item_name = notesMatch[1].trim();
+            description = notesMatch[2].trim();
+            hsn_code = notesMatch[3].trim();
+            unit = notesMatch[4].trim();
+            notes = ''; // Clear notes since we parsed the data
+          } else {
+            // Fallback: just use the notes as item name if parsing fails
+            item_name = notes;
+          }
+        }
+
+        return {
+          id: item.id,
+          item_name: item_name || 'Unknown Item',
+          description: description,
+          quantity: item.quantity,
+          estimated_price: item.estimated_price,
+          unit: unit,
+          notes: notes,
+          hsn_code: hsn_code,
+          product_id: item.product_id
+        };
+      }));
 
       setEditDialogOpen(true);
     } catch (error) {
@@ -802,6 +827,23 @@ const PurchaseRequisition = () => {
         estimated_price: parseFloat(product.last_purchase_price) || 0
       };
       setIndependentItems(updated);
+    }
+  };
+
+  const selectEditableProduct = (index, productId) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      const updated = [...editableItems];
+      updated[index] = {
+        ...updated[index],
+        product_id: product.id,
+        item_name: product.name,
+        description: `${product.make} ${product.model}` || product.name,
+        hsn_code: product.hsn_code || '',
+        unit: product.unit || 'Nos',
+        estimated_price: parseFloat(product.last_purchase_price) || 0
+      };
+      setEditableItems(updated);
     }
   };
 
@@ -1583,8 +1625,10 @@ const PurchaseRequisition = () => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
+                      <TableCell>Select Product</TableCell>
                       <TableCell>Item Name</TableCell>
                       <TableCell>Description</TableCell>
+                      <TableCell>HSN Code</TableCell>
                       <TableCell align="center">Quantity</TableCell>
                       <TableCell align="right">Est. Price</TableCell>
                       <TableCell>Unit</TableCell>
@@ -1595,6 +1639,35 @@ const PurchaseRequisition = () => {
                   <TableBody>
                     {editableItems.map((item, index) => (
                       <TableRow key={index}>
+                        <TableCell>
+                          <Autocomplete
+                            size="small"
+                            options={products}
+                            getOptionLabel={(option) => `${option.name} - ${option.make || 'N/A'} [Stock: ${option.available_stock || 0}]`}
+                            value={products.find(p => p.id === item.product_id) || null}
+                            onChange={(event, newValue) => {
+                              if (newValue) {
+                                selectEditableProduct(index, newValue.id);
+                              } else {
+                                // Clear selection
+                                updateEditableItemField(index, 'product_id', null);
+                                updateEditableItemField(index, 'item_name', '');
+                                updateEditableItemField(index, 'description', '');
+                                updateEditableItemField(index, 'hsn_code', '');
+                                updateEditableItemField(index, 'unit', 'Nos');
+                              }
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder="Select or type product"
+                                size="small"
+                                sx={{ minWidth: 200 }}
+                              />
+                            )}
+                            freeSolo
+                          />
+                        </TableCell>
                         <TableCell>
                           <TextField
                             size="small"
@@ -1608,7 +1681,15 @@ const PurchaseRequisition = () => {
                             size="small"
                             value={item.description}
                             onChange={(e) => updateEditableItemField(index, 'description', e.target.value)}
-                            sx={{ minWidth: 120 }}
+                            sx={{ minWidth: 150 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            value={item.hsn_code}
+                            onChange={(e) => updateEditableItemField(index, 'hsn_code', e.target.value)}
+                            sx={{ width: 100 }}
                           />
                         </TableCell>
                         <TableCell align="center">
