@@ -545,6 +545,7 @@ const PurchaseRequisition = () => {
         // If item_name is still empty and we have notes in old format, parse it
         if ((!item_name || item_name === 'Unknown Item') && notes) {
           // Parse old format: "Item Name - Description (HSN: XXX, Unit: XXX)"
+          // Handle various formats including extra spaces
           const notesMatch = notes.match(/^(.+?)\s*-\s*(.+?)\s*\(HSN:\s*(.+?),\s*Unit:\s*(.+?)\)$/);
           if (notesMatch) {
             item_name = notesMatch[1].trim();
@@ -553,8 +554,18 @@ const PurchaseRequisition = () => {
             unit = notesMatch[4].trim();
             notes = ''; // Clear notes since we parsed the data
           } else {
-            // Fallback: just use the notes as item name if parsing fails
-            item_name = notes;
+            // Try alternative format: "Item Name - (HSN: XXX, Unit: XXX)"
+            const altMatch = notes.match(/^(.+?)\s*-\s*\(HSN:\s*(.+?),\s*Unit:\s*(.+?)\)$/);
+            if (altMatch) {
+              item_name = altMatch[1].trim();
+              description = '';
+              hsn_code = altMatch[2].trim();
+              unit = altMatch[3].trim();
+              notes = '';
+            } else {
+              // Fallback: just use the notes as item name if parsing fails
+              item_name = notes;
+            }
           }
         }
 
