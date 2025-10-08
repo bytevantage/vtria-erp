@@ -1273,8 +1273,7 @@ class QuotationEnhancedController {
                     p.model,
                     p.part_code,
                     p.hsn_code,
-                    p.unit,
-                    p.image_url
+                    p.unit
                 FROM estimation_items ei
                 LEFT JOIN estimation_subsections ess ON ei.subsection_id = ess.id
                 LEFT JOIN estimation_sections es ON ess.section_id = es.id
