@@ -697,17 +697,21 @@ class PurchaseRequisitionController {
                 });
             }
 
-            // Insert consolidated PR items (using basic columns first)
+            // Insert consolidated PR items (using proper columns)
             const itemsData = finalItems.map(item => [
                 pr_id,
                 null, // product_id (will be null for now)
-                item.total_quantity,
-                item.avg_estimated_price,
-                `${item.item_name} - ${item.description || ''} (HSN: ${item.hsn_code || 'N/A'}, Unit: ${item.unit || 'Nos'})` // Combined notes
+                item.item_name, // item_name
+                item.description || '', // description
+                item.hsn_code || '', // hsn_code
+                item.unit || 'Nos', // unit
+                item.total_quantity, // quantity
+                item.avg_estimated_price, // estimated_price
+                '' // notes (empty, since we have separate fields now)
             ]);
 
             const itemsInsertQuery = `INSERT INTO purchase_requisition_items 
-                (pr_id, product_id, quantity, estimated_price, notes) 
+                (pr_id, product_id, item_name, description, hsn_code, unit, quantity, estimated_price, notes) 
                 VALUES ?`;
 
             await db.query(itemsInsertQuery, [itemsData]);
