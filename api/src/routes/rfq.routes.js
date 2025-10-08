@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const rfqController = require('../controllers/rfq.controller');
+const authMiddleware = require('../middleware/auth.middleware');
+
+// Apply authentication middleware to all routes
+router.use(authMiddleware.verifyToken);
 
 // RFQ Campaign routes
 router.post('/create', rfqController.createRFQCampaign);

@@ -5341,3 +5341,20 @@
 2025-10-06T18:20:29.656Z ERROR: Error on POST /api/estimations/4/approve:
 2025-10-06T18:34:21.668Z ERROR: Authentication error:
 2025-10-06T18:34:21.752Z ERROR: Error on POST /api/estimations/4/approve:
+2025-10-08T11:47:35.741Z ERROR: Failed to initialize email transporter:
+2025-10-08T12:01:03.572Z ERROR: Authentication error:
+2025-10-08T12:01:03.808Z ERROR: Error on GET /api/estimations:
+2025-10-08T12:34:23.712Z ERROR: Failed to initialize email transporter:
+2025-10-08T13:04:27.508Z ERROR: Failed to initialize email transporter:
+2025-10-08T14:02:08.503Z ERROR: Authentication error:
+2025-10-08T14:02:08.571Z ERROR: Error on GET /api/estimations:
+2025-10-08T14:02:13.459Z ERROR: Error on GET /api/health:
+2025-10-08T14:51:21.157Z ERROR: Error fetching employees:
+2025-10-08T14:51:51.878Z ERROR: Error fetching employees:
+2025-10-08T15:06:39.782Z ERROR: Failed to initialize email transporter:
+2025-10-08T15:06:57.791Z ERROR: Failed to initialize email transporter:
+2025-10-08T15:07:07.402Z ERROR: Failed to initialize email transporter:
+2025-10-08T15:07:24.315Z ERROR: Failed to initialize email transporter:
+2025-10-08T15:20:47.762Z ERROR: Authentication error:
+2025-10-08T15:20:47.784Z ERROR: Error on GET /api/rfq-campaigns:
+2025-10-08T15:27:25.290Z ERROR: Failed to initialize email transporter:
