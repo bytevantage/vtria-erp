@@ -134,10 +134,12 @@ class AuditTrailService {
      */
     findChangedFields(oldObj, newObj) {
         const changedFields = [];
-        const allKeys = new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})]);
+        const safeOldObj = oldObj || {};
+        const safeNewObj = newObj || {};
+        const allKeys = new Set([...Object.keys(safeOldObj), ...Object.keys(safeNewObj)]);
         
         for (const key of allKeys) {
-            if (oldObj[key] !== newObj[key]) {
+            if (safeOldObj[key] !== safeNewObj[key]) {
                 changedFields.push(key);
             }
         }
