@@ -27,7 +27,7 @@ router.delete('/categories/:id', authMiddleware.verifyToken, inventoryEnhancedCo
 // ====================
 
 // Get all enhanced inventory items with filters
-router.get('/items/enhanced', inventoryEnhancedController.getEnhancedItems);
+router.get('/items/enhanced', authMiddleware.verifyToken, inventoryEnhancedController.getEnhancedItems);
 
 // Create new enhanced inventory item
 router.post('/items/enhanced', authMiddleware.verifyToken, inventoryEnhancedController.createEnhancedItem);

@@ -1106,7 +1106,7 @@ class QuotationEnhancedController {
 
         try {
             const { id } = req.params;
-            const { status: rawStatus } = req.body;
+            const { status: rawStatus, rejection_reason } = req.body;
             const updated_by = req.user?.id || 1;
 
             // Status mapping for frontend compatibility
@@ -1156,12 +1156,19 @@ class QuotationEnhancedController {
 
             const oldStatus = quotations[0].status;
 
-            // Update quotation status
-            await connection.execute(`
-                UPDATE quotations 
-                SET status = ?
-                WHERE id = ?
-            `, [status, id]);
+            // Update quotation status and optionally rejection_reason
+            let updateQuery = 'UPDATE quotations SET status = ?';
+            let updateParams = [status];
+
+            if (rejection_reason !== undefined) {
+                updateQuery += ', rejection_reason = ?';
+                updateParams.push(rejection_reason);
+            }
+
+            updateQuery += ' WHERE id = ?';
+            updateParams.push(id);
+
+            await connection.execute(updateQuery, updateParams);
 
             // Log status change (optional - skip if table doesn't exist)
             try {
@@ -1259,7 +1266,7 @@ class QuotationEnhancedController {
             const [bomItems] = await db.execute(`
                 SELECT 
                     ei.*,
-                    es.section_name as main_section_name,
+                    es.heading as main_section_name,
                     ess.subsection_name as sub_section_name,
                     p.name as product_name,
                     p.make,
@@ -1273,7 +1280,7 @@ class QuotationEnhancedController {
                 LEFT JOIN estimation_sections es ON ess.section_id = es.id
                 LEFT JOIN products p ON ei.product_id = p.id
                 WHERE es.estimation_id = ?
-                ORDER BY es.section_order, ess.subsection_order, ei.id
+                ORDER BY es.sort_order, ess.subsection_order, ei.id
             `, [quotation.estimation_id]);
 
             // Get company config
@@ -1541,14 +1548,14 @@ async function createBOMFromQuotation(connection, quotationId, userId) {
                     p.part_code,
                     p.make,
                     p.model,
-                    es.section_name,
+                    es.heading as section_name,
                     ess.subsection_name
                 FROM estimation_items ei
                 LEFT JOIN products p ON ei.product_id = p.id
                 LEFT JOIN estimation_sections es ON ei.section_id = es.id
                 LEFT JOIN estimation_subsections ess ON ei.subsection_id = ess.id
                 WHERE ei.estimation_id = ?
-                ORDER BY es.section_order, ess.subsection_order, ei.id
+                ORDER BY es.sort_order, ess.subsection_order, ei.id
             `, [estimationId]);
 
         if (estimationItems.length === 0) {

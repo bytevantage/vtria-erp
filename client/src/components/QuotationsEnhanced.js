@@ -28,6 +28,7 @@ import {
   MenuItem,
   Grid,
   Alert,
+  AlertTitle,
   CircularProgress,
   Card,
   CardContent,
@@ -99,17 +100,28 @@ const QuotationsEnhanced = () => {
     tax_percentage: 0
   });
 
+  // Rejection dialog state
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
+  const [rejectionQuotationId, setRejectionQuotationId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+
   // Fetch stock items
   const fetchStockItems = async () => {
     try {
+      console.log('🔄 Fetching stock items...');
       const response = await axios.get(`${API_BASE_URL}/api/inventory-enhanced/items/enhanced`, {
         headers: getAuthHeaders()
       });
+      console.log('📦 Stock items response:', response.data);
       if (response.data && response.data.success) {
+        console.log('✅ Setting stock items:', response.data.data.length, 'items');
         setStockItems(response.data.data);
+      } else {
+        console.error('❌ API response not successful:', response.data);
       }
     } catch (error) {
-      console.error('Error fetching stock items:', error);
+      console.error('❌ Error fetching stock items:', error);
+      console.error('Error details:', error.response?.data || error.message);
     }
   };
 
@@ -681,6 +693,47 @@ const QuotationsEnhanced = () => {
     }
   };
 
+  // Rejection dialog handlers
+  const handleOpenRejectionDialog = (quotationId) => {
+    setRejectionQuotationId(quotationId);
+    setRejectionReason('');
+    setRejectionDialogOpen(true);
+  };
+
+  const handleCloseRejectionDialog = () => {
+    setRejectionDialogOpen(false);
+    setRejectionQuotationId(null);
+    setRejectionReason('');
+  };
+
+  const handleConfirmRejection = async () => {
+    if (!rejectionReason.trim()) {
+      alert('Please provide a rejection reason.');
+      return;
+    }
+
+    try {
+      setError('');
+      const response = await axios.put(`${API_BASE_URL}/api/quotations/enhanced/${rejectionQuotationId}/status`, {
+        status: 'draft', // Set to draft so it can be edited and resubmitted
+        rejection_reason: rejectionReason.trim()
+      }, {
+        headers: getAuthHeaders()
+      });
+
+      if (response.data.success) {
+        await fetchQuotations();
+        handleCloseRejectionDialog();
+        alert('Quotation rejected and returned to draft status for revision.');
+      } else {
+        setError(response.data.message || 'Failed to reject quotation');
+      }
+    } catch (error) {
+      console.error('Error rejecting quotation:', error);
+      setError(error.response?.data?.message || 'Failed to reject quotation');
+    }
+  };
+
   const handleGeneratePDF = async (quotationId, quotationNumber) => {
     try {
       setError('');
@@ -753,9 +806,9 @@ const QuotationsEnhanced = () => {
       setItemFormData({
         ...itemFormData,
         item_id: itemId,
-        item_name: selectedItem.name,
-        unit: selectedItem.unit || 'nos',
-        rate: parseFloat(selectedItem.last_price) || 0,
+        item_name: selectedItem.item_name,
+        unit: selectedItem.primary_unit || 'nos',
+        rate: parseFloat(selectedItem.selling_price) || 0,
         tax_percentage: parseFloat(selectedItem.gst_rate) || 0
       });
     }
@@ -1184,8 +1237,8 @@ const QuotationsEnhanced = () => {
                               <DownloadIcon fontSize="small" />
                             </IconButton>
 
-                            {/* Edit - for draft, pending_approval, and limited edit for approved */}
-                            {['draft', 'pending_approval', 'approved'].includes(quotation.status) && (
+                            {/* Edit - for draft, pending_approval, approved, and rejected */}
+                            {['draft', 'pending_approval', 'approved', 'rejected'].includes(quotation.status) && (
                               <IconButton
                                 onClick={() => handleOpen(quotation)}
                                 size="small"
@@ -1196,12 +1249,12 @@ const QuotationsEnhanced = () => {
                               </IconButton>
                             )}
 
-                            {/* Submit for Approval - only for draft */}
-                            {quotation.status === 'draft' && (
+                            {/* Submit for Approval - only for draft and rejected */}
+                            {['draft', 'rejected'].includes(quotation.status) && (
                               <IconButton
                                 onClick={() => handleStatusUpdate(quotation.id, 'pending_approval')}
                                 size="small"
-                                title="Submit for Approval"
+                                title={quotation.status === 'rejected' ? 'Resubmit for Approval' : 'Submit for Approval'}
                                 sx={{ color: '#ff9800', p: 0.5 }}
                               >
                                 <SendIcon fontSize="small" />
@@ -1271,9 +1324,9 @@ const QuotationsEnhanced = () => {
                             {/* Reject - only for sent */}
                             {quotation.status === 'sent' && (
                               <IconButton
-                                onClick={() => handleStatusUpdate(quotation.id, 'rejected')}
+                                onClick={() => handleOpenRejectionDialog(quotation.id)}
                                 size="small"
-                                title="Reject"
+                                title="Reject with Reason"
                                 sx={{ color: '#d32f2f', p: 0.5 }}
                               >
                                 <RejectIcon fontSize="small" />
@@ -1599,7 +1652,7 @@ const QuotationsEnhanced = () => {
                             >
                               {stockItems.map((item) => (
                                 <MenuItem key={item.id} value={item.id}>
-                                  {item.name}
+                                  {item.item_name}
                                 </MenuItem>
                               ))}
                             </Select>
@@ -1898,6 +1951,19 @@ const QuotationsEnhanced = () => {
         </DialogTitle>
 
         <DialogContent sx={{ p: 4 }}>
+          {/* Display rejection reason if exists */}
+          {viewDialog.quotation?.rejection_reason && (
+            <Alert severity="warning" sx={{ mb: 3, borderRadius: '8px' }}>
+              <AlertTitle>Rejection Reason</AlertTitle>
+              <Typography variant="body2">
+                {viewDialog.quotation.rejection_reason}
+              </Typography>
+              <Typography variant="caption" sx={{ mt: 1, display: 'block', opacity: 0.8 }}>
+                This quotation was rejected and returned to draft status for revision.
+              </Typography>
+            </Alert>
+          )}
+
           {viewDialog.quotation && (
             <Grid container spacing={4}>
               <Grid item xs={12} md={6}>
@@ -2024,6 +2090,41 @@ const QuotationsEnhanced = () => {
             startIcon={<DownloadIcon />}
           >
             Download PDF
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Rejection Dialog */}
+      <Dialog open={rejectionDialogOpen} onClose={handleCloseRejectionDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>Reject Quotation</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            Please provide a reason for rejecting this quotation. The quotation will be returned to draft status for revision.
+          </Typography>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Rejection Reason"
+            fullWidth
+            multiline
+            rows={4}
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            placeholder="Enter the reason for rejection..."
+            required
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRejectionDialog} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRejection}
+            variant="contained"
+            color="error"
+            disabled={!rejectionReason.trim()}
+          >
+            Reject & Return to Draft
           </Button>
         </DialogActions>
       </Dialog>
