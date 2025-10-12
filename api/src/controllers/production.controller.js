@@ -432,7 +432,8 @@ class ProductionController {
         }
       });
     } catch (error) {
-      logger.error('Error fetching production dashboard:', error);
+      logger.error('Error fetching production dashboard:', error.message);
+      logger.error('Stack trace:', error.stack);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch production dashboard',

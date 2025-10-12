@@ -7,10 +7,14 @@ const API_BASE_URL = process.env.DOCKER_ENV === 'true'
 
 export const apiRequest = async (method, endpoint, data = null, options = {}) => {
     try {
+        // Always include authentication token from localStorage
+        const token = localStorage.getItem('vtria_token');
+        
         const config = {
             method,
             url: `${API_BASE_URL}${endpoint}`,
             headers: {
+                ...(token && { 'Authorization': `Bearer ${token}` }),
                 ...options.headers
             },
             ...options

@@ -91,6 +91,13 @@ const ProductionManagement = () => {
 
   // Fetch data from APIs
   useEffect(() => {
+    // Check authentication before fetching data
+    const token = localStorage.getItem('vtria_token');
+    if (!token) {
+      console.error('No authentication token found - please login');
+      return;
+    }
+    
     fetchDashboardData();
     fetchCasesReadyForProduction();
     fetchManufacturingCases();

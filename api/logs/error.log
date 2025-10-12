@@ -5792,3 +5792,8 @@
 2025-10-12T19:39:18.203Z ERROR: Failed to create audit log:
 2025-10-12T19:42:37.871Z ERROR: Error on GET /api/purchase-requisitions/1:
 2025-10-12T19:42:43.804Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T19:59:46.901Z ERROR: Error fetching production dashboard:
+2025-10-12T20:03:17.378Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:03:25.837Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:03:33.269Z ERROR: Authentication error:
+2025-10-12T20:03:33.280Z ERROR: Error on GET /api/production/dashboard:
