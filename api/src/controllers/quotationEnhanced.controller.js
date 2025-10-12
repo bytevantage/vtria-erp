@@ -1116,7 +1116,6 @@ class QuotationEnhancedController {
                 'under_review': 'sent',
                 'in_review': 'sent',
                 'review': 'sent',
-                'accepted': 'approved',
                 'confirmed': 'approved',
                 'declined': 'rejected',
                 'cancelled': 'rejected',
@@ -1130,7 +1129,7 @@ class QuotationEnhancedController {
             const status = statusMapping[rawStatus] || rawStatus;
 
             // Validate status (must match database ENUM values)
-            const validStatuses = ['draft', 'sent', 'approved', 'rejected', 'revised'];
+            const validStatuses = ['draft', 'sent', 'approved', 'rejected', 'revised', 'accepted'];
             if (!validStatuses.includes(status)) {
                 return res.status(400).json({
                     success: false,
@@ -1194,15 +1193,56 @@ class QuotationEnhancedController {
                 }
             }
 
+            // Transition case to 'order' state if status is being set to 'accepted'
+            let caseTransitioned = false;
+            if (status === 'accepted' && quotations[0].case_id) {
+                try {
+                    // Get case details
+                    const [cases] = await connection.execute(
+                        'SELECT id, case_number, current_state FROM cases WHERE id = ?',
+                        [quotations[0].case_id]
+                    );
+
+                    if (cases.length > 0 && cases[0].current_state === 'quotation') {
+                        // Update case state to 'order'
+                        await connection.execute(
+                            'UPDATE cases SET current_state = "order", updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+                            [quotations[0].case_id]
+                        );
+
+                        // Add case state transition history
+                        await connection.execute(
+                            `INSERT INTO case_state_transitions 
+                             (case_id, from_state, to_state, notes, created_by, created_at) 
+                             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+                            [
+                                quotations[0].case_id,
+                                'quotation',
+                                'order',
+                                `Case transitioned to order state - customer accepted quotation ${quotations[0].quotation_id}`,
+                                updated_by
+                            ]
+                        );
+
+                        caseTransitioned = true;
+                        console.log(`Case ${cases[0].case_number} transitioned to order state - quotation accepted by customer`);
+                    }
+                } catch (caseError) {
+                    console.error('Error transitioning case to order state:', caseError);
+                    // Don't fail the quotation status update if case transition fails
+                }
+            }
+
             await connection.commit();
 
             res.json({
                 success: true,
-                message: `Quotation status updated to ${status}${bomCreated ? '. BOM created automatically.' : ''}`,
+                message: `Quotation status updated to ${status}${bomCreated ? '. BOM created automatically.' : ''}${caseTransitioned ? '. Case moved to order state - ready for production.' : ''}`,
                 data: {
                     id,
                     status,
                     bom_created: bomCreated,
+                    case_transitioned: caseTransitioned,
                     updated_at: new Date().toISOString()
                 }
             });

@@ -1306,6 +1306,28 @@ const QuotationsEnhanced = () => {
                                 >
                                   <BomIcon fontSize="small" />
                                 </IconButton>
+
+                                {/* Customer Accepted - mark quotation as accepted to start production */}
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  onClick={() => {
+                                    if (window.confirm('Mark this quotation as accepted by customer? This will move the case to Order state and make it ready for production.')) {
+                                      handleStatusUpdate(quotation.id, 'accepted');
+                                    }
+                                  }}
+                                  sx={{
+                                    fontSize: '0.7rem',
+                                    padding: '4px 8px',
+                                    minWidth: 'auto',
+                                    backgroundColor: '#2e7d32',
+                                    '&:hover': {
+                                      backgroundColor: '#1b5e20'
+                                    }
+                                  }}
+                                >
+                                  ✓ Customer Accepted
+                                </Button>
                               </>
                             )}
 

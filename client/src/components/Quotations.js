@@ -332,7 +332,19 @@ const Quotations = () => {
                             onClick={() => handleApprove(quotation.id)}
                             sx={{ minWidth: 'auto', px: 1 }}
                           >
-                            Approve & Start Manufacturing
+                            Approve
+                          </Button>
+                        )}
+
+                        {quotation.status === 'approved' && (
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleStatusUpdate(quotation.id, 'accepted')}
+                            sx={{ minWidth: 'auto', px: 1 }}
+                          >
+                            ✓ Customer Accepted
                           </Button>
                         )}
 

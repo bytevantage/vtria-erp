@@ -5797,3 +5797,18 @@
 2025-10-12T20:03:25.837Z ERROR: Failed to initialize email transporter:
 2025-10-12T20:03:33.269Z ERROR: Authentication error:
 2025-10-12T20:03:33.280Z ERROR: Error on GET /api/production/dashboard:
+2025-10-12T20:08:22.437Z ERROR: Error fetching production dashboard:
+2025-10-12T20:08:22.443Z ERROR: Stack trace:
+2025-10-12T20:08:55.942Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T20:08:59.542Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T20:09:01.135Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T20:09:01.987Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T20:09:11.691Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T20:09:21.642Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:18:06.662Z ERROR: Error fetching production dashboard:
+2025-10-12T20:18:06.703Z ERROR: Stack trace:
+2025-10-12T20:20:00.462Z ERROR: Error fetching production dashboard:
+2025-10-12T20:20:00.489Z ERROR: Stack trace:
+2025-10-12T20:29:22.123Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:29:42.696Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:30:45.515Z ERROR: Failed to initialize email transporter:

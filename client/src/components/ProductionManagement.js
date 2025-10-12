@@ -97,7 +97,7 @@ const ProductionManagement = () => {
       console.error('No authentication token found - please login');
       return;
     }
-    
+
     fetchDashboardData();
     fetchCasesReadyForProduction();
     fetchManufacturingCases();
