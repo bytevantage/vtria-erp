@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const { verifyToken: authenticate, hasRole } = require('../middleware/auth.middleware');
 const hrController = require('../controllers/hr.controller');
+const payrollController = require('../controllers/payroll.controller');
+const performanceController = require('../controllers/performance.controller');
 
 // Root route for HR module (no auth)
 router.get('/', (req, res) => {
@@ -107,6 +109,270 @@ router.get('/departments',
   hasRole(['hr', 'manager', 'employee']),
   hrController.getDepartments
 );
+
+// ============================================================================
+// PAYROLL ROUTES
+// ============================================================================
+
+// Salary Components
+router.get('/payroll/components',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.getSalaryComponents
+);
+
+router.post('/payroll/components',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.createSalaryComponent
+);
+
+// Employee Salary Structure
+router.get('/payroll/employees/:employee_id/salary-structure',
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  payrollController.getEmployeeSalaryStructure
+);
+
+router.post('/payroll/employees/:employee_id/salary-structure',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.setEmployeeSalaryStructure
+);
+
+// Payroll Cycles
+router.get('/payroll/cycles',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.getPayrollCycles
+);
+
+router.post('/payroll/cycles',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.createPayrollCycle
+);
+
+// Process Payroll
+router.post('/payroll/cycles/:cycle_id/process',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.processPayroll
+);
+
+router.post('/payroll/cycles/:cycle_id/approve',
+  hasRole(['director', 'admin']),
+  payrollController.approvePayrollCycle
+);
+
+// Payroll Transactions
+router.get('/payroll/cycles/:cycle_id/transactions',
+  hasRole(['admin', 'director', 'accounts']),
+  payrollController.getPayrollTransactions
+);
+
+router.get('/payroll/transactions/:id',
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  payrollController.getPayrollTransaction
+);
+
+// Reports
+router.get('/payroll/reports/summary',
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  payrollController.getPayrollSummary
+);
+
+router.get('/payroll/employees/:employee_id/salary-register',
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  payrollController.getEmployeeSalaryRegister
+);
+
+// ============================================================================
+// END PAYROLL ROUTES
+// ============================================================================
+
+// ============================================================================
+// PERFORMANCE MANAGEMENT ROUTES
+// ============================================================================
+
+// Rating Scales & Competencies
+router.get(
+  '/performance/rating-scales',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getRatingScales
+);
+
+router.get(
+  '/performance/competencies',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getCompetencies
+);
+
+// Review Cycles
+router.get(
+  '/performance/review-cycles',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getReviewCycles
+);
+
+router.post(
+  '/performance/review-cycles',
+  authenticate,
+  hasRole(['admin', 'director']),
+  performanceController.createReviewCycle
+);
+
+router.patch(
+  '/performance/review-cycles/:id/status',
+  authenticate,
+  hasRole(['admin', 'director']),
+  performanceController.updateReviewCycleStatus
+);
+
+// Goals Management
+router.get(
+  '/performance/employees/:employeeId/goals',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getEmployeeGoals
+);
+
+router.post(
+  '/performance/goals',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.createGoal
+);
+
+router.patch(
+  '/performance/goals/:id/progress',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.updateGoalProgress
+);
+
+router.patch(
+  '/performance/key-results/:id/progress',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.updateKeyResultProgress
+);
+
+// Performance Reviews
+router.get(
+  '/performance/reviews',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getPerformanceReviews
+);
+
+router.get(
+  '/performance/reviews/:id',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getPerformanceReview
+);
+
+router.post(
+  '/performance/reviews',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.createPerformanceReview
+);
+
+router.post(
+  '/performance/reviews/:id/self-review',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin', 'designer', 'technician']),
+  performanceController.submitSelfReview
+);
+
+router.post(
+  '/performance/reviews/:id/manager-review',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.submitManagerReview
+);
+
+router.post(
+  '/performance/reviews/:id/feedback',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin', 'designer', 'technician']),
+  performanceController.submitFeedback
+);
+
+router.post(
+  '/performance/reviews/:id/acknowledge',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin', 'designer', 'technician']),
+  performanceController.acknowledgeReview
+);
+
+router.post(
+  '/performance/reviews/:id/approve',
+  authenticate,
+  hasRole(['admin', 'director']),
+  performanceController.approveReview
+);
+
+// Development Plans
+router.get(
+  '/performance/employees/:employeeId/development-plans',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getEmployeeDevelopmentPlans
+);
+
+router.post(
+  '/performance/development-plans',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.createDevelopmentPlan
+);
+
+router.patch(
+  '/performance/development-actions/:id/progress',
+  authenticate,
+  hasRole(['admin', 'director', 'sales-admin']),
+  performanceController.updateDevelopmentActionProgress
+);
+
+// Performance Improvement Plans (PIPs)
+router.post(
+  '/performance/pips',
+  authenticate,
+  hasRole(['admin', 'director']),
+  performanceController.createPIP
+);
+
+router.get(
+  '/performance/employees/:employeeId/pips',
+  authenticate,
+  hasRole(['admin', 'director']),
+  performanceController.getEmployeePIPs
+);
+
+router.patch(
+  '/performance/pips/:id/status',
+  authenticate,
+  hasRole(['admin', 'director']),
+  performanceController.updatePIPStatus
+);
+
+// Reports & Analytics
+router.get(
+  '/performance/reports/summary',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getPerformanceSummary
+);
+
+router.get(
+  '/performance/reports/goals-analytics',
+  authenticate,
+  hasRole(['admin', 'director', 'accounts', 'sales-admin']),
+  performanceController.getGoalsAnalytics
+);
+
+// ============================================================================
+// END PERFORMANCE ROUTES
+// ============================================================================
 
 // Error handling middleware for file uploads
 router.use((err, req, res, next) => {

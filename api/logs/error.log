@@ -5358,3 +5358,412 @@
 2025-10-08T15:20:47.762Z ERROR: Authentication error:
 2025-10-08T15:20:47.784Z ERROR: Error on GET /api/rfq-campaigns:
 2025-10-08T15:27:25.290Z ERROR: Failed to initialize email transporter:
+2025-10-12T03:34:22.866Z ERROR: Failed to initialize email transporter:
+2025-10-12T03:36:30.984Z ERROR: Error fetching employees:
+2025-10-12T04:09:12.689Z ERROR: Error fetching employees:
+2025-10-12T04:24:37.558Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:31:26.535Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:33:14.666Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:34:28.825Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:37:21.164Z ERROR: Error fetching employees:
+2025-10-12T04:38:43.817Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:38:59.495Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:39:03.449Z ERROR: Failed to initialize email transporter:
+2025-10-12T04:43:08.860Z ERROR: Error fetching employees:
+2025-10-12T04:43:46.489Z ERROR: Error fetching production dashboard:
+2025-10-12T04:44:04.183Z ERROR: Error fetching employees:
+2025-10-12T04:46:57.927Z ERROR: Error fetching employees:
+2025-10-12T05:15:10.682Z ERROR: Failed to initialize email transporter:
+2025-10-12T05:15:30.666Z ERROR: Failed to initialize email transporter:
+2025-10-12T05:18:37.900Z ERROR: Failed to initialize email transporter:
+2025-10-12T05:31:28.687Z ERROR: Failed to initialize email transporter:
+2025-10-12T05:32:49.090Z ERROR: Failed to initialize email transporter:
+2025-10-12T05:33:47.953Z ERROR: Error fetching employees:
+2025-10-12T05:33:56.535Z ERROR: Error fetching employees:
+2025-10-12T05:37:37.594Z ERROR: Error fetching employees:
+2025-10-12T05:37:45.127Z ERROR: Error fetching employees:
+2025-10-12T05:38:24.693Z ERROR: Error fetching employees:
+2025-10-12T05:42:17.296Z ERROR: Error fetching employees:
+2025-10-12T07:09:54.449Z ERROR: Error fetching employees:
+2025-10-12T07:10:07.918Z ERROR: Error fetching employees:
+2025-10-12T07:24:07.279Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:24:38.063Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:25:44.449Z ERROR: Authentication error:
+2025-10-12T07:25:44.774Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T07:29:10.346Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:29:35.233Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:29:47.666Z ERROR: Authentication error:
+2025-10-12T07:29:47.683Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T07:32:26.004Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:33:09.386Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:34:26.120Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:35:11.753Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:36:49.901Z ERROR: Failed to initialize email transporter:
+2025-10-12T07:37:26.942Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:04:08.244Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:04:13.951Z ERROR: Authentication error:
+2025-10-12T08:04:13.967Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T08:05:49.913Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:06:23.266Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:06:25.161Z ERROR: Authentication error:
+2025-10-12T08:06:25.170Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T08:08:42.903Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:09:12.701Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:10:14.530Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:10:33.650Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:10:35.607Z ERROR: Authentication error:
+2025-10-12T08:10:35.614Z ERROR: Error on GET /api/users/test-simple:
+2025-10-12T08:10:50.713Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:10:52.829Z ERROR: Authentication error:
+2025-10-12T08:10:52.837Z ERROR: Error on GET /api/users/test-simple:
+2025-10-12T08:11:06.445Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:11:19.538Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:11:22.351Z ERROR: Error on GET /api/test-db:
+2025-10-12T08:11:44.393Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:12:06.640Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:12:11.658Z ERROR: Error on GET /api/test-db:
+2025-10-12T08:13:02.984Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:15:21.905Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:15:24.889Z ERROR: Authentication error:
+2025-10-12T08:15:24.897Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T08:15:28.476Z ERROR: Authentication error:
+2025-10-12T08:15:28.479Z ERROR: Error on GET /api/users/test-connection:
+2025-10-12T08:15:57.302Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:15:59.807Z ERROR: Authentication error:
+2025-10-12T08:15:59.815Z ERROR: Error on GET /api/users/test-connection:
+2025-10-12T08:16:24.207Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:16:26.294Z ERROR: Error on GET /api/test-connection:
+2025-10-12T08:16:42.999Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:16:46.051Z ERROR: Error on GET /api/db-test:
+2025-10-12T08:16:57.558Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:17:09.632Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:17:12.797Z ERROR: Error on GET /api/test/db-test:
+2025-10-12T08:18:35.704Z ERROR: Authentication error:
+2025-10-12T08:18:35.720Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T08:24:10.883Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:24:14.568Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:24:19.674Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:24:54.464Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:24:56.011Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:24:57.647Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:25:08.842Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:25:18.657Z ERROR: Authentication error:
+2025-10-12T08:25:18.664Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T08:25:26.316Z ERROR: Failed to initialize email transporter:
+2025-10-12T08:28:23.714Z ERROR: Failed to initialize email transporter:
+2025-10-12T11:42:34.145Z ERROR: Failed to initialize email transporter:
+2025-10-12T11:46:49.375Z ERROR: Failed to initialize email transporter:
+2025-10-12T11:46:58.057Z ERROR: Failed to initialize email transporter:
+2025-10-12T11:47:18.844Z ERROR: Failed to initialize email transporter:
+2025-10-12T11:52:11.071Z ERROR: Authentication error:
+2025-10-12T11:52:11.117Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T11:52:11.160Z ERROR: Authentication error:
+2025-10-12T11:52:11.205Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T11:52:11.247Z ERROR: Authentication error:
+2025-10-12T11:52:11.250Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T11:52:11.286Z ERROR: Authentication error:
+2025-10-12T11:52:11.525Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T12:05:25.725Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:07:09.121Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:07:18.031Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:07:25.272Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:07:44.855Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:08:09.078Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:11:41.393Z ERROR: Authentication error:
+2025-10-12T12:11:41.410Z ERROR: Error on GET /api/financial/expense-categories:
+2025-10-12T12:12:44.383Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:14:51.127Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:15:25.266Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:18:48.635Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:19:54.830Z ERROR: Authentication error:
+2025-10-12T12:19:54.841Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T12:19:54.853Z ERROR: Authentication error:
+2025-10-12T12:19:54.859Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T12:19:54.870Z ERROR: Authentication error:
+2025-10-12T12:19:54.872Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T12:19:54.886Z ERROR: Authentication error:
+2025-10-12T12:19:54.890Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T12:36:17.980Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:38:19.833Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:38:38.840Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:45:51.206Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:52:19.157Z ERROR: Error on GET /api/hr/payroll/components:
+2025-10-12T12:52:19.204Z ERROR: Error on GET /api/hr/payroll/components:
+2025-10-12T12:52:19.245Z ERROR: Error on POST /api/hr/payroll/components:
+2025-10-12T12:52:19.286Z ERROR: Error on GET /api/hr/payroll/employees/1/salary-structure:
+2025-10-12T12:52:19.318Z ERROR: Error on POST /api/hr/payroll/employees/1/salary-structure:
+2025-10-12T12:52:19.355Z ERROR: Error on GET /api/hr/payroll/employees/1/salary-structure:
+2025-10-12T12:52:19.397Z ERROR: Error on GET /api/hr/payroll/cycles:
+2025-10-12T12:52:19.430Z ERROR: Error on POST /api/hr/payroll/cycles:
+2025-10-12T12:52:19.473Z ERROR: Error on GET /api/hr/payroll/reports/summary:
+2025-10-12T12:52:19.507Z ERROR: Error on GET /api/hr/payroll/employees/1/salary-register:
+2025-10-12T12:53:15.232Z ERROR: Error on GET /api/v1/v1/hr/payroll/components:
+2025-10-12T12:53:15.272Z ERROR: Error on GET /api/v1/hr/payroll/components:
+2025-10-12T12:53:15.311Z ERROR: Error on POST /api/v1/hr/payroll/components:
+2025-10-12T12:53:15.349Z ERROR: Error on GET /api/v1/hr/payroll/employees/1/salary-structure:
+2025-10-12T12:53:15.386Z ERROR: Error on POST /api/v1/hr/payroll/employees/1/salary-structure:
+2025-10-12T12:53:15.424Z ERROR: Error on GET /api/v1/hr/payroll/employees/1/salary-structure:
+2025-10-12T12:53:15.464Z ERROR: Error on GET /api/v1/hr/payroll/cycles:
+2025-10-12T12:53:15.497Z ERROR: Error on POST /api/v1/hr/payroll/cycles:
+2025-10-12T12:53:15.533Z ERROR: Error on GET /api/v1/hr/payroll/reports/summary:
+2025-10-12T12:53:15.567Z ERROR: Error on GET /api/v1/hr/payroll/employees/1/salary-register:
+2025-10-12T12:54:00.784Z ERROR: Error on GET /api/v1/hr/payroll/components:
+2025-10-12T12:54:56.298Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:55:47.857Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:56:08.640Z ERROR: Error on GET /api/v1/v1/hr/payroll/components:
+2025-10-12T12:57:07.043Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:57:17.018Z ERROR: Failed to initialize email transporter:
+2025-10-12T12:57:44.554Z ERROR: Error on GET /api/v1/v1/hr/payroll/components:
+2025-10-12T12:58:13.431Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:07:44.167Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:08:51.961Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:08:57.432Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:09:11.024Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:09:57.266Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:10:21.771Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:11:01.371Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:11:20.824Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:11:44.230Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:12:01.151Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:13:21.275Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:13:47.450Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:14:25.881Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:17:05.375Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:26:51.349Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:27:38.105Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:28:06.381Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:28:22.814Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:29:20.334Z ERROR: Error on POST /api/v1/auth/login:
+2025-10-12T13:30:03.614Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:30:19.183Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:30:25.714Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:30:54.865Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:30:56.734Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:31:11.361Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:31:49.029Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:32:07.507Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:32:11.384Z ERROR: Error on POST /auth/login:
+2025-10-12T13:32:11.410Z ERROR: Authentication error:
+2025-10-12T13:32:11.417Z ERROR: Error on GET /api/v1/hr/performance/reports/summary:
+2025-10-12T13:32:37.889Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:32:53.840Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:33:12.227Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:51:24.417Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:51:57.969Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:52:55.536Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:54:23.249Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:55:23.900Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:55:54.782Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:58:39.070Z ERROR: Failed to initialize email transporter:
+2025-10-12T13:59:28.097Z ERROR: Error on GET /api/departments:
+2025-10-12T13:59:30.417Z ERROR: Authentication error:
+2025-10-12T13:59:30.468Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T14:11:01.159Z ERROR: Authentication error:
+2025-10-12T14:11:01.170Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T14:11:50.873Z ERROR: Authentication error:
+2025-10-12T14:11:50.881Z ERROR: Error on GET /api/employees:
+2025-10-12T14:11:50.899Z ERROR: Authentication error:
+2025-10-12T14:11:50.906Z ERROR: Error on GET /api/leave-policy/applications:
+2025-10-12T14:11:50.936Z ERROR: Authentication error:
+2025-10-12T14:11:50.940Z ERROR: Error on GET /api/leave-policy/types:
+2025-10-12T14:11:55.959Z ERROR: Error on GET /api/departments:
+2025-10-12T14:11:59.626Z ERROR: Authentication error:
+2025-10-12T14:11:59.636Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T14:11:59.644Z ERROR: Authentication error:
+2025-10-12T14:11:59.649Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T14:11:59.659Z ERROR: Authentication error:
+2025-10-12T14:11:59.662Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T14:11:59.675Z ERROR: Authentication error:
+2025-10-12T14:11:59.681Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T14:33:37.240Z ERROR: Failed to initialize email transporter:
+2025-10-12T14:34:59.954Z ERROR: Error on GET /api/v1/production/quality/checkpoints:
+2025-10-12T14:34:59.990Z ERROR: Error on GET /api/v1/production/quality/defect-types:
+2025-10-12T14:35:00.036Z ERROR: Error on GET /api/v1/production/quality/inspections:
+2025-10-12T14:35:00.081Z ERROR: Error on GET /api/v1/production/quality/dashboard:
+2025-10-12T14:35:00.110Z ERROR: Error on GET /api/v1/production/shopfloor/machines:
+2025-10-12T14:35:00.138Z ERROR: Error on GET /api/v1/production/shopfloor/machines/1/utilization:
+2025-10-12T14:35:00.175Z ERROR: Error on GET /api/v1/production/shopfloor/dashboard:
+2025-10-12T14:35:00.210Z ERROR: Error on GET /api/v1/production/planning/schedule:
+2025-10-12T14:35:00.244Z ERROR: Error on GET /api/v1/production/planning/capacity:
+2025-10-12T14:35:00.273Z ERROR: Error on GET /api/v1/production/planning/waste/categories:
+2025-10-12T14:35:00.303Z ERROR: Error on GET /api/v1/production/planning/waste/records:
+2025-10-12T14:35:00.333Z ERROR: Error on GET /api/v1/production/planning/oee/records:
+2025-10-12T14:35:00.364Z ERROR: Error on GET /api/v1/production/planning/dashboard:
+2025-10-12T14:37:59.559Z ERROR: Error on POST /auth/login:
+2025-10-12T14:37:59.582Z ERROR: Error on GET /api/v1/production/quality/checkpoints:
+2025-10-12T14:43:13.915Z ERROR: Error fetching quality inspections:
+2025-10-12T14:43:13.993Z ERROR: Error on GET /api/production/planning/waste-categories:
+2025-10-12T14:43:14.026Z ERROR: Error on GET /api/production/planning/schedule:
+2025-10-12T14:43:46.041Z ERROR: Failed to initialize email transporter:
+2025-10-12T14:44:08.262Z ERROR: Failed to initialize email transporter:
+2025-10-12T14:45:34.795Z ERROR: Error fetching quality inspections:
+2025-10-12T14:45:35.028Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-10-12T14:45:35.057Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-10-12T14:45:35.175Z ERROR: Error on GET /api/production/shopfloor/machine-performance:
+2025-10-12T14:45:35.215Z ERROR: Error fetching production schedules:
+2025-10-12T14:45:35.289Z ERROR: Error fetching waste records:
+2025-10-12T14:45:35.360Z ERROR: Error fetching OEE records:
+2025-10-12T14:46:17.430Z ERROR: Failed to initialize email transporter:
+2025-10-12T14:48:18.054Z ERROR: Error fetching production dashboard:
+2025-10-12T15:31:00.238Z ERROR: Authentication error:
+2025-10-12T15:31:00.256Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-12T15:31:00.329Z ERROR: Authentication error:
+2025-10-12T15:31:00.332Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-12T15:31:00.372Z ERROR: Authentication error:
+2025-10-12T15:31:00.374Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-10-12T15:31:00.398Z ERROR: Authentication error:
+2025-10-12T15:31:00.400Z ERROR: Error on GET /api/production/planning/schedules:
+2025-10-12T16:04:10.707Z ERROR: Failed to initialize email transporter:
+2025-10-12T16:04:28.868Z ERROR: Authentication error:
+2025-10-12T16:04:28.877Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-12T16:06:57.469Z ERROR: Failed to initialize email transporter:
+2025-10-12T16:42:39.631Z ERROR: Failed to initialize email transporter:
+2025-10-12T16:55:23.476Z ERROR: Error fetching production dashboard:
+2025-10-12T16:55:35.859Z ERROR: Error on GET /api/departments:
+2025-10-12T16:55:38.275Z ERROR: Authentication error:
+2025-10-12T16:55:38.289Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T16:55:58.975Z ERROR: Error on GET /api/departments:
+2025-10-12T16:57:25.568Z ERROR: Error on GET /api/departments:
+2025-10-12T16:57:27.742Z ERROR: Authentication error:
+2025-10-12T16:57:27.749Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T16:58:17.057Z ERROR: Error fetching production dashboard:
+2025-10-12T16:58:55.614Z ERROR: Authentication error:
+2025-10-12T16:58:55.617Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T16:59:14.992Z ERROR: Error on GET /api/departments:
+2025-10-12T17:04:47.772Z ERROR: Error on GET /api/departments:
+2025-10-12T17:05:39.931Z ERROR: Error on GET /api/departments:
+2025-10-12T17:06:01.704Z ERROR: Authentication error:
+2025-10-12T17:06:01.709Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T17:06:04.292Z ERROR: Authentication error:
+2025-10-12T17:06:04.296Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T17:15:54.442Z ERROR: Authentication error:
+2025-10-12T17:15:54.452Z ERROR: Error on GET /api/users/with-hr:
+2025-10-12T17:16:43.792Z ERROR: Error fetching production dashboard:
+2025-10-12T17:17:17.957Z ERROR: Authentication error:
+2025-10-12T17:17:17.985Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T17:17:18.001Z ERROR: Authentication error:
+2025-10-12T17:17:18.010Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T17:17:18.022Z ERROR: Authentication error:
+2025-10-12T17:17:18.035Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T17:17:18.047Z ERROR: Authentication error:
+2025-10-12T17:17:18.053Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T17:17:20.998Z ERROR: Authentication error:
+2025-10-12T17:17:21.003Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T17:17:21.024Z ERROR: Authentication error:
+2025-10-12T17:17:21.027Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T17:17:21.041Z ERROR: Authentication error:
+2025-10-12T17:17:21.064Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T17:17:21.084Z ERROR: Authentication error:
+2025-10-12T17:17:21.092Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T18:01:46.449Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:05:10.247Z ERROR: Error fetching employees:
+2025-10-12T18:05:15.066Z ERROR: Error fetching employees:
+2025-10-12T18:05:52.037Z ERROR: Error fetching production dashboard:
+2025-10-12T18:05:57.034Z ERROR: Authentication error:
+2025-10-12T18:05:57.081Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-10-12T18:05:57.103Z ERROR: Authentication error:
+2025-10-12T18:05:57.108Z ERROR: Error on GET /api/production/quality/inspections:
+2025-10-12T18:05:57.118Z ERROR: Authentication error:
+2025-10-12T18:05:57.129Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-12T18:05:57.137Z ERROR: Authentication error:
+2025-10-12T18:05:57.141Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-10-12T18:06:01.833Z ERROR: Authentication error:
+2025-10-12T18:06:01.858Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-10-12T18:06:01.917Z ERROR: Authentication error:
+2025-10-12T18:06:01.920Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-10-12T18:06:01.932Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-10-12T18:06:01.950Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-10-12T18:06:24.100Z ERROR: Authentication error:
+2025-10-12T18:06:24.103Z ERROR: Error on GET /api/production/planning/schedules:
+2025-10-12T18:06:24.116Z ERROR: Authentication error:
+2025-10-12T18:06:24.119Z ERROR: Error on GET /api/production/planning/waste/categories:
+2025-10-12T18:06:24.131Z ERROR: Authentication error:
+2025-10-12T18:06:24.134Z ERROR: Error on GET /api/production/planning/waste/records:
+2025-10-12T18:06:24.146Z ERROR: Authentication error:
+2025-10-12T18:06:24.149Z ERROR: Error on GET /api/production/planning/oee/records:
+2025-10-12T18:06:56.883Z ERROR: Authentication error:
+2025-10-12T18:06:56.892Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T18:06:56.903Z ERROR: Authentication error:
+2025-10-12T18:06:56.915Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T18:06:56.924Z ERROR: Authentication error:
+2025-10-12T18:06:56.934Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T18:06:56.951Z ERROR: Authentication error:
+2025-10-12T18:06:56.954Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T18:07:05.889Z ERROR: Error fetching employees:
+2025-10-12T18:07:08.257Z ERROR: Error fetching employees:
+2025-10-12T18:08:09.065Z ERROR: Authentication error:
+2025-10-12T18:08:09.082Z ERROR: Error on GET /api/employees/attendance/records:
+2025-10-12T18:08:09.093Z ERROR: Authentication error:
+2025-10-12T18:08:09.104Z ERROR: Error on GET /api/employees:
+2025-10-12T18:08:09.390Z ERROR: Error fetching employees:
+2025-10-12T18:10:17.050Z ERROR: Authentication error:
+2025-10-12T18:10:17.110Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-12T18:10:17.421Z ERROR: Authentication error:
+2025-10-12T18:10:17.439Z ERROR: Error on GET /api/production/quality/inspections:
+2025-10-12T18:10:17.466Z ERROR: Authentication error:
+2025-10-12T18:10:17.484Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-10-12T18:10:17.561Z ERROR: Authentication error:
+2025-10-12T18:10:17.581Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-10-12T18:10:28.183Z ERROR: Authentication error:
+2025-10-12T18:10:28.190Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-10-12T18:10:28.206Z ERROR: Authentication error:
+2025-10-12T18:10:28.210Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-10-12T18:10:28.230Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-10-12T18:10:28.248Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-10-12T18:10:31.493Z ERROR: Authentication error:
+2025-10-12T18:10:31.497Z ERROR: Error on GET /api/production/planning/schedules:
+2025-10-12T18:10:31.508Z ERROR: Authentication error:
+2025-10-12T18:10:31.513Z ERROR: Error on GET /api/production/planning/waste/categories:
+2025-10-12T18:10:31.522Z ERROR: Authentication error:
+2025-10-12T18:10:31.526Z ERROR: Error on GET /api/production/planning/oee/records:
+2025-10-12T18:10:31.542Z ERROR: Authentication error:
+2025-10-12T18:10:31.551Z ERROR: Error on GET /api/production/planning/waste/records:
+2025-10-12T18:10:43.583Z ERROR: Error fetching production dashboard:
+2025-10-12T18:10:48.398Z ERROR: Authentication error:
+2025-10-12T18:10:48.414Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-10-12T18:10:48.434Z ERROR: Authentication error:
+2025-10-12T18:10:48.437Z ERROR: Error on GET /api/production/quality/inspections:
+2025-10-12T18:10:48.448Z ERROR: Authentication error:
+2025-10-12T18:10:48.453Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-12T18:10:48.489Z ERROR: Authentication error:
+2025-10-12T18:10:48.492Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-10-12T18:10:51.132Z ERROR: Authentication error:
+2025-10-12T18:10:51.137Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-10-12T18:10:51.153Z ERROR: Authentication error:
+2025-10-12T18:10:51.157Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-10-12T18:10:51.169Z ERROR: Authentication error:
+2025-10-12T18:10:51.172Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T18:10:51.181Z ERROR: Authentication error:
+2025-10-12T18:10:51.187Z ERROR: Error on GET /api/financial/invoices:
+2025-10-12T18:11:31.935Z ERROR: Authentication error:
+2025-10-12T18:11:31.939Z ERROR: Error on GET /api/employees:
+2025-10-12T18:11:31.954Z ERROR: Authentication error:
+2025-10-12T18:11:31.981Z ERROR: Error on GET /api/leave-policy/applications:
+2025-10-12T18:11:32.052Z ERROR: Authentication error:
+2025-10-12T18:11:32.057Z ERROR: Error on GET /api/leave-policy/types:
+2025-10-12T18:14:37.918Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:15:29.506Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:15:37.658Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:16:09.054Z ERROR: Authentication error:
+2025-10-12T18:16:09.063Z ERROR: Error on GET /api/employees:
+2025-10-12T18:16:23.906Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:25:02.150Z ERROR: Error fetching production dashboard:
+2025-10-12T18:25:39.013Z ERROR: Authentication error:
+2025-10-12T18:25:39.019Z ERROR: Error on GET /api/employees/attendance/records:
+2025-10-12T18:25:39.030Z ERROR: Authentication error:
+2025-10-12T18:25:39.035Z ERROR: Error on GET /api/employees:
+2025-10-12T18:31:38.192Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:31:53.522Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:32:06.784Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:32:23.864Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:37:13.267Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:38:52.356Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:44:21.693Z ERROR: Authentication error:
+2025-10-12T18:44:21.715Z ERROR: Error on GET /api/employees/attendance/records:
+2025-10-12T18:44:21.725Z ERROR: Authentication error:
+2025-10-12T18:44:21.729Z ERROR: Error on GET /api/employees:
+2025-10-12T18:46:22.509Z ERROR: Authentication error:
+2025-10-12T18:46:22.553Z ERROR: Error on GET /api/employees:
+2025-10-12T18:47:08.990Z ERROR: Failed to initialize email transporter:
+2025-10-12T18:47:54.888Z ERROR: Authentication error:
+2025-10-12T18:47:54.910Z ERROR: Error on GET /api/employees:

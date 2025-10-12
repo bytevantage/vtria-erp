@@ -859,4 +859,86 @@ router.get('/manufacturing-cases/:id/report', authMiddleware.verifyToken, produc
 router.get('/boms/active', authMiddleware.verifyToken, productionController.getActiveBOMs);
 router.get('/boms/:id/components', authMiddleware.verifyToken, productionController.getBOMComponents);
 
+// ============================================================================
+// QUALITY CONTROL ROUTES
+// ============================================================================
+const qualityController = require('../controllers/quality.controller');
+
+// Quality Checkpoints
+router.get('/quality/checkpoints', authMiddleware.verifyToken, qualityController.getQualityCheckpoints);
+router.post('/quality/checkpoints', authMiddleware.verifyToken, qualityController.createQualityCheckpoint);
+
+// Defect Types
+router.get('/quality/defect-types', authMiddleware.verifyToken, qualityController.getDefectTypes);
+router.post('/quality/defect-types', authMiddleware.verifyToken, qualityController.createDefectType);
+
+// Quality Inspections
+router.get('/quality/inspections', authMiddleware.verifyToken, qualityController.getQualityInspections);
+router.get('/quality/inspections/:id', authMiddleware.verifyToken, qualityController.getQualityInspection);
+router.post('/quality/inspections', authMiddleware.verifyToken, qualityController.createQualityInspection);
+router.put('/quality/inspections/:id/results', authMiddleware.verifyToken, qualityController.updateInspectionResults);
+router.put('/quality/inspections/:id/submit', authMiddleware.verifyToken, qualityController.submitInspection);
+router.put('/quality/inspections/:id/approve', authMiddleware.verifyToken, qualityController.approveInspection);
+
+// Defect Records
+router.post('/quality/inspections/:inspection_id/defects', authMiddleware.verifyToken, qualityController.addDefectRecord);
+router.get('/quality/inspections/:inspection_id/defects', authMiddleware.verifyToken, qualityController.getInspectionDefects);
+router.put('/quality/defects/:id/resolve', authMiddleware.verifyToken, qualityController.resolveDefect);
+
+// Quality Analytics
+router.get('/quality/metrics/dashboard', authMiddleware.verifyToken, qualityController.getQualityMetricsDashboard);
+router.get('/quality/defect-analysis', authMiddleware.verifyToken, qualityController.getDefectAnalysis);
+router.get('/quality/summary-report', authMiddleware.verifyToken, qualityController.getQualitySummaryReport);
+
+// ============================================================================
+// SHOP FLOOR CONTROL ROUTES
+// ============================================================================
+const shopFloorController = require('../controllers/shopfloor.controller');
+
+// Production Machines
+router.get('/shopfloor/machines', authMiddleware.verifyToken, shopFloorController.getProductionMachines);
+router.post('/shopfloor/machines', authMiddleware.verifyToken, shopFloorController.createProductionMachine);
+router.put('/shopfloor/machines/:id/status', authMiddleware.verifyToken, shopFloorController.updateMachineStatus);
+router.post('/shopfloor/machines/:id/maintenance', authMiddleware.verifyToken, shopFloorController.recordMaintenance);
+
+// Work Order Operation Tracking
+router.get('/shopfloor/operation-tracking', authMiddleware.verifyToken, shopFloorController.getOperationTracking);
+router.post('/shopfloor/operation-tracking/start', authMiddleware.verifyToken, shopFloorController.startOperation);
+router.put('/shopfloor/operation-tracking/:id/pause', authMiddleware.verifyToken, shopFloorController.pauseOperation);
+router.put('/shopfloor/operation-tracking/:id/resume', authMiddleware.verifyToken, shopFloorController.resumeOperation);
+router.put('/shopfloor/operation-tracking/:id/complete', authMiddleware.verifyToken, shopFloorController.completeOperation);
+
+// Machine Utilization
+router.get('/shopfloor/machine-utilization', authMiddleware.verifyToken, shopFloorController.getMachineUtilizationLog);
+router.post('/shopfloor/machine-utilization', authMiddleware.verifyToken, shopFloorController.logMachineUtilization);
+router.put('/shopfloor/machine-utilization/:id/end', authMiddleware.verifyToken, shopFloorController.endMachineUtilization);
+
+// Shop Floor Dashboard
+router.get('/shopfloor/dashboard', authMiddleware.verifyToken, shopFloorController.getShopFloorDashboard);
+router.get('/shopfloor/machine-utilization/summary', authMiddleware.verifyToken, shopFloorController.getMachineUtilizationSummary);
+
+// ============================================================================
+// PRODUCTION PLANNING & ANALYTICS ROUTES
+// ============================================================================
+const planningController = require('../controllers/planning.controller');
+
+// Production Schedule
+router.get('/planning/schedules', authMiddleware.verifyToken, planningController.getProductionSchedules);
+router.get('/planning/schedules/:id', authMiddleware.verifyToken, planningController.getProductionSchedule);
+router.post('/planning/schedules', authMiddleware.verifyToken, planningController.createProductionSchedule);
+router.post('/planning/schedules/:schedule_id/items', authMiddleware.verifyToken, planningController.addWorkOrderToSchedule);
+router.put('/planning/schedule-items/:id/status', authMiddleware.verifyToken, planningController.updateScheduleItemStatus);
+router.put('/planning/schedules/:id/approve', authMiddleware.verifyToken, planningController.approveProductionSchedule);
+
+// Waste Tracking
+router.get('/planning/waste/categories', authMiddleware.verifyToken, planningController.getWasteCategories);
+router.get('/planning/waste/records', authMiddleware.verifyToken, planningController.getWasteRecords);
+router.post('/planning/waste/records', authMiddleware.verifyToken, planningController.recordWaste);
+router.get('/planning/waste/analytics', authMiddleware.verifyToken, planningController.getWasteAnalytics);
+
+// OEE Analytics
+router.get('/planning/oee/records', authMiddleware.verifyToken, planningController.getOEERecords);
+router.post('/planning/oee/calculate', authMiddleware.verifyToken, planningController.calculateOEE);
+router.get('/planning/oee/summary', authMiddleware.verifyToken, planningController.getOEESummary);
+
 module.exports = router;

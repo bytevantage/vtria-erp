@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const financialController = require('../controllers/financial.controller');
+const expensesController = require('../controllers/expenses.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 const db = require('../config/database');
 
@@ -18,6 +19,7 @@ router.get('/', (req, res) => {
                 'GET /profit-loss - P&L statements',
                 'GET /invoices - Invoice management',
                 'GET /payments - Payment tracking',
+                'GET /expenses - Expense management',
                 'GET /reports - Financial reports',
                 'GET /customer-outstanding - Outstanding amounts'
             ]
@@ -463,6 +465,40 @@ router.post('/payments', async (req, res) => {
         });
     }
 });
+
+// ========== Expense Management Routes ==========
+
+// Get expense categories
+router.get('/expense-categories', expensesController.getCategories);
+
+// Get expense summary/statistics
+router.get('/expenses/summary', expensesController.getExpenseSummary);
+
+// Get all expenses with filters and pagination
+router.get('/expenses', expensesController.getAllExpenses);
+
+// Get single expense by ID
+router.get('/expenses/:id', expensesController.getExpenseById);
+
+// Create new expense
+router.post('/expenses', expensesController.createExpense);
+
+// Update expense
+router.put('/expenses/:id', expensesController.updateExpense);
+
+// Submit expense for approval
+router.post('/expenses/:id/submit', expensesController.submitForApproval);
+
+// Approve/reject expense
+router.post('/expenses/:id/approve', expensesController.approveExpense);
+
+// Mark expense as paid
+router.post('/expenses/:id/pay', expensesController.markAsPaid);
+
+// Delete expense (soft delete)
+router.delete('/expenses/:id', expensesController.deleteExpense);
+
+// ========== End Expense Management Routes ==========
 
 // Test route
 router.get('/test', (req, res) => {

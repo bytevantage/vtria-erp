@@ -27,10 +27,10 @@ class SmartAllocationController {
             // For dry run, get allocation preview without executing
             if (dry_run) {
                 const allocationPreview = await this.getAllocationPreview(
-                    allocation_type, product_id, location_id, requested_quantity, 
+                    allocation_type, product_id, location_id, requested_quantity,
                     customer_tier, project_priority
                 );
-                
+
                 return res.json({
                     success: true,
                     data: allocationPreview,
@@ -43,7 +43,7 @@ class SmartAllocationController {
                 CALL ExecuteSmartAllocation(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `, [
                 allocation_reference,
-                allocation_type, 
+                allocation_type,
                 product_id,
                 location_id,
                 requested_quantity,
@@ -62,7 +62,7 @@ class SmartAllocationController {
             }
 
             const allocationResult = result[0];
-            
+
             // Get detailed batch breakdown
             const [batchDetails] = await db.execute(`
                 SELECT 
@@ -119,8 +119,8 @@ class SmartAllocationController {
         try {
             // Get the scoring based on allocation type
             const scoreColumn = allocation_type === 'estimation' ? 'estimation_score' :
-                              allocation_type === 'manufacturing' ? 'manufacturing_score' : 
-                              'sales_score';
+                allocation_type === 'manufacturing' ? 'manufacturing_score' :
+                    'sales_score';
 
             const [batches] = await db.execute(`
                 SELECT 
@@ -169,7 +169,7 @@ class SmartAllocationController {
             }
 
             const allocatedQuantity = parseFloat(requested_quantity) - remainingQuantity;
-            
+
             return {
                 allocation_type,
                 requested_quantity: parseFloat(requested_quantity),
@@ -234,7 +234,7 @@ class SmartAllocationController {
             // Add comparison with other allocation types for analysis
             const comparisons = {};
             const allocationTypes = ['estimation', 'manufacturing', 'sales'];
-            
+
             for (const type of allocationTypes) {
                 if (type !== allocation_type) {
                     const comparison = await this.getAllocationPreview(
@@ -246,7 +246,7 @@ class SmartAllocationController {
                         total_cost: comparison.total_cost,
                         batches_used: comparison.batches_used,
                         cost_difference: comparison.total_cost - preview.total_cost,
-                        cost_savings_percentage: preview.total_cost > 0 ? 
+                        cost_savings_percentage: preview.total_cost > 0 ?
                             ((comparison.total_cost - preview.total_cost) / preview.total_cost * 100) : 0
                     };
                 }
@@ -298,7 +298,7 @@ class SmartAllocationController {
             recommendation.reasoning.push(
                 'Using higher cost items for estimation protects profit margins'
             );
-            
+
             if (comparisons.manufacturing) {
                 const savings = comparisons.manufacturing.cost_difference;
                 if (savings < 0) {
@@ -315,7 +315,7 @@ class SmartAllocationController {
             recommendation.reasoning.push(
                 'Using lowest cost items for manufacturing maximizes profitability'
             );
-            
+
             if (comparisons.estimation) {
                 const savings = Math.abs(comparisons.estimation.cost_difference);
                 recommendation.reasoning.push(
@@ -337,7 +337,7 @@ class SmartAllocationController {
                 recommendation.alternatives.push({
                     strategy: type,
                     cost_difference: comparison.cost_difference,
-                    description: comparison.cost_difference < 0 ? 
+                    description: comparison.cost_difference < 0 ?
                         `${type} strategy would save ₹${Math.abs(comparison.cost_difference).toFixed(2)}` :
                         `${type} strategy would cost ₹${comparison.cost_difference.toFixed(2)} more`
                 });
@@ -362,10 +362,10 @@ class SmartAllocationController {
 
             if (is_active !== undefined) {
                 whereConditions.push('is_active = ?');
-                params.push(is_active === 'true' || is_active === true);
+                params.push((is_active === 'true' || is_active === '1' || is_active === true) ? 1 : 0);
             }
 
-            const whereClause = whereConditions.length > 0 ? 
+            const whereClause = whereConditions.length > 0 ?
                 `WHERE ${whereConditions.join(' AND ')}` : '';
 
             const [strategies] = await db.execute(`
@@ -441,7 +441,7 @@ class SmartAllocationController {
                 params.push(date_to);
             }
 
-            const whereClause = whereConditions.length > 0 ? 
+            const whereClause = whereConditions.length > 0 ?
                 `WHERE ${whereConditions.join(' AND ')}` : '';
 
             // Get allocation history
@@ -567,9 +567,9 @@ class SmartAllocationController {
             } = req.body;
 
             // Validate weights sum to 100
-            const totalWeight = (cost_weight || 0) + (age_weight || 0) + (warranty_weight || 0) + 
-                              (performance_weight || 0) + (expiry_weight || 0);
-            
+            const totalWeight = (cost_weight || 0) + (age_weight || 0) + (warranty_weight || 0) +
+                (performance_weight || 0) + (expiry_weight || 0);
+
             if (Math.abs(totalWeight - 100) > 0.01) {
                 return res.status(400).json({
                     success: false,

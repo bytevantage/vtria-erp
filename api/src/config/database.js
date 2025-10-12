@@ -8,38 +8,67 @@ const pool = mysql.createPool({
     password: process.env.DB_PASS || 'dev_password',
     database: process.env.DB_NAME || 'vtria_erp',
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    connectionLimit: 50, // Increased from 10 for production workload
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+    // Connection timeouts
+    connectTimeout: 10000,
+    acquireTimeout: 10000,
+    timeout: 60000
 });
 
 const promisePool = pool.promise();
 
-// Add connection error handling
+// Add connection monitoring
 pool.on('connection', (connection) => {
-    console.log(`Database connected as id ${connection.threadId}`);
+    console.log(`[DB Pool] Connection ${connection.threadId} acquired`);
+});
+
+pool.on('acquire', (connection) => {
+    console.log(`[DB Pool] Connection ${connection.threadId} acquired from pool`);
+});
+
+pool.on('release', (connection) => {
+    console.log(`[DB Pool] Connection ${connection.threadId} released back to pool`);
+});
+
+pool.on('enqueue', () => {
+    console.warn('[DB Pool] Waiting for available connection (pool exhausted)');
 });
 
 pool.on('error', (err) => {
-    console.error('Database pool error:', err);
+    console.error('[DB Pool] Error:', err);
     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-        console.log('Database connection was closed.');
+        console.error('[DB Pool] Database connection was closed.');
     }
     if (err.code === 'ER_CON_COUNT_ERROR') {
-        console.log('Database has too many connections.');
+        console.error('[DB Pool] Database has too many connections.');
     }
     if (err.code === 'ECONNREFUSED') {
-        console.log('Database connection was refused.');
+        console.error('[DB Pool] Database connection was refused.');
     }
 });
 
 // Test database connection on startup
 promisePool.execute('SELECT 1')
     .then(() => {
-        console.log('Database connection successful');
+        console.log('✅ Database connection successful');
+        console.log(`📊 Connection pool configured: ${pool.config.connectionLimit} max connections`);
     })
     .catch((err) => {
-        console.error('Database connection failed:', err.message);
-        console.log('Server will continue running with limited functionality');
+        console.error('❌ Database connection failed:', err.message);
+        console.error('Server will continue running with limited functionality');
     });
+
+// Export pool stats function for monitoring
+promisePool.getPoolStats = () => {
+    return {
+        connectionLimit: pool.config.connectionLimit,
+        activeConnections: pool._allConnections ? pool._allConnections.length : 0,
+        freeConnections: pool._freeConnections ? pool._freeConnections.length : 0,
+        queueLength: pool._connectionQueue ? pool._connectionQueue.length : 0
+    };
+};
 
 module.exports = promisePool;

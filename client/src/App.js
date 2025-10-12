@@ -77,7 +77,10 @@ import EnterpriseTechnicianDashboard from './components/EnterpriseTechnicianDash
 import EnterpriseAssigneeReport from './components/EnterpriseAssigneeReport';
 import AssigneeReport from './components/AssigneeReport';
 
-import CompetitiveBiddingManager from './components/CompetitiveBiddingManager';
+// Production Enhancement Components
+import { QualityDashboard, ShopFloorDashboard, PlanningDashboard } from './components/Production';
+
+// import CompetitiveBiddingManager from './components/CompetitiveBiddingManager'; // REMOVED: Competitive Bidding feature
 
 // Master Inventory Dashboard temporarily disabled
 // import MasterInventoryDashboard from './components/MasterInventoryDashboard';
@@ -346,7 +349,7 @@ function App() {
                     </ProtectedRoute>
                   } />
 
-                  {/* 🏆 COMPETITIVE BIDDING MANAGER */}
+                  {/* REMOVED: Competitive Bidding feature
                   <Route path="/competitive-bidding" element={
                     <ProtectedRoute>
                       <ErrorBoundary fallback={<div>Error loading competitive bidding manager. Please try again.</div>}>
@@ -354,6 +357,7 @@ function App() {
                       </ErrorBoundary>
                     </ProtectedRoute>
                   } />
+                  */}
 
 
 
@@ -362,6 +366,29 @@ function App() {
                   <Route path="/production" element={
                     <ProtectedRoute>
                       <ProductionManagement />
+                    </ProtectedRoute>
+                  } />
+
+                  {/* Production Enhancement Routes */}
+                  <Route path="/production/quality" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading quality dashboard. Please try again.</div>}>
+                        <QualityDashboard />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/production/shopfloor" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading shop floor dashboard. Please try again.</div>}>
+                        <ShopFloorDashboard />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/production/planning" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary fallback={<div>Error loading production planning. Please try again.</div>}>
+                        <PlanningDashboard />
+                      </ErrorBoundary>
                     </ProtectedRoute>
                   } />
 

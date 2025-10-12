@@ -220,7 +220,7 @@ const EmployeeManagement: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('active');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -306,7 +306,7 @@ const EmployeeManagement: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setEmployees(result.data);
+        setEmployees(result.data || []);
         setTotalPages(result.pagination?.totalPages || 1);
       }
     } catch (error) {
@@ -327,7 +327,7 @@ const EmployeeManagement: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setDepartments(result.data);
+        setDepartments(result.data || []);
       }
     } catch (error) {
       console.error('Error fetching departments:', error);
@@ -346,7 +346,8 @@ const EmployeeManagement: React.FC = () => {
         },
         body: JSON.stringify({
           department_name: departmentName,
-          department_code: departmentName.toUpperCase().replace(/\s+/g, '_')
+          department_code: departmentName.toUpperCase().replace(/\s+/g, '_'),
+          status: 'active'
         }),
       });
 

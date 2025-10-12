@@ -173,7 +173,7 @@ const CompetitiveBiddingManager = () => {
       });
 
       // Create Purchase Requisition with winning supplier
-      await axios.post(`${API_BASE_URL}/api/purchase-requisition/from-rfq-winner`, {
+      await axios.post(`${API_BASE_URL}/api/rfq-campaigns/from-rfq-winner`, {
         rfq_id: selectedRfq.id,
         supplier_id: supplierId,
         bid_id: bidId

@@ -249,30 +249,20 @@ const SalesEnquiry = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/users`);
+      // Use employees API for user/employee data
+      const response = await axios.get(`${API_BASE_URL}/api/employees?limit=100&status=active`);
 
       if (response.data.success) {
-        // Users now exist, but we need employee_id for display
-        // Let's get employee data to match with users
-        const employeeResponse = await axios.get(`${API_BASE_URL}/api/employees?limit=100&status=active`);
+        // Map employees to user format for backward compatibility
+        const usersWithEmployeeData = (response.data.data || []).map(employee => {
+          return {
+            ...employee,
+            employee_id: employee.employee_id || `EMP-${employee.id}`,
+            department_name: user.department_name || 'Unknown'
+          };
+        });
 
-        if (employeeResponse.data.success) {
-          const employees = employeeResponse.data.data;
-
-          // Match users with employees based on email
-          const usersWithEmployeeData = response.data.data.map(user => {
-            const matchingEmployee = employees.find(emp => emp.email === user.email);
-            return {
-              ...user,
-              employee_id: matchingEmployee?.employee_id || `USR-${user.id}`,
-              department_name: matchingEmployee?.department_name || 'Unknown'
-            };
-          });
-
-          setUsers(usersWithEmployeeData);
-        } else {
-          setUsers(response.data.data);
-        }
+        setUsers(usersWithEmployeeData);
       }
     } catch (error) {
       console.error('Error fetching users:', error);

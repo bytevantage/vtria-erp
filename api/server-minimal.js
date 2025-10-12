@@ -58,7 +58,7 @@ const purchasePriceComparisonRoutes = require('./src/routes/purchasePriceCompari
 const purchaseRequisitionRoutes = require('./src/routes/purchaseRequisition.routes');
 const quotationRoutes = require('./src/routes/quotation.routes');
 const rbacRoutes = require('./src/routes/rbac.routes');
-const rfqRoutes = require('./src/routes/rfq.routes');
+// const rfqRoutes = require('./src/routes/rfq.routes'); // REMOVED: Competitive Bidding feature
 const salesRoutes = require('./src/routes/sales.routes');
 const salesEnquiryRoutes = require('./src/routes/salesEnquiry.routes');
 const salesOrderRoutes = require('./src/routes/salesOrder.routes');
@@ -117,7 +117,7 @@ app.use('/api/purchase-price-comparison', purchasePriceComparisonRoutes);
 app.use('/api/purchase-requisition', purchaseRequisitionRoutes);
 app.use('/api/quotation', quotationRoutes);
 app.use('/api/rbac', rbacRoutes);
-app.use('/api/rfq-campaigns', rfqRoutes);
+// app.use('/api/rfq-campaigns', rfqRoutes); // REMOVED: Competitive Bidding feature
 app.use('/api/sales', salesRoutes);
 app.use('/api/sales-enquiry', salesEnquiryRoutes);
 app.use('/api/sales-order', salesOrderRoutes);

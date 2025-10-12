@@ -170,12 +170,15 @@ class ProductionController {
       // Generate BOM number
       const bomNumber = `BOM-${Date.now()}`;
 
-      // Start transaction
-      await db.beginTransaction();
+      // Get connection for transaction
+      const connection = await db.getConnection();
 
       try {
+        // Start transaction
+        await connection.beginTransaction();
+
         // Create BOM header
-        const [headerResult] = await db.execute(`
+        const [headerResult] = await connection.execute(`
           INSERT INTO bom_headers 
           (bom_number, production_item_id, version, description, quantity_per_unit, 
            effective_from, status, created_by)
@@ -187,7 +190,7 @@ class ProductionController {
         // Create BOM components
         for (let i = 0; i < components.length; i++) {
           const component = components[i];
-          await db.execute(`
+          await connection.execute(`
             INSERT INTO bom_components 
             (bom_header_id, inventory_item_id, quantity_required, unit_cost, 
              sequence_number, is_optional, notes)
@@ -203,7 +206,7 @@ class ProductionController {
           ]);
         }
 
-        await db.commit();
+        await connection.commit();
 
         res.status(201).json({
           success: true,
@@ -211,8 +214,10 @@ class ProductionController {
           data: { id: bomHeaderId, bom_number: bomNumber }
         });
       } catch (error) {
-        await db.rollback();
+        await connection.rollback();
         throw error;
+      } finally {
+        connection.release();
       }
     } catch (error) {
       logger.error('Error creating BOM:', error);

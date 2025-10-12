@@ -330,17 +330,20 @@ class MultiLocationInventoryController {
             const { shipped_items } = req.body;
             const user_id = req.user.id;
             
-            // Start transaction
-            await req.db.beginTransaction();
+            // Get connection for transaction
+            const connection = await req.db.getConnection();
             
             try {
+                // Start transaction
+                await connection.beginTransaction();
+                
                 // Get transfer details
                 const transferQuery = `
                     SELECT * FROM inter_store_transfers 
                     WHERE id = ? AND status = 'approved'
                 `;
                 
-                const [transferRows] = await req.db.execute(transferQuery, [transferId]);
+                const [transferRows] = await connection.execute(transferQuery, [transferId]);
                 
                 if (transferRows.length === 0) {
                     throw new Error('Transfer request not found or not approved');
@@ -360,7 +363,7 @@ class MultiLocationInventoryController {
                         WHERE product_id = ? AND location_id = ? AND quantity >= ?
                     `;
                     
-                    const [reduceResult] = await req.db.execute(reduceStockQuery, [
+                    const [reduceResult] = await connection.execute(reduceStockQuery, [
                         shipped_quantity,
                         product_id,
                         transfer.from_location_id,
@@ -380,7 +383,7 @@ class MultiLocationInventoryController {
                         last_updated = NOW()
                     `;
                     
-                    await req.db.execute(addStockQuery, [
+                    await connection.execute(addStockQuery, [
                         product_id,
                         transfer.to_location_id,
                         shipped_quantity
@@ -393,7 +396,7 @@ class MultiLocationInventoryController {
                         WHERE transfer_id = ? AND product_id = ?
                     `;
                     
-                    await req.db.execute(updateItemQuery, [
+                    await connection.execute(updateItemQuery, [
                         shipped_quantity,
                         transferId,
                         product_id
@@ -409,9 +412,9 @@ class MultiLocationInventoryController {
                     WHERE id = ?
                 `;
                 
-                await req.db.execute(updateTransferQuery, [user_id, transferId]);
+                await connection.execute(updateTransferQuery, [user_id, transferId]);
                 
-                await req.db.commit();
+                await connection.commit();
                 
                 res.json({
                     success: true,
@@ -419,8 +422,10 @@ class MultiLocationInventoryController {
                 });
                 
             } catch (error) {
-                await req.db.rollback();
+                await connection.rollback();
                 throw error;
+            } finally {
+                connection.release();
             }
             
         } catch (error) {

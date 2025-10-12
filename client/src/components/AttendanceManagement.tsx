@@ -100,7 +100,7 @@ const AttendanceManagement: React.FC = () => {
 
       const response = await fetch(`${API_BASE_URL}/api/employees/attendance/records?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -147,23 +147,38 @@ const AttendanceManagement: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
+      const token = localStorage.getItem('vtria_token');
+      if (!token) {
+        console.warn('No auth token found - user may need to login');
+        setEmployees([]);
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/employees?status=active`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        setEmployees(result.data);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`Failed to fetch employees: ${response.status}`, errorData);
+
+        if (response.status === 401 || response.status === 403) {
+          console.warn('Authentication failed - user may need to login again');
+        }
+
+        setEmployees([]);
+        return;
       }
+
+      const result = await response.json();
+      console.log('Employees fetched successfully:', result.data?.length || 0);
+      setEmployees(result.data || []);
+
     } catch (error) {
       console.error('Error fetching employees:', error);
-      // Mock data for demo
-      setEmployees([
-        { id: 1, employee_id: 'EMP/2024/001', first_name: 'John', last_name: 'Doe' },
-        { id: 2, employee_id: 'EMP/2024/002', first_name: 'Jane', last_name: 'Smith' }
-      ]);
+      setEmployees([]);
     }
   };
 
@@ -204,7 +219,7 @@ const AttendanceManagement: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           employee_id: parseInt(selectedEmployee),

@@ -1,38 +1,53 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
-const { body } = require('express-validator');
+const { verifyToken } = require('../middleware/auth.middleware');
+const { check } = require('express-validator');
 
-// Validation middleware
-const validateUser = [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('full_name').notEmpty().withMessage('Full name is required'),
-    body('user_role').isIn(['director', 'admin', 'sales-admin', 'designer', 'accounts', 'technician'])
-        .withMessage('Invalid user role')
+// Define validation rules
+const createUserValidation = [
+    check('email').isEmail().withMessage('Valid email is required'),
+    check('full_name').notEmpty().withMessage('Full name is required'),
+    check('user_role').isIn(['director', 'admin', 'sales-admin', 'designer', 'accounts', 'technician']).withMessage('Invalid user role')
 ];
 
-// Validation for creating user (password is optional)
-const validateCreateUser = [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('full_name').notEmpty().withMessage('Full name is required'),
-    body('user_role').isIn(['director', 'admin', 'sales-admin', 'designer', 'accounts', 'technician'])
-        .withMessage('Invalid user role'),
-    body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+const updateUserValidation = [
+    check('email').isEmail().withMessage('Valid email is required'),
+    check('full_name').notEmpty().withMessage('Full name is required'),
+    check('user_role').isIn(['director', 'admin', 'sales-admin', 'designer', 'accounts', 'technician']).withMessage('Invalid user role')
 ];
 
-// Get all users
+// Apply authentication middleware to all routes
+router.use(verifyToken);
+
+// ============================================
+// UNIFIED USER/EMPLOYEE MANAGEMENT (NEW)
+// ============================================
+
+// Get all users with HR details
+router.get('/with-hr', userController.getAllUsersWithHR);
+
+// Create user with HR details
+router.post('/with-hr', userController.createUserWithHR);
+
+// Update user with HR details
+router.put('/:id/with-hr', userController.updateUserWithHR);
+
+// Reset user password
+router.post('/:id/reset-password', userController.resetUserPassword);
+
+// Toggle user active/inactive
+router.post('/:id/toggle-active', userController.toggleUserActive);
+
+// ============================================
+// LEGACY ROUTES (Backward compatible)
+// ============================================
+
+// User routes
 router.get('/', userController.getUsers);
-
-// Create new user
-router.post('/', validateCreateUser, userController.createUser);
-
-// Get user by ID
+router.post('/', createUserValidation, userController.createUser);
 router.get('/:id', userController.getUserById);
-
-// Update user
-router.put('/:id', validateUser, userController.updateUser);
-
-// Delete user
+router.put('/:id', updateUserValidation, userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

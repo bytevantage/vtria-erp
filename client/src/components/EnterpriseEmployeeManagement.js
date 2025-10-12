@@ -69,37 +69,37 @@ import axios from 'axios';
  */
 const EnterpriseEmployeeManagement = () => {
   const navigate = useNavigate();
-  
+
   // State management
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Data states
   const [employees, setEmployees] = useState([]);
   const [groups, setGroups] = useState([]);
   const [roles, setRoles] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [locations, setLocations] = useState([]);
-  
+
   // Dialog states
   const [employeeDialog, setEmployeeDialog] = useState(false);
   const [groupDialog, setGroupDialog] = useState(false);
   const [roleAssignmentDialog, setRoleAssignmentDialog] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
     department_id: '',
-    employment_status: 'active',
+    is_active: 'true',  // Changed from employment_status to match backend API
     employee_type: '',
     page: 1,
     limit: 20
   });
-  
+
   // Form states
   const [employeeForm, setEmployeeForm] = useState({
     first_name: '',
@@ -145,14 +145,24 @@ const EnterpriseEmployeeManagement = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams(filters);
-      const response = await axios.get(`/api/enterprise-employees?${params}`);
-      
+      // Use employees API
+      console.log('Loading employees from:', `/api/employees?${params}`);
+      const response = await axios.get(`/api/employees?${params}`);
+
+      console.log('Employee API response:', response.data);
+
       if (response.data.success) {
-        setEmployees(response.data.data);
+        setEmployees(response.data.data || []);
         setPagination(response.data.pagination || {});
+        console.log('Loaded employees:', response.data.data?.length || 0);
+      } else {
+        setError('Failed to load employees: API returned unsuccessful response');
+        console.error('API returned success=false');
       }
     } catch (error) {
-      setError('Failed to load employees: ' + error.message);
+      setError('Failed to load employees: ' + (error.response?.data?.message || error.message));
+      console.error('Load employees error:', error);
+      console.error('Error response:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -160,17 +170,33 @@ const EnterpriseEmployeeManagement = () => {
 
   const loadMasterData = async () => {
     try {
-      const [rolesRes, deptRes, locRes] = await Promise.all([
-        axios.get('/api/enterprise-employees/master/roles'),
-        axios.get('/api/enterprise-employees/master/departments'),
-        axios.get('/api/enterprise-employees/master/locations')
+      // Load departments from employees API
+      const [deptRes] = await Promise.all([
+        axios.get('/api/employees/master/departments')
       ]);
 
-      setRoles(rolesRes.data.data || []);
+      // Set hardcoded roles (from RBAC)
+      setRoles([
+        { id: 'director', name: 'Director' },
+        { id: 'admin', name: 'Administrator' },
+        { id: 'sales-admin', name: 'Sales Admin' },
+        { id: 'designer', name: 'Designer' },
+        { id: 'accounts', name: 'Accounts' },
+        { id: 'technician', name: 'Technician' }
+      ]);
       setDepartments(deptRes.data.data || []);
-      setLocations(locRes.data.data || []);
+      setLocations([]); // Can be loaded from work_locations if table exists
     } catch (error) {
       console.error('Failed to load master data:', error);
+      // Set default roles even if API fails
+      setRoles([
+        { id: 'director', name: 'Director' },
+        { id: 'admin', name: 'Administrator' },
+        { id: 'sales-admin', name: 'Sales Admin' },
+        { id: 'designer', name: 'Designer' },
+        { id: 'accounts', name: 'Accounts' },
+        { id: 'technician', name: 'Technician' }
+      ]);
     }
   };
 
@@ -188,12 +214,19 @@ const EnterpriseEmployeeManagement = () => {
   const handleEmployeeSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      const response = selectedEmployee 
-        ? await axios.put(`/api/enterprise-employees/${selectedEmployee.id}`, employeeForm)
-        : await axios.post('/api/enterprise-employees', employeeForm);
-      
+      // Prepare data for unified API
+      const data = {
+        ...employeeForm,
+        user_role: employeeForm.user_role || 'technician', // Ensure role is set
+        password: employeeForm.password || 'vtria123' // Default password for new users
+      };
+
+      const response = selectedEmployee
+        ? await axios.put(`/api/employees/${selectedEmployee.id}`, data)
+        : await axios.post('/api/employees', data);
+
       if (response.data.success) {
         setSuccess(selectedEmployee ? 'Employee updated successfully' : 'Employee created successfully');
         setEmployeeDialog(false);
@@ -201,7 +234,8 @@ const EnterpriseEmployeeManagement = () => {
         loadEmployees();
       }
     } catch (error) {
-      setError('Failed to save employee: ' + error.message);
+      setError('Failed to save employee: ' + (error.response?.data?.message || error.message));
+      console.error('Save employee error:', error);
     } finally {
       setLoading(false);
     }
@@ -210,10 +244,10 @@ const EnterpriseEmployeeManagement = () => {
   const handleGroupSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const response = await axios.post('/api/enterprise-employees/groups', groupForm);
-      
+
       if (response.data.success) {
         setSuccess('Group created successfully');
         setGroupDialog(false);
@@ -229,7 +263,7 @@ const EnterpriseEmployeeManagement = () => {
 
   const handleRoleAssignment = async (employeeId, roleId, action = 'assign') => {
     setLoading(true);
-    
+
     try {
       if (action === 'assign') {
         await axios.post(`/api/enterprise-employees/${employeeId}/roles`, {
@@ -243,7 +277,7 @@ const EnterpriseEmployeeManagement = () => {
         });
         setSuccess('Role revoked successfully');
       }
-      
+
       loadEmployees();
     } catch (error) {
       setError(`Failed to ${action} role: ` + error.message);
@@ -254,7 +288,7 @@ const EnterpriseEmployeeManagement = () => {
 
   const handleGroupMembership = async (groupId, employeeId, action = 'add') => {
     setLoading(true);
-    
+
     try {
       if (action === 'add') {
         await axios.post(`/api/enterprise-employees/groups/${groupId}/members/${employeeId}`);
@@ -263,7 +297,7 @@ const EnterpriseEmployeeManagement = () => {
         await axios.delete(`/api/enterprise-employees/groups/${groupId}/members/${employeeId}`);
         setSuccess('Employee removed from group successfully');
       }
-      
+
       loadGroups();
       loadEmployees();
     } catch (error) {
@@ -278,15 +312,18 @@ const EnterpriseEmployeeManagement = () => {
       first_name: '',
       last_name: '',
       email: '',
+      password: '',
       phone: '',
+      user_role: 'technician',
       department_id: '',
-      position_id: '',
+      position: '',
       hire_date: '',
       employee_type: 'full_time',
       basic_salary: '',
       work_location_id: '',
-      initial_roles: [],
-      initial_groups: []
+      manager_id: '',
+      date_of_birth: '',
+      address: ''
     });
     setSelectedEmployee(null);
   };
@@ -317,7 +354,7 @@ const EnterpriseEmployeeManagement = () => {
   const getStatusColor = (status) => {
     const colors = {
       'active': 'success',
-      'inactive': 'warning', 
+      'inactive': 'warning',
       'terminated': 'error',
       'on_leave': 'info',
       'suspended': 'error'
@@ -486,7 +523,7 @@ const EnterpriseEmployeeManagement = () => {
                 <Typography variant="h6" gutterBottom>
                   Employees ({pagination.totalRecords || 0})
                 </Typography>
-                
+
                 {loading ? (
                   <Box display="flex" justifyContent="center" p={3}>
                     <CircularProgress />
@@ -547,20 +584,20 @@ const EnterpriseEmployeeManagement = () => {
                               />
                             </TableCell>
                             <TableCell>
-                              <IconButton 
-                                size="small" 
+                              <IconButton
+                                size="small"
                                 onClick={() => navigate(`/employees/${employee.id}`)}
                               >
                                 <ViewIcon />
                               </IconButton>
-                              <IconButton 
-                                size="small" 
+                              <IconButton
+                                size="small"
                                 onClick={() => openEmployeeDialog(employee)}
                               >
                                 <EditIcon />
                               </IconButton>
-                              <IconButton 
-                                size="small" 
+                              <IconButton
+                                size="small"
                                 onClick={() => setRoleAssignmentDialog(true)}
                               >
                                 <AssignmentIcon />
@@ -618,7 +655,7 @@ const EnterpriseEmployeeManagement = () => {
                     Create Group
                   </Button>
                 </Box>
-                
+
                 <Grid container spacing={2}>
                   {groups.map((group) => (
                     <Grid item xs={12} md={6} lg={4} key={group.id}>
@@ -656,7 +693,7 @@ const EnterpriseEmployeeManagement = () => {
                 <Typography variant="h6" gutterBottom>
                   System Roles
                 </Typography>
-                
+
                 <TableContainer>
                   <Table>
                     <TableHead>
@@ -707,14 +744,14 @@ const EnterpriseEmployeeManagement = () => {
                 <Typography variant="h6" gutterBottom>
                   Departments
                 </Typography>
-                
+
                 {departments.map((dept) => (
                   <Accordion key={dept.id}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Box display="flex" justifyContent="between" width="100%">
                         <Typography>{dept.department_name}</Typography>
-                        <Chip 
-                          label={`${dept.employee_count} employees`} 
+                        <Chip
+                          label={`${dept.employee_count} employees`}
                           size="small"
                           sx={{ mr: 2 }}
                         />
@@ -742,7 +779,7 @@ const EnterpriseEmployeeManagement = () => {
                 <Typography variant="h6" gutterBottom>
                   Work Locations
                 </Typography>
-                
+
                 {locations.map((location) => (
                   <Box key={location.id} sx={{ mb: 2, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
                     <Typography variant="subtitle1">

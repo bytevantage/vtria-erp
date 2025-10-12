@@ -67,7 +67,7 @@ class EmployeeController {
         FROM employees e
         LEFT JOIN departments d ON e.department_id = d.id
         LEFT JOIN employees mgr ON e.reporting_manager_id = mgr.id
-        LEFT JOIN users u ON e.user_id = u.id
+        LEFT JOIN users u ON e.employee_id = u.employee_id
         ${whereClause}
         ORDER BY e.created_at DESC
         LIMIT ? OFFSET ?
@@ -376,18 +376,31 @@ class EmployeeController {
         device_info
       } = req.body;
 
-      // Get the numeric employee ID from the employee_id string
-      const employeeQuery = 'SELECT id FROM employees WHERE employee_id = ?';
-      const [employeeResult] = await db.query(employeeQuery, [employee_id]);
+      // Handle both numeric ID and string employee_id format
+      let numericEmployeeId;
+      if (typeof employee_id === 'number' || !isNaN(employee_id)) {
+        // Already numeric or can be converted
+        numericEmployeeId = parseInt(employee_id);
 
-      if (employeeResult.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'Employee not found'
-        });
+        // Verify employee exists
+        const [employeeCheck] = await db.query('SELECT id FROM employees WHERE id = ?', [numericEmployeeId]);
+        if (employeeCheck.length === 0) {
+          return res.status(404).json({
+            success: false,
+            message: 'Employee not found'
+          });
+        }
+      } else {
+        // String format like "EMP/2024/001"
+        const [employeeResult] = await db.query('SELECT id FROM employees WHERE employee_id = ?', [employee_id]);
+        if (employeeResult.length === 0) {
+          return res.status(404).json({
+            success: false,
+            message: 'Employee not found'
+          });
+        }
+        numericEmployeeId = employeeResult[0].id;
       }
-
-      const numericEmployeeId = employeeResult[0].id;
 
       // Check if attendance record exists for the date
       const checkQuery = `
@@ -396,6 +409,20 @@ class EmployeeController {
       `;
 
       const [existing] = await db.query(checkQuery, [numericEmployeeId, attendance_date]);
+
+      // Convert timestamp to MySQL datetime format
+      const currentDateTime = new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ');
+
+      // Calculate late status for check-in
+      const WORK_START_HOUR = 9;
+      const GRACE_MINUTES = 15;
+      const checkInTime = new Date(timestamp);
+      const startTime = new Date(checkInTime);
+      startTime.setHours(WORK_START_HOUR, GRACE_MINUTES, 0, 0);
+
+      const isLate = checkInTime > startTime;
+      const lateMinutes = isLate ? Math.floor((checkInTime - startTime) / 60000) : 0;
+      const attendanceStatus = isLate ? 'late' : 'present';
 
       let query, params;
 
@@ -411,13 +438,15 @@ class EmployeeController {
         query = `
           INSERT INTO attendance_records (
             employee_id, attendance_date, check_in_time, check_in_location,
-            check_in_latitude, check_in_longitude, check_in_method
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            check_in_latitude, check_in_longitude, check_in_method,
+            is_late, late_minutes, status, created_by
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         params = [
-          numericEmployeeId, attendance_date, timestamp, location,
-          latitude, longitude, method
+          numericEmployeeId, attendance_date, currentDateTime, location,
+          latitude, longitude, method, isLate, lateMinutes, attendanceStatus,
+          req.user?.id || 1
         ];
       } else {
         // Update existing record
@@ -448,10 +477,12 @@ class EmployeeController {
           query = `
             UPDATE attendance_records 
             SET check_in_time = ?, check_in_location = ?, check_in_latitude = ?,
-                check_in_longitude = ?, check_in_method = ?
+                check_in_longitude = ?, check_in_method = ?,
+                is_late = ?, late_minutes = ?, status = ?
             WHERE id = ?
           `;
-          params = [timestamp, location, latitude, longitude, method, record.id];
+          params = [currentDateTime, location, latitude, longitude, method,
+            isLate, lateMinutes, attendanceStatus, record.id];
         } else {
           // Calculate hours worked
           const checkInTime = new Date(record.check_in_time);
@@ -461,6 +492,7 @@ class EmployeeController {
           query = `
             UPDATE attendance_records 
             SET check_out_time = ?, check_out_location = ?, 
+                check_out_latitude = ?, check_out_longitude = ?,
                 total_hours = ?, regular_hours = ?, overtime_hours = ?
             WHERE id = ?
           `;
@@ -469,8 +501,8 @@ class EmployeeController {
           const overtimeHours = Math.max(0, totalHours - 9);
 
           params = [
-            timestamp, location,
-            totalHours, regularHours, overtimeHours, record.id
+            currentDateTime, location, latitude, longitude,
+            totalHours.toFixed(2), regularHours.toFixed(2), overtimeHours.toFixed(2), record.id
           ];
         }
       }
@@ -524,7 +556,8 @@ class EmployeeController {
       const query = `
         SELECT 
           ar.*,
-          e.employee_id,
+          e.employee_id as employee_employee_id,
+          ar.status as attendance_status,
           CONCAT(e.first_name, ' ', e.last_name) as employee_name,
           'Standard Shift' as shift_name
         FROM attendance_records ar

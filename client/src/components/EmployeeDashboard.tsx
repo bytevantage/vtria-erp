@@ -76,32 +76,11 @@ const EmployeeDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [recentActivities] = useState<RecentActivity[]>([
-    {
-      id: 1,
-      type: 'attendance',
-      message: 'Checked in at Head Office',
-      timestamp: '9:15 AM',
-      employee_name: 'John Doe'
-    },
-    {
-      id: 2,
-      type: 'leave',
-      message: 'Applied for sick leave',
-      timestamp: '8:30 AM',
-      employee_name: 'Jane Smith'
-    },
-    {
-      id: 3,
-      type: 'employee',
-      message: 'New employee onboarded',
-      timestamp: 'Yesterday',
-      employee_name: 'Mike Johnson'
-    }
-  ]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchRecentActivities();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -109,7 +88,7 @@ const EmployeeDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/employees/dashboard/data', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -132,6 +111,33 @@ const EmployeeDashboard: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentActivities = async () => {
+    try {
+      // Fetch recent employees for activity feed
+      const response = await fetch('/api/employees?limit=5&sortBy=created_at&sortOrder=desc', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Convert employees to activity format
+        const activities: RecentActivity[] = (result.data || []).slice(0, 3).map((employee: any) => ({
+          id: employee.id,
+          type: 'employee' as const,
+          message: 'Recently added employee',
+          timestamp: employee.created_at || new Date().toISOString(),
+          employee_name: `${employee.first_name} ${employee.last_name}`
+        }));
+        setRecentActivities(activities);
+      }
+    } catch (error) {
+      console.error('Error fetching recent activities:', error);
+      setRecentActivities([]);
     }
   };
 

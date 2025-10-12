@@ -11,7 +11,7 @@ class SuppliersController {
 
             if (is_active !== undefined) {
                 whereClause = 'WHERE is_active = ?';
-                params.push(is_active === 'true' || is_active === true);
+                params.push((is_active === 'true' || is_active === '1' || is_active === true) ? 1 : 0);
             }
 
             const query = `

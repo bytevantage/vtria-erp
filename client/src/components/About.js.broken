@@ -1,0 +1,948 @@
+/* eslint-disable */
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Divider,
+  Paper,
+  Avatar,
+  Chip,
+  Button,
+  Link,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
+import {
+  Business as BusinessIcon,
+  Email as EmailIcon,
+  Language as WebsiteIcon,
+  LocationOn as LocationIcon,
+  Phone as PhoneIcon,
+  ExpandMore as ExpandMoreIcon,
+  Info as InfoIcon,
+  Security as SecurityIcon,
+  ContactMail as ContactMailIcon,
+  Architecture as ArchitectureIcon,
+  Timeline as TimelineIcon,
+  Analytics as AnalyticsIcon,
+  Settings as SettingsIcon,
+  SmartToy as AIIcon,
+  AutoFixHigh as SmartIcon,
+  Gavel as BiddingIcon,
+  AccountBalance as FinanceIcon,
+  People as PeopleIcon,
+  Inventory as InventoryIcon,
+  Assignment as ManufacturingIcon,
+} from '@mui/icons-material';
+
+const About = () => {
+  const companyInfo = {
+    name: 'ByteVantage Enterprise Solutions',
+    location: 'Mangalore, Karnataka, India',
+    website: 'www.bytevantage.in',
+    email: 'support@bytevantage.in',
+    phone: '+91 8951386437', // Updated phone number
+  };
+
+  const eulaContent = `
+END USER LICENSE AGREEMENT (EULA)
+
+This End User License Agreement ("Agreement") is a legal agreement between you and ByteVantage Enterprise Solutions ("Company") for the VTRIA ERP System software product(s) identified above which may include associated software components, media, printed materials, and "online" or electronic documentation ("Software").
+
+By installing, copying, or otherwise using the Software, you agree to be bound by the terms of this Agreement. This license agreement represents the entire agreement concerning the program between you and the Company (referred to as "licensor"), (referred to as "licensee"), superseding any prior proposal, representation, or understanding between the parties.
+
+1. GRANT OF LICENSE
+The Company hereby grants you a non-exclusive, non-transferable license to use the Software on a single computer or network, subject to the terms and conditions of this Agreement.
+
+2. INTELLECTUAL PROPERTY RIGHTS
+The Software is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties. The Software is licensed, not sold.
+
+3. RESTRICTIONS
+You may not:
+- Modify, adapt, translate, reverse engineer, decompile, or disassemble the Software
+- Create derivative works based on the Software
+- Rent, lease, or lend the Software to any third party
+- Use the Software for any unlawful purpose
+- Remove or alter any copyright, trademark, or other proprietary notices
+
+4. TERMINATION
+This Agreement is effective until terminated. You may terminate this Agreement at any time by destroying all copies of the Software. This Agreement will terminate immediately without notice if you fail to comply with any provision of this Agreement.
+
+5. LIMITED WARRANTY
+The Company warrants that the Software will perform substantially in accordance with the accompanying written materials for a period of ninety (90) days from the date of receipt.
+
+6. LIMITATION OF LIABILITY
+In no event shall the Company be liable for any damages (including, without limitation, lost profits, business interruption, or lost information) arising out of the use of or inability to use the Software.
+
+7. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of India.
+
+8. ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties and supersedes all prior agreements and understandings.
+
+For support and inquiries, please contact:
+Email: support@bytevantage.in
+Website: www.bytevantage.in
+  `;
+
+  return (
+    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4, textAlign: 'center' }}>
+        About VTRIA ERP System
+      </Typography>
+
+      {/* Company Information Card */}
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <Avatar sx={{ bgcolor: 'primary.main', mr: 2, width: 60, height: 60 }}>
+              <BusinessIcon sx={{ fontSize: 30 }} />
+            </Avatar>
+            <Box>
+              <Typography variant="h5" component="div">
+                {companyInfo.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Enterprise Resource Planning Solutions
+              </Typography>
+            </Box>
+          </Box>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 2, height: '100%' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <ContactMailIcon sx={{ mr: 1 }} />
+                  Contact Information
+                </Typography>
+                <List dense>
+                  <ListItem>
+                    <ListItemIcon>
+                      <LocationIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={companyInfo.location} />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <EmailIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Link href={`mailto:${companyInfo.email}`} color="primary">
+                          {companyInfo.email}
+                        </Link>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <WebsiteIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Link href={`https://${companyInfo.website}`} target="_blank" rel="noopener" color="primary">
+                          {companyInfo.website}
+                        </Link>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <PhoneIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={companyInfo.phone} />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 2, height: '100%' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <InfoIcon sx={{ mr: 1 }} />
+                  System Information
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body1" paragraph>
+                    <strong>Product:</strong> VTRIA ERP System
+                  </Typography>
+                  <Typography variant="body1" paragraph>
+                    <strong>Version:</strong> 1.1.0
+                  </Typography>
+                  <Typography variant="body1" paragraph>
+                    <strong>Technology:</strong> React.js, TypeScript, Node.js, MySQL
+                  </Typography>
+                  <Typography variant="body1" paragraph>
+                    <strong>Deployment:</strong> Docker Containerized
+                  </Typography>
+                  <Typography variant="body1" paragraph>
+                    <strong>Components:</strong> 380+ React Components
+                  </Typography>
+                  <Box sx={{ mt: 2 }}>
+                    <Chip label="Manufacturing ERP" sx={{ mr: 1, mb: 1 }} />
+                    <Chip label="AI-Powered Analytics" sx={{ mr: 1, mb: 1 }} color="primary" />
+                    <Chip label="Smart Inventory" sx={{ mr: 1, mb: 1 }} color="secondary" />
+                    {/* <Chip label="Competitive Bidding" sx={{ mr: 1, mb: 1 }} color="success" /> */}
+                    <Chip label="HR Management" sx={{ mr: 1, mb: 1 }} color="warning" />
+                    <Chip label="Financial Analytics" sx={{ mr: 1, mb: 1 }} color="info" />
+                    <Chip label="Mobile Attendance" sx={{ mr: 1, mb: 1 }} color="error" />
+                  </Box>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Enhanced Features & AI Capabilities */}
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <SmartIcon sx={{ mr: 1 }} />
+            AI-Powered Enterprise Features
+          </Typography>
+
+          <Grid container spacing={3}>
+            {/* Smart Inventory Management */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'primary.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <AIIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Smart Allocation Engine</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="AI-Powered Inventory Allocation"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Context-aware batch selection based on business scenarios
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Smart Cost Optimization"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated FIFO, warranty, and performance-based allocation
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Predictive Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Allocation recommendations with cost impact analysis
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* REMOVED: Competitive Bidding System
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'success.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <BiddingIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Competitive Bidding</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Multi-Supplier RFQ Management"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated RFQ distribution to multiple suppliers
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Price Comparison Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Real-time bid comparison with savings calculation
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Supplier Intelligence"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Performance tracking and market competitiveness analysis
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+            */}
+
+            {/* Enterprise Financial Dashboard */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'warning.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <FinanceIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Financial Analytics</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Real-Time KPI Dashboard"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Cash flow, P&L, and customer outstanding tracking
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Cost Optimization Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated cost analysis and savings identification
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Financial Forecasting"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Predictive financial modeling and trend analysis
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Advanced HR Management */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'info.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <PeopleIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Smart HR Management</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Multi-Modal Attendance"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Biometric, GPS, QR Code, and photo-based check-ins
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Enhanced Analytics"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Attendance patterns, productivity metrics, and insights
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Mobile-First Design"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Dedicated mobile interfaces for employee self-service
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Master Inventory Dashboard */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'secondary.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <InventoryIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Advanced Inventory</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Serial Number Tracking"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Complete lifecycle tracking with batch management
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Smart Procurement Alerts"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Automated reorder points and stock optimization
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Warranty Management"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Warranty expiry tracking and lifecycle analytics
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            {/* Manufacturing Workflow */}
+            <Grid item xs={12} md={6} lg={4}>
+              <Paper sx={{ p: 2, height: '100%', bgcolor: 'error.light', color: 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <ManufacturingIcon sx={{ mr: 1 }} />
+                  <Typography variant="h6">Manufacturing Excellence</Typography>
+                </Box>
+                <List dense sx={{ color: 'white' }}>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Bill of Materials (BOM)"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Multi-level BOM management with cost tracking
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Production Planning"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Resource allocation and production scheduling
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <ListItemText
+                      primary="Quality Control"
+                      secondary={
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Integrated quality management and compliance tracking
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* System Overview & Technical Analysis */}
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <AnalyticsIcon sx={{ mr: 1 }} />
+            System Overview & Technical Analysis
+          </Typography>
+
+          {/* Executive Summary */}
+          <Paper sx={{ p: 2, mb: 3, bgcolor: 'grey.50' }}>
+            <Typography variant="h6" gutterBottom color="primary">
+              Executive Summary
+            </Typography>
+            <Typography variant="body2" paragraph>
+              The VTRIA ERP system is a comprehensive enterprise resource planning solution designed specifically for engineering and manufacturing businesses. Built with modern technologies and automated workflows, it provides complete visibility and control over business processes from enquiry to delivery.
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <Chip label="Modern Tech Stack" sx={{ mr: 1, mb: 1 }} />
+              <Chip label="Case-Driven Workflow" sx={{ mr: 1, mb: 1 }} />
+              <Chip label="Real-Time Tracking" sx={{ mr: 1, mb: 1 }} />
+              <Chip label="Role-Based Security" sx={{ mr: 1, mb: 1 }} />
+            </Box>
+          </Paper>
+
+          {/* Technical Architecture */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <ArchitectureIcon sx={{ mr: 1 }} />
+                Technical Architecture
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Technology Stack</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Frontend: React.js with Material-UI" secondary="Port: 3000" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Backend: Node.js with Express.js" secondary="Port: 3001" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Database: MySQL 8.0" secondary="Port: 3306" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Cache: Redis 7-alpine" secondary="Port: 6379" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Key Features</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Containerized Deployment" secondary="Docker-based architecture" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="JWT Authentication" secondary="Secure user sessions" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Role-Based Access Control" secondary="Granular permissions" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Real-Time Updates" secondary="WebSocket integration" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Case Flow Analysis */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <TimelineIcon sx={{ mr: 1 }} />
+                Complete Case Flow Management
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography variant="subtitle1" gutterBottom>Workflow Overview</Typography>
+              <Typography variant="body2" paragraph>
+                The system follows a comprehensive 7-stage case lifecycle that automates the entire business process from customer enquiry to project completion.
+              </Typography>
+
+              <Grid container spacing={1} sx={{ mb: 2 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'primary.light', color: 'white' }}>
+                    <Typography variant="subtitle2">1. Enquiry</Typography>
+                    <Typography variant="caption">Customer inquiry received</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'secondary.light', color: 'white' }}>
+                    <Typography variant="subtitle2">2. Estimation</Typography>
+                    <Typography variant="caption">Technical assessment</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'success.light', color: 'white' }}>
+                    <Typography variant="subtitle2">3. Quotation</Typography>
+                    <Typography variant="caption">Formal pricing</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'warning.light', color: 'white' }}>
+                    <Typography variant="subtitle2">4. Order</Typography>
+                    <Typography variant="caption">Purchase order confirmed</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'info.light', color: 'white' }}>
+                    <Typography variant="subtitle2">5. Production</Typography>
+                    <Typography variant="caption">Manufacturing process</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'error.light', color: 'white' }}>
+                    <Typography variant="subtitle2">6. Delivery</Typography>
+                    <Typography variant="caption">Goods delivered</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Paper sx={{ p: 1, textAlign: 'center', bgcolor: 'grey.500', color: 'white' }}>
+                    <Typography variant="subtitle2">7. Closed</Typography>
+                    <Typography variant="caption">Case archived</Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              <Typography variant="subtitle1" gutterBottom>Key Capabilities</Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemText primary="Automated Case Creation" secondary="Enquiry automatically generates case with unique numbering" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="State Transition Management" secondary="Controlled workflow progression with validation" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Document Generation" secondary="PDF quotations, sales orders, delivery challans" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Inventory Integration" secondary="Real-time stock checking and allocation" />
+                </ListItem>
+              </List>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* AI & Smart Features */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <AIIcon sx={{ mr: 1 }} />
+                AI-Powered Intelligence & Smart Features
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Smart Allocation Engine</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Context-Aware Allocation" secondary="AI chooses optimal batches based on business scenarios (estimation/manufacturing/sales)" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Multi-Factor Optimization" secondary="Balances cost, FIFO, warranty, and performance metrics automatically" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Predictive Recommendations" secondary="Cost impact analysis and alternative strategy suggestions" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Customer Tier Intelligence" secondary="VIP/Standard/New customer prioritization in allocation decisions" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Price Intelligence & Competitive Analysis</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Market Price Analytics" secondary="Real-time competitive pricing analysis with variance tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Supplier Performance Scoring" secondary="Automated rating based on delivery time, price competitiveness" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Cost Savings Identification" secondary="Automatic detection of savings opportunities with alerts" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Procurement Intelligence" secondary="Smart supplier matching and negotiation assistance" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="subtitle1" gutterBottom>Advanced Analytics & Insights</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Financial KPI Dashboard" secondary="Cash flow, P&L, customer outstanding analytics" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Inventory Performance Analytics" secondary="Batch performance scoring and optimization metrics" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="HR Analytics" secondary="Attendance patterns, productivity metrics, suspicious activity detection" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Manufacturing Intelligence" secondary="Production efficiency, resource utilization analytics" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Predictive Maintenance" secondary="Warranty tracking, lifecycle management, expiry predictions" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Enhanced HR & Employee Management */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <PeopleIcon sx={{ mr: 1 }} />
+                Enhanced HR & Employee Management
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Multi-Modal Attendance System</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Biometric Integration" secondary="Fingerprint and facial recognition support" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="GPS-Based Check-in" secondary="Location validation with mobile GPS tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="QR Code Attendance" secondary="Contactless check-in with QR code scanning" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Photo Verification" secondary="Selfie-based attendance with validation" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Web & Admin Entry" secondary="Manual entry options with audit trails" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Advanced Analytics & Management</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Suspicious Activity Detection" secondary="AI-powered anomaly detection in attendance patterns" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Productivity Analytics" secondary="Work hours analysis, late arrival tracking, efficiency metrics" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Leave Management" secondary="Automated leave applications, approvals, and balance tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Mobile-First Experience" secondary="Dedicated mobile interfaces for employee self-service" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Bulk Operations" secondary="Mass attendance imports and batch processing capabilities" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Advanced Features */}
+          <Accordion sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <SettingsIcon sx={{ mr: 1 }} />
+                Enterprise-Grade Features & Capabilities
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Procurement Management</Typography>
+                  <List dense>
+                    {/* REMOVED: Competitive Bidding features
+                    <ListItem>
+                      <ListItemText primary="Multi-Supplier RFQ Management" secondary="Automated RFQ distribution to multiple suppliers" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Real-Time Bid Comparison" secondary="Side-by-side analysis with automatic savings calculation" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Supplier Intelligence Dashboard" secondary="Performance metrics, response rates, and competitiveness analysis" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Automated Winner Processing" secondary="Convert winning bids to purchase requisitions automatically" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Advanced Manufacturing & BOM</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Multi-Level BOM Management" secondary="Complex bill of materials with nested components" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Production Planning" secondary="Resource allocation and production scheduling optimization" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Cost Tracking & Analysis" secondary="Real-time cost analysis and manufacturing expense tracking" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Quality Control Integration" secondary="Quality management and compliance tracking workflows" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="subtitle1" gutterBottom>Security & Infrastructure</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="JWT Authentication" secondary="Secure token-based authentication with refresh tokens" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Role-Based Access Control" secondary="Granular permissions with department-level security" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Complete Audit Logging" secondary="Activity tracking across all modules with timestamps" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Docker Containerization" secondary="Production-ready deployment with environment isolation" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="API Documentation" secondary="Comprehensive Swagger/OpenAPI documentation" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="TypeScript Integration" secondary="Type-safe development with 380+ React components" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Performance & Scalability */}
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                <AnalyticsIcon sx={{ mr: 1 }} />
+                Performance & Scalability
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Current Performance</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="API Response Time" secondary="< 200ms average" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Concurrent Users" secondary="50+ simultaneous users" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Database Performance" secondary="Optimized with proper indexing" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Real-Time Updates" secondary="WebSocket integration" />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>Scalability Features</Typography>
+                  <List dense>
+                    <ListItem>
+                      <ListItemText primary="Horizontal Scaling" secondary="Multiple API server instances" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Docker Containerization" secondary="Consistent deployment" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Redis Caching" secondary="Performance optimization" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Database Optimization" secondary="Read replicas and pooling" />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* EULA Section */}
+      <Card>
+        <CardContent>
+          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <SecurityIcon sx={{ mr: 1 }} />
+            End User License Agreement (EULA)
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Please read this End User License Agreement carefully before using the VTRIA ERP System.
+          </Typography>
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="eula-content"
+              id="eula-header"
+            >
+              <Typography variant="h6">Full EULA Text</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box sx={{ maxHeight: 400, overflow: 'auto', p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="body2" component="pre" sx={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
+                  {eulaContent}
+                </Typography>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              By using this software, you acknowledge that you have read, understood, and agree to be bound by the terms of this EULA.
+            </Typography>
+            <Button
+              variant="outlined"
+              startIcon={<EmailIcon />}
+              href={`mailto:${companyInfo.email}?subject=VTRIA ERP Support Request`}
+              sx={{ mt: 2 }}
+            >
+              Contact Support
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* Footer */}
+      <Box sx={{ mt: 4, textAlign: 'center', py: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Typography variant="body2" color="text.secondary">
+          © 2025 {companyInfo.name}. All rights reserved.
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          VTRIA ERP System - Enterprise Resource Planning Solution
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
+
+export default About;

@@ -61,7 +61,6 @@ const menuItems: MenuItem[] = [
     icon: <ShoppingBasketIcon />,
     type: 'group',
     children: [
-      { text: ' Competitive Bidding', icon: <AssignmentIcon />, path: '/competitive-bidding', type: 'single' },
       { text: 'Purchase Requisition', icon: <AssignmentIcon />, path: '/purchase-requisition', type: 'single' },
       { text: 'Purchase Order', icon: <ShoppingCartIcon />, path: '/purchase-orders', type: 'single' },
       { text: 'GRN', icon: <LocalShippingIcon />, path: '/grn', type: 'single' },
@@ -70,8 +69,13 @@ const menuItems: MenuItem[] = [
   {
     text: 'Manufacturing',
     icon: <PrecisionManufacturingIcon />,
-    path: '/production',
-    type: 'single'
+    type: 'group',
+    children: [
+      { text: 'Production Management', icon: <PrecisionManufacturingIcon />, path: '/production', type: 'single' },
+      { text: 'Quality Control', icon: <AssignmentIcon />, path: '/production/quality', type: 'single' },
+      { text: 'Shop Floor Control', icon: <EngineeringIcon />, path: '/production/shopfloor', type: 'single' },
+      { text: 'Production Planning', icon: <DashboardIcon />, path: '/production/planning', type: 'single' },
+    ]
   },
   {
     text: 'Inventory & Products',

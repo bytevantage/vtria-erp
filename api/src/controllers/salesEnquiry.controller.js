@@ -206,7 +206,6 @@ class SalesEnquiryController {
             }
 
             await connection.commit();
-            connection.release();
 
             res.status(201).json({
                 success: true,

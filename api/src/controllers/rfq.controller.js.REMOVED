@@ -147,37 +147,42 @@ class RFQController {
       const { winning_bid_id, supplier_id } = req.body;
       const created_by = req.user?.id || 1;
 
-      // Start transaction
-      await db.beginTransaction();
+      // Get connection for transaction
+      const connection = await db.getConnection();
 
       try {
+        // Start transaction
+        await connection.beginTransaction();
+
         // Update RFQ status to completed
-        await db.execute(
+        await connection.execute(
           `UPDATE rfq_campaigns SET status = 'completed', winner_supplier_id = ?, completed_at = NOW() WHERE id = ?`,
           [supplier_id, rfq_id]
         );
 
         // Mark winning bid
-        await db.execute(
+        await connection.execute(
           `UPDATE supplier_bids SET status = 'won', selected_at = NOW() WHERE id = ?`,
           [winning_bid_id]
         );
 
         // Mark other bids as lost
-        await db.execute(
+        await connection.execute(
           `UPDATE supplier_bids SET status = 'lost' WHERE rfq_id = ? AND id != ?`,
           [rfq_id, winning_bid_id]
         );
 
-        await db.commit();
+        await connection.commit();
 
         res.json({
           success: true,
           message: 'Winning bid selected successfully'
         });
       } catch (error) {
-        await db.rollback();
+        await connection.rollback();
         throw error;
+      } finally {
+        connection.release();
       }
     } catch (error) {
       console.error('Error selecting winning bid:', error);
@@ -230,7 +235,7 @@ class RFQController {
                 VALUES (?, ?, ?, CURDATE(), ?, ?, ?, 'draft')`,
         [
           pr_number,
-          rfq.quotation_number, // Use quotation number, not ID
+          rfq.quotation_id, // Use quotation ID (numeric), not quotation_number (string)
           supplier_id,
           `Created from RFQ: ${rfq.title}\nWinning bid: ₹${rfq.total_price}\nDelivery: ${rfq.delivery_days} days\nTerms: ${rfq.payment_terms}\n${rfq.bid_notes || ''}`,
           created_by,
@@ -251,7 +256,7 @@ class RFQController {
                     qi.rate as estimated_price
                 FROM quotation_items qi
                 WHERE qi.quotation_id = ?
-            `, [rfq.quotation_number]);
+            `, [rfq.quotation_id]);
 
       // Insert PR items
       if (items.length > 0) {

@@ -13,6 +13,49 @@ const slaScheduler = require('./services/slaScheduler');
 const notificationService = require('./services/notificationService');
 require('dotenv').config();
 
+// Validate required environment variables
+function validateEnvironment() {
+    const required = [
+        'DB_HOST',
+        'DB_PORT',
+        'DB_USER',
+        'DB_PASS',
+        'DB_NAME',
+        'JWT_SECRET',
+        'PORT'
+    ];
+    
+    const missing = required.filter(key => !process.env[key]);
+    
+    if (missing.length > 0) {
+        console.error('❌ FATAL: Missing required environment variables:');
+        missing.forEach(key => console.error(`   - ${key}`));
+        console.error('\n💡 Please check your .env file or environment configuration');
+        console.error('   Example: cp .env.example .env\n');
+        process.exit(1);
+    }
+    
+    // Validate DB_HOST for Docker deployment
+    if (process.env.DB_HOST === 'localhost' && process.env.NODE_ENV === 'production') {
+        console.warn('⚠️  WARNING: DB_HOST is "localhost" in production.');
+        console.warn('   If running in Docker, DB_HOST should be "db" (the service name)');
+        console.warn('   Update your .env file: DB_HOST=db\n');
+    }
+    
+    // Validate JWT_SECRET strength
+    if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
+        console.warn('⚠️  WARNING: JWT_SECRET is too short (less than 32 characters)');
+        console.warn('   This is a security risk in production environments\n');
+    }
+    
+    console.log('✅ Environment validation passed');
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔌 Database: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
+    console.log(`🚪 Server Port: ${process.env.PORT}\n`);
+}
+
+validateEnvironment();
+
 // Add process error handlers
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
@@ -72,7 +115,7 @@ const serialWarrantyTrackingRoutes = require('./routes/serialWarrantyTracking.ro
 const rbacRoutes = require('./routes/rbac.routes');
 const stockAvailabilityRoutes = require('./routes/stockAvailability.routes');
 const purchaseRequisitionRoutes = require('./routes/purchaseRequisition.routes');
-const rfqRoutes = require('./routes/rfq.routes');
+// const rfqRoutes = require('./routes/rfq.routes'); // REMOVED: Competitive Bidding feature
 const grnRoutes = require('./routes/grn.routes');
 const bomRoutes = require('./routes/bom.routes');
 const bomSetupRoutes = require('./routes/bomSetup.routes');
@@ -191,7 +234,7 @@ app.use('/api/serial-warranty', serialWarrantyTrackingRoutes);
 app.use('/api/rbac', rbacRoutes);
 app.use('/api/stock-availability', stockAvailabilityRoutes);
 app.use('/api/purchase-requisition', purchaseRequisitionRoutes);
-app.use('/api/rfq-campaigns', rfqRoutes);
+// app.use('/api/rfq-campaigns', rfqRoutes); // REMOVED: Competitive Bidding feature
 app.use('/api/grn', grnRoutes);
 app.use('/api/po-advance-payments', require('./routes/poAdvancePayment.routes'));
 app.use('/api/bom', bomRoutes);

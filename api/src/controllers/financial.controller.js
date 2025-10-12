@@ -179,15 +179,15 @@ class FinancialController {
                 WHERE status = 'completed'
             `, [currentMonth, currentYear, previousMonth, previousYear, currentYear, currentYear - 1]);
 
-            // Operating Expenses (estimate)
+            // Operating Expenses (actual expenses from expense management system)
             const [expenseData] = await db.execute(`
                 SELECT 
-                    SUM(CASE WHEN MONTH(expense_date) = ? AND YEAR(expense_date) = ? THEN amount ELSE 0 END) as current_month,
-                    SUM(CASE WHEN MONTH(expense_date) = ? AND YEAR(expense_date) = ? THEN amount ELSE 0 END) as previous_month,
-                    SUM(CASE WHEN YEAR(expense_date) = ? THEN amount ELSE 0 END) as ytd_current,
-                    SUM(CASE WHEN YEAR(expense_date) = ? THEN amount ELSE 0 END) as ytd_previous
+                    SUM(CASE WHEN MONTH(expense_date) = ? AND YEAR(expense_date) = ? THEN total_amount ELSE 0 END) as current_month,
+                    SUM(CASE WHEN MONTH(expense_date) = ? AND YEAR(expense_date) = ? THEN total_amount ELSE 0 END) as previous_month,
+                    SUM(CASE WHEN YEAR(expense_date) = ? THEN total_amount ELSE 0 END) as ytd_current,
+                    SUM(CASE WHEN YEAR(expense_date) = ? THEN total_amount ELSE 0 END) as ytd_previous
                 FROM expenses 
-                WHERE is_active = 1
+                WHERE is_active = 1 AND approval_status = 'approved'
             `, [currentMonth, currentYear, previousMonth, previousYear, currentYear, currentYear - 1]);
 
             const revenue = revenueData[0] || { current_month: 0, previous_month: 0, ytd_current: 0, ytd_previous: 0 };

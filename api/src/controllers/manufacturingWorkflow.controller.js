@@ -168,13 +168,16 @@ class ManufacturingWorkflowController {
             
             const user_id = req.user.id;
             
-            // Generate job number
-            const jobNumber = await this.generateJobNumber(db);
-            
-            // Start transaction
-            await db.beginTransaction();
+            // Get connection for transaction
+            const connection = await db.getConnection();
             
             try {
+                // Generate job number
+                const jobNumber = await this.generateJobNumber(connection);
+                
+                // Start transaction
+                await connection.beginTransaction();
+                
                 // Create manufacturing job
                 const jobQuery = `
                     INSERT INTO manufacturing_jobs 
@@ -184,7 +187,7 @@ class ManufacturingWorkflowController {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())
                 `;
                 
-                const [jobResult] = await db.execute(jobQuery, [
+                const [jobResult] = await connection.execute(jobQuery, [
                     jobNumber,
                     sales_order_id,
                     job_title,
@@ -209,7 +212,7 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?, ?, ?, ?, 'pending')
                     `;
                     
-                    await db.execute(taskQuery, [
+                    await connection.execute(taskQuery, [
                         jobId,
                         task.task_name,
                         task.description || null,
@@ -227,7 +230,7 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?, 0, ?)
                     `;
                     
-                    await db.execute(materialQuery, [
+                    await connection.execute(materialQuery, [
                         jobId,
                         material.product_id,
                         material.required_quantity,
@@ -235,7 +238,7 @@ class ManufacturingWorkflowController {
                     ]);
                 }
                 
-                await db.commit();
+                await connection.commit();
                 
                 res.json({
                     success: true,
@@ -245,8 +248,10 @@ class ManufacturingWorkflowController {
                 });
                 
             } catch (error) {
-                await db.rollback();
+                await connection.rollback();
                 throw error;
+            } finally {
+                connection.release();
             }
             
         } catch (error) {
@@ -316,10 +321,13 @@ class ManufacturingWorkflowController {
             
             const technician_id = req.user.id;
             
-            // Start transaction
-            await db.beginTransaction();
+            // Get connection for transaction
+            const connection = await db.getConnection();
             
             try {
+                // Start transaction
+                await connection.beginTransaction();
+                
                 // Add work log entry
                 const logQuery = `
                     INSERT INTO manufacturing_work_logs 
@@ -328,7 +336,7 @@ class ManufacturingWorkflowController {
                     VALUES (?, ?, ?, ?, ?, ?, NOW())
                 `;
                 
-                const [logResult] = await db.execute(logQuery, [
+                const [logResult] = await connection.execute(logQuery, [
                     jobId,
                     task_id || null,
                     technician_id,
@@ -347,7 +355,7 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?, ?)
                     `;
                     
-                    await db.execute(materialQuery, [
+                    await connection.execute(materialQuery, [
                         logId,
                         material.product_id,
                         material.quantity_used,
@@ -361,7 +369,7 @@ class ManufacturingWorkflowController {
                         WHERE product_id = ? AND location_id = 1 AND quantity >= ?
                     `;
                     
-                    await db.execute(stockQuery, [
+                    await connection.execute(stockQuery, [
                         material.quantity_used,
                         material.product_id,
                         material.quantity_used
@@ -376,14 +384,14 @@ class ManufacturingWorkflowController {
                         VALUES (?, ?, ?)
                     `;
                     
-                    await db.execute(photoQuery, [
+                    await connection.execute(photoQuery, [
                         logId,
                         photo.photo_path,
                         photo.description || null
                     ]);
                 }
                 
-                await db.commit();
+                await connection.commit();
                 
                 res.json({
                     success: true,
@@ -392,8 +400,10 @@ class ManufacturingWorkflowController {
                 });
                 
             } catch (error) {
-                await db.rollback();
+                await connection.rollback();
                 throw error;
+            } finally {
+                connection.release();
             }
             
         } catch (error) {
