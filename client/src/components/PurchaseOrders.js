@@ -371,6 +371,12 @@ const PurchaseOrders = () => {
   const [approvedRequisitions, setApprovedRequisitions] = useState([]);
   const [selectedRequisition, setSelectedRequisition] = useState(null);
 
+  // Authentication headers helper
+  const authHeaders = () => {
+    const token = localStorage.getItem('vtria_token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   // Dialog states
   const [createPODialog, setCreatePODialog] = useState(false);
   const [quoteReviewDialog, setQuoteReviewDialog] = useState(false);
@@ -421,39 +427,44 @@ const PurchaseOrders = () => {
     try {
       setLoading(true);
 
-      // Direct fetch to bypass any API utility issues
-      const response = await fetch('/api/purchase-order', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      // Use api utility with automatic auth
+      const { data, error } = await api.get('/api/purchase-order');
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        throw new Error(error);
       }
 
-      const data = await response.json();
-
-      if (data.success && data.data) {
+      if (data && data.data) {
         setPurchaseOrders(data.data);
         console.log('Successfully loaded', data.data.length, 'purchase orders');
+      } else if (Array.isArray(data)) {
+        setPurchaseOrders(data);
+        console.log('Successfully loaded', data.length, 'purchase orders');
       } else {
         throw new Error('Invalid response format');
       }
 
     } catch (error) {
       console.error('Error loading purchase orders:', error);
-      setError('Failed to load purchase orders: ' + error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      setError('Failed to load purchase orders: ' + errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Check authentication before loading data
+    const token = localStorage.getItem('vtria_token');
+    if (!token) {
+      console.warn('No authentication token found, redirecting to login');
+      navigate('/vtria-erp/login');
+      return;
+    }
+
     loadPurchaseOrders();
     loadApprovedRequisitions();
-  }, []);
+  }, [navigate]);
 
   const handleCreatePO = () => {
     loadApprovedRequisitions(); // Refresh the list when opening dialog
@@ -623,19 +634,16 @@ const PurchaseOrders = () => {
   const handleDownloadPO = async (po) => {
     try {
       setError('');
+      setLoading(true);
 
-      // Generate PDF using the PDF API
-      const response = await fetch(`http://localhost:3001/api/pdf/purchase-order/${po.id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('vtria_token') || 'test'}`
-        }
-      });
+      // Generate PDF using the api utility with automatic auth
+      const { data: result, error } = await api.post(`/api/pdf/purchase-order/${po.id}`, {});
 
-      const result = await response.json();
+      if (error) {
+        throw new Error(error);
+      }
 
-      if (result.success) {
+      if (result.success && result.downloadUrl) {
         // Download the generated PDF
         const downloadUrl = `http://localhost:3001${result.downloadUrl}`;
         const link = document.createElement('a');
@@ -651,7 +659,10 @@ const PurchaseOrders = () => {
       }
     } catch (error) {
       console.error('Error downloading PO PDF:', error);
-      setError('Error downloading purchase order PDF: ' + error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      setError('Error downloading purchase order PDF: ' + errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 

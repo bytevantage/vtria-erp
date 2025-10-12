@@ -5812,3 +5812,8 @@
 2025-10-12T20:29:22.123Z ERROR: Failed to initialize email transporter:
 2025-10-12T20:29:42.696Z ERROR: Failed to initialize email transporter:
 2025-10-12T20:30:45.515Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:33:09.527Z ERROR: Failed to initialize email transporter:
+2025-10-12T20:35:43.770Z ERROR: Error fetching production dashboard:
+2025-10-12T20:35:43.780Z ERROR: Stack trace:
+2025-10-12T20:36:39.434Z ERROR: Validation Error:
+2025-10-12T20:36:39.443Z ERROR: Error on PUT /api/purchase-order/1:
