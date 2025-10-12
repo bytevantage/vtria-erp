@@ -57,6 +57,11 @@ const PurchaseRequisition = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper function for auth headers
+  const authHeaders = () => ({
+    Authorization: `Bearer ${localStorage.getItem('vtria_token') || 'demo-token'}`
+  });
+
   // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [independentPRDialogOpen, setIndependentPRDialogOpen] = useState(false);
@@ -641,7 +646,7 @@ const PurchaseRequisition = () => {
       await axios.put(`${API_BASE_URL}/api/purchase-requisition/${id}/status`, {
         status,
         rejection_reason: reason
-      });
+      }, { headers: authHeaders() });
       fetchRequisitions();
       // Refresh open quotations when PR is rejected (makes quotation available again)
       if (status === 'rejected') {
@@ -672,7 +677,7 @@ const PurchaseRequisition = () => {
       await axios.put(`${API_BASE_URL}/api/purchase-requisition/${id}/status`, {
         status: 'draft',
         rejection_reason: null
-      });
+      }, { headers: authHeaders() });
       fetchRequisitions();
     } catch (error) {
       console.error('Error returning to draft:', error);

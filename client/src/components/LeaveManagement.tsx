@@ -96,6 +96,7 @@ const LeaveManagement: React.FC = () => {
   const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>([]);
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -115,6 +116,7 @@ const LeaveManagement: React.FC = () => {
   });
 
   useEffect(() => {
+    fetchCurrentEmployee(); // Fetch logged-in employee
     fetchLeaveApplications();
     fetchLeaveTypes();
     fetchEmployees();
@@ -122,7 +124,7 @@ const LeaveManagement: React.FC = () => {
 
   const resetForm = () => {
     setFormData({
-      employee_id: '',
+      employee_id: currentEmployee?.id.toString() || '',
       leave_type_id: '',
       start_date: '',
       end_date: '',
@@ -132,6 +134,42 @@ const LeaveManagement: React.FC = () => {
       contact_phone: '',
       handover_notes: ''
     });
+  };
+
+  const fetchCurrentEmployee = async () => {
+    try {
+      const token = localStorage.getItem('vtria_token');
+      if (!token) {
+        console.error('No authentication token found');
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/employees/current`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const empData: Employee = {
+            id: result.data.id,
+            employee_id: result.data.employee_id,
+            first_name: result.data.first_name,
+            last_name: result.data.last_name
+          };
+          setCurrentEmployee(empData);
+          // Auto-set employee_id in form
+          setFormData(prev => ({ ...prev, employee_id: empData.id.toString() }));
+          console.log('Current employee loaded:', empData);
+        }
+      } else {
+        console.error('Failed to fetch current employee');
+      }
+    } catch (error) {
+      console.error('Error fetching current employee:', error);
+    }
   };
 
   const fetchLeaveApplications = async () => {
@@ -144,7 +182,7 @@ const LeaveManagement: React.FC = () => {
 
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -164,7 +202,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/types`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -182,15 +220,26 @@ const LeaveManagement: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('/api/employees?status=active', {
+      const token = localStorage.getItem('vtria_token');
+      if (!token) {
+        console.error('No authentication token found');
+        setEmployees([]);
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/employees?status=active`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const result = await response.json();
         setEmployees(result.data || []);
+        console.log(`Employees fetched successfully: ${result.data?.length || 0}`);
+      } else if (response.status === 401 || response.status === 403) {
+        console.error('Authentication failed for employee fetch');
+        setEmployees([]);
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -201,10 +250,11 @@ const LeaveManagement: React.FC = () => {
   };
 
   const fetchLeaveBalances = async (employeeId: string) => {
+    setLoading(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/balance/${employeeId}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -215,6 +265,8 @@ const LeaveManagement: React.FC = () => {
     } catch (error) {
       console.error('Error fetching leave balances:', error);
       setLeaveBalances([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -224,7 +276,7 @@ const LeaveManagement: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           employee_id: parseInt(formData.employee_id),
@@ -253,17 +305,24 @@ const LeaveManagement: React.FC = () => {
   };
 
   const handleProcessApplication = async (applicationId: number, action: 'approve' | 'reject', comments?: string) => {
+    // Confirmation dialog
+    const actionText = action === 'approve' ? 'approve' : 'reject';
+    if (!window.confirm(`Are you sure you want to ${actionText} this leave application?`)) {
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications/${applicationId}/process`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({ action, comments })
       });
 
       if (response.ok) {
+        alert(`Leave application ${action}d successfully!`);
         fetchLeaveApplications();
       } else {
         const error = await response.json();
@@ -601,20 +660,13 @@ const LeaveManagement: React.FC = () => {
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Employee *</InputLabel>
-                <Select
-                  value={formData.employee_id}
-                  label="Employee *"
-                  onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
-                >
-                  {employees.map((emp) => (
-                    <MenuItem key={emp.id} value={emp.id.toString()}>
-                      {emp.first_name} {emp.last_name} ({emp.employee_id})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                fullWidth
+                label="Employee"
+                value={currentEmployee ? `${currentEmployee.first_name} ${currentEmployee.last_name} (${currentEmployee.employee_id})` : 'Loading...'}
+                disabled
+                helperText="You can only apply leave for yourself"
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth required>
@@ -711,16 +763,16 @@ const LeaveManagement: React.FC = () => {
             onClick={handleApplyLeave}
             variant="contained"
             disabled={
-              !formData.employee_id?.toString().trim() ||
               !formData.leave_type_id?.toString().trim() ||
               !formData.start_date?.trim() ||
               !formData.end_date?.trim() ||
               !formData.reason?.trim() ||
               (formData.start_date && formData.end_date && new Date(formData.start_date) > new Date(formData.end_date)) ||
-              loading
+              loading ||
+              !currentEmployee
             }
             title={
-              !formData.employee_id ? 'Please select an employee' :
+              !currentEmployee ? 'Loading employee data...' :
                 !formData.leave_type_id ? 'Please select a leave type' :
                   !formData.start_date ? 'Please select start date' :
                     !formData.end_date ? 'Please select end date' :

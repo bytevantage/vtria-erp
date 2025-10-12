@@ -470,7 +470,7 @@ const PurchaseOrders = () => {
     try {
       setLoading(true);
       // Fetch PR details with items for review
-      const { data, error } = await api.get(`/api/purchase-requisitions/${selectedRequisition.id}`);
+      const { data, error } = await api.get(`/api/purchase-requisition/${selectedRequisition.id}`);
 
       if (error) {
         throw new Error(error);

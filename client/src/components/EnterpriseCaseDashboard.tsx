@@ -134,6 +134,13 @@ const EnterpriseCaseDashboard: React.FC = () => {
     ];
 
     useEffect(() => {
+        // Check authentication before loading
+        const token = localStorage.getItem('vtria_token');
+        if (!token) {
+            console.error('No authentication token found - redirecting to login');
+            navigate('/login');
+            return;
+        }
         fetchAnalytics();
     }, [dateRange, filterBy]);
 
@@ -142,9 +149,18 @@ const EnterpriseCaseDashboard: React.FC = () => {
             setLoading(true);
             setError(null);
 
+            const token = localStorage.getItem('vtria_token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
             // Simulate enterprise analytics API call
             const response = await axios.get(`${API_BASE_URL}/api/analytics/cases`, {
-                params: { dateRange, filterBy }
+                params: { dateRange, filterBy },
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (response.data.success) {
@@ -319,22 +335,22 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                                         </Box>
                                                     </TableCell>
                                                     <TableCell align="right">
-                                                        <Chip 
-                                                            label={stage.count} 
-                                                            size="small" 
-                                                            sx={{ 
-                                                                backgroundColor: stageConfig?.color, 
+                                                        <Chip
+                                                            label={stage.count}
+                                                            size="small"
+                                                            sx={{
+                                                                backgroundColor: stageConfig?.color,
                                                                 color: 'white',
                                                                 minWidth: 40
-                                                            }} 
+                                                            }}
                                                         />
                                                     </TableCell>
                                                     <TableCell align="right">
                                                         {stage.avgDuration} days
                                                     </TableCell>
                                                     <TableCell align="right">
-                                                        <Typography 
-                                                            variant="body2" 
+                                                        <Typography
+                                                            variant="body2"
                                                             sx={{ color: getEfficiencyColor(stage.efficiency) }}
                                                             fontWeight={500}
                                                         >
@@ -375,9 +391,9 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                 System Alerts
                             </Typography>
                             {analytics.alerts.map((alert, index) => (
-                                <Alert 
-                                    key={index} 
-                                    severity={alert.type} 
+                                <Alert
+                                    key={index}
+                                    severity={alert.type}
                                     sx={{ mb: 2 }}
                                     action={
                                         <Badge badgeContent={alert.count} color="error">
@@ -432,7 +448,7 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                                 const completionRate = (trend.completed / trend.cases) * 100;
                                                 const prevRate = index > 0 ? (analytics.monthlyTrends[index - 1].completed / analytics.monthlyTrends[index - 1].cases) * 100 : completionRate;
                                                 const isImproving = completionRate >= prevRate;
-                                                
+
                                                 return (
                                                     <TableRow key={trend.month}>
                                                         <TableCell>
@@ -456,12 +472,12 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                                         </TableCell>
                                                         <TableCell align="right">
                                                             <Box display="flex" alignItems="center" justifyContent="flex-end">
-                                                                <TrendingUpIcon 
-                                                                    sx={{ 
+                                                                <TrendingUpIcon
+                                                                    sx={{
                                                                         color: isImproving ? '#4caf50' : '#f44336',
                                                                         transform: isImproving ? 'none' : 'rotate(180deg)',
                                                                         fontSize: 20
-                                                                    }} 
+                                                                    }}
                                                                 />
                                                             </Box>
                                                         </TableCell>
@@ -491,7 +507,7 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                 <PeopleIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                                 Team Performance Analytics
                             </Typography>
-                            
+
                             {analytics.assigneePerformance.map((assignee, index) => (
                                 <Accordion key={assignee.name} sx={{ mb: 2 }}>
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -525,8 +541,8 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                                     </Typography>
                                                 </Box>
                                                 <Box textAlign="center">
-                                                    <Typography 
-                                                        variant="h6" 
+                                                    <Typography
+                                                        variant="h6"
                                                         sx={{ color: getEfficiencyColor(assignee.efficiency) }}
                                                     >
                                                         {assignee.efficiency}%
@@ -584,8 +600,8 @@ const EnterpriseCaseDashboard: React.FC = () => {
                                                                 }}
                                                             />
                                                             <Typography variant="body2" fontWeight={500}>
-                                                                {assignee.efficiency >= 85 ? 'Excellent' : 
-                                                                 assignee.efficiency >= 70 ? 'Good' : 'Needs Improvement'}
+                                                                {assignee.efficiency >= 85 ? 'Excellent' :
+                                                                    assignee.efficiency >= 70 ? 'Good' : 'Needs Improvement'}
                                                             </Typography>
                                                         </Box>
                                                     </CardContent>
@@ -618,7 +634,7 @@ const EnterpriseCaseDashboard: React.FC = () => {
                     <AnalyticsIcon sx={{ mr: 2, fontSize: 36 }} />
                     Enterprise Case Analytics
                 </Typography>
-                
+
                 <Box display="flex" gap={2} alignItems="center">
                     <FormControl size="small" sx={{ minWidth: 120 }}>
                         <InputLabel>Date Range</InputLabel>
@@ -633,7 +649,7 @@ const EnterpriseCaseDashboard: React.FC = () => {
                             <MenuItem value="1year">Last Year</MenuItem>
                         </Select>
                     </FormControl>
-                    
+
                     <FormControl size="small" sx={{ minWidth: 120 }}>
                         <InputLabel>Filter</InputLabel>
                         <Select
@@ -647,7 +663,7 @@ const EnterpriseCaseDashboard: React.FC = () => {
                             <MenuItem value="completed">Completed</MenuItem>
                         </Select>
                     </FormControl>
-                    
+
                     <Button
                         variant="outlined"
                         startIcon={<RefreshIcon />}
@@ -668,19 +684,19 @@ const EnterpriseCaseDashboard: React.FC = () => {
             <Card>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
-                        <Tab 
-                            label="Overview" 
-                            icon={<DashboardIcon />} 
+                        <Tab
+                            label="Overview"
+                            icon={<DashboardIcon />}
                             iconPosition="start"
                         />
-                        <Tab 
-                            label="Trends" 
-                            icon={<LineChartIcon />} 
+                        <Tab
+                            label="Trends"
+                            icon={<LineChartIcon />}
                             iconPosition="start"
                         />
-                        <Tab 
-                            label="Performance" 
-                            icon={<AssessmentIcon />} 
+                        <Tab
+                            label="Performance"
+                            icon={<AssessmentIcon />}
                             iconPosition="start"
                         />
                     </Tabs>

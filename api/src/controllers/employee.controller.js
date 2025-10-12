@@ -7,6 +7,61 @@ class EmployeeController {
   // Employee Management
   // ====================
 
+  // Get current logged-in employee data
+  async getCurrentEmployee(req, res) {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'User authentication required'
+        });
+      }
+
+      // Find employee by user_id from JWT token
+      const [employees] = await db.execute(`
+        SELECT 
+          e.id,
+          e.employee_id,
+          e.first_name,
+          e.last_name,
+          e.email,
+          e.phone,
+          e.department_id,
+          d.name as department,
+          e.employee_type,
+          e.status,
+          e.shift_id,
+          s.shift_name
+        FROM employees e
+        LEFT JOIN departments d ON e.department_id = d.id
+        LEFT JOIN shifts s ON e.shift_id = s.id
+        WHERE e.user_id = ? AND e.status = 'active'
+        LIMIT 1
+      `, [userId]);
+
+      if (employees.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Employee profile not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: employees[0]
+      });
+    } catch (error) {
+      console.error('Error fetching current employee:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch current employee data',
+        error: error.message
+      });
+    }
+  }
+
   // Get all employees with pagination and filtering
   async getAllEmployees(req, res) {
     try {

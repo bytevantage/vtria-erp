@@ -223,7 +223,7 @@ const Quotations = () => {
     try {
       const response = await axios.put(`http://localhost:3001/api/quotations/enhanced/${quotationId}/status`, {
         status: newStatus
-      });
+      }, { headers: authHeaders() });
       if (response.data.success) {
         await fetchQuotations();
       }

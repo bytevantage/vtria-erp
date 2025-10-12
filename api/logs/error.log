@@ -5767,3 +5767,28 @@
 2025-10-12T18:47:08.990Z ERROR: Failed to initialize email transporter:
 2025-10-12T18:47:54.888Z ERROR: Authentication error:
 2025-10-12T18:47:54.910Z ERROR: Error on GET /api/employees:
+2025-10-12T19:00:00.830Z ERROR: Authentication error:
+2025-10-12T19:00:00.867Z ERROR: Error on GET /api/leave-policy/applications:
+2025-10-12T19:00:00.881Z ERROR: Authentication error:
+2025-10-12T19:00:00.899Z ERROR: Error on GET /api/employees:
+2025-10-12T19:00:00.911Z ERROR: Authentication error:
+2025-10-12T19:00:00.917Z ERROR: Error on GET /api/leave-policy/types:
+2025-10-12T19:05:18.891Z ERROR: Failed to initialize email transporter:
+2025-10-12T19:05:24.096Z ERROR: Failed to initialize email transporter:
+2025-10-12T19:11:37.296Z ERROR: Failed to initialize email transporter:
+2025-10-12T19:13:10.694Z ERROR: Failed to initialize email transporter:
+2025-10-12T19:15:05.959Z ERROR: Authentication error:
+2025-10-12T19:15:05.969Z ERROR: Error on GET /api/employees:
+2025-10-12T19:15:05.992Z ERROR: Authentication error:
+2025-10-12T19:15:06.000Z ERROR: Error on GET /api/leave-policy/applications:
+2025-10-12T19:15:06.025Z ERROR: Authentication error:
+2025-10-12T19:15:06.032Z ERROR: Error on GET /api/leave-policy/types:
+2025-10-12T19:23:53.931Z ERROR: Authentication error:
+2025-10-12T19:23:53.951Z ERROR: Error on GET /api/employees:
+2025-10-12T19:23:53.990Z ERROR: Authentication error:
+2025-10-12T19:23:53.996Z ERROR: Error on GET /api/leave-policy/applications:
+2025-10-12T19:23:54.008Z ERROR: Authentication error:
+2025-10-12T19:23:54.028Z ERROR: Error on GET /api/leave-policy/types:
+2025-10-12T19:39:18.203Z ERROR: Failed to create audit log:
+2025-10-12T19:42:37.871Z ERROR: Error on GET /api/purchase-requisitions/1:
+2025-10-12T19:42:43.804Z ERROR: Error on GET /api/purchase-requisitions/1:

@@ -91,8 +91,14 @@ const MobileAttendanceApp: React.FC = () => {
   const [showLocationDialog, setShowLocationDialog] = useState(false);
 
   // Real employee data from authentication
-  const [employee, setEmployee] = useState({
-    id: null,
+  const [employee, setEmployee] = useState<{
+    id: number | undefined;
+    name: string;
+    employee_id: string;
+    department: string;
+    shift: string;
+  }>({
+    id: undefined,
     name: 'Loading...',
     employee_id: 'Loading...',
     department: 'Loading...',
@@ -129,7 +135,7 @@ const MobileAttendanceApp: React.FC = () => {
 
   const loadEmployeeData = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('vtria_token');
       if (!token) {
         setLocationError('Authentication required. Please login first.');
         return;
@@ -156,7 +162,7 @@ const MobileAttendanceApp: React.FC = () => {
       } else {
         // Fallback to mock data for demo
         setEmployee({
-          id: null,
+          id: undefined,
           name: 'Demo User',
           employee_id: 'DEMO/001',
           department: 'Demo Department',
@@ -167,7 +173,7 @@ const MobileAttendanceApp: React.FC = () => {
       console.error('Error loading employee data:', error);
       // Fallback to mock data
       setEmployee({
-        id: null,
+        id: undefined,
         name: 'Demo User',
         employee_id: 'DEMO/001',
         department: 'Demo Department',
@@ -245,8 +251,8 @@ const MobileAttendanceApp: React.FC = () => {
   };
 
   const handleAttendanceAction = async (action: 'check_in' | 'check_out') => {
-    if (!employee.id) {
-      setLocationError('Employee authentication required');
+    if (!employee.id || employee.id === undefined) {
+      setLocationError('Employee authentication required. Please login first.');
       return;
     }
 
@@ -255,15 +261,16 @@ const MobileAttendanceApp: React.FC = () => {
       return;
     }
 
-    if (action === 'check_in' && !currentLocation.isWithinGeofence) {
-      setLocationError('You must be within a designated work location to check in');
+    // Validate geofence for both check-in and check-out
+    if (!currentLocation.isWithinGeofence) {
+      setLocationError(`You must be within a designated work location to ${action === 'check_in' ? 'check in' : 'check out'}`);
       return;
     }
 
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('vtria_token');
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/enhanced-attendance/record`, {
         method: 'POST',
         headers: {

@@ -209,6 +209,7 @@ const validateLeaveApplication = [
  */
 
 // Employee Management Routes
+router.get('/current', authMiddleware.verifyToken, employeeController.getCurrentEmployee);
 router.get('/', authMiddleware.verifyToken, employeeController.getAllEmployees);
 router.post('/', authMiddleware.verifyToken, validateEmployee, employeeController.createEmployee);
 
