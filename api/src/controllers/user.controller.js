@@ -2,7 +2,7 @@ const db = require('../config/database');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
-exports.getUsers = async (req, res) => {
+module.exports.getUsers = async (req, res) => {
     try {
         const [users] = await db.execute(
             'SELECT id, email, full_name, user_role, status, created_at, updated_at FROM users ORDER BY created_at DESC'
@@ -22,7 +22,7 @@ exports.getUsers = async (req, res) => {
     }
 };
 
-exports.createUser = async (req, res) => {
+module.exports.createUser = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -33,7 +33,7 @@ exports.createUser = async (req, res) => {
             });
         }
 
-        const { email, full_name, user_role, password } = req.body;
+        const { email, full_name: fullName, user_role: userRole, password } = req.body;
 
         // Check if email already exists
         const [existingUser] = await db.execute(
@@ -55,7 +55,7 @@ exports.createUser = async (req, res) => {
         // Insert new user
         const [result] = await db.execute(
             'INSERT INTO users (email, full_name, user_role, password_hash, status) VALUES (?, ?, ?, ?, ?)',
-            [email, full_name, user_role, hashedPassword, 'active']
+            [email, fullName, userRole, hashedPassword, 'active']
         );
 
         // Get the created user (without password)
@@ -79,7 +79,7 @@ exports.createUser = async (req, res) => {
     }
 };
 
-exports.getUserById = async (req, res) => {
+module.exports.getUserById = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -109,7 +109,7 @@ exports.getUserById = async (req, res) => {
     }
 };
 
-exports.updateUser = async (req, res) => {
+module.exports.updateUser = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -121,7 +121,7 @@ exports.updateUser = async (req, res) => {
         }
 
         const { id } = req.params;
-        const { email, full_name, user_role, status } = req.body;
+        const { email, full_name: fullName, user_role: userRole, status } = req.body;
 
         // Check if user exists
         const [existingUser] = await db.execute('SELECT id FROM users WHERE id = ?', [id]);
@@ -148,7 +148,7 @@ exports.updateUser = async (req, res) => {
         // Update user
         await db.execute(
             'UPDATE users SET email = ?, full_name = ?, user_role = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-            [email, full_name, user_role, status || 'active', id]
+            [email, fullName, userRole, status || 'active', id]
         );
 
         // Get updated user
@@ -172,7 +172,7 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-exports.deleteUser = async (req, res) => {
+module.exports.deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -209,15 +209,15 @@ exports.deleteUser = async (req, res) => {
 // UNIFIED USER/EMPLOYEE MANAGEMENT (NEW)
 // ============================================
 
-exports.getAllUsersWithHR = async (req, res) => {
+module.exports.getAllUsersWithHR = async (req, res) => {
     try {
         const {
             page = 1,
             limit = 20,
-            department_id,
-            user_role,
-            employee_type,
-            is_active,
+            department_id: departmentId,
+            user_role: userRole,
+            employee_type: employeeType,
+            is_active: isActive,
             search
         } = req.query;
 
@@ -225,24 +225,24 @@ exports.getAllUsersWithHR = async (req, res) => {
         let whereClause = 'WHERE 1=1';
         const params = [];
 
-        if (department_id) {
+        if (departmentId) {
             whereClause += ' AND u.department_id = ?';
-            params.push(department_id);
+            params.push(departmentId);
         }
 
-        if (user_role) {
+        if (userRole) {
             whereClause += ' AND u.user_role = ?';
-            params.push(user_role);
+            params.push(userRole);
         }
 
-        if (employee_type) {
+        if (employeeType) {
             whereClause += ' AND u.employee_type = ?';
-            params.push(employee_type);
+            params.push(employeeType);
         }
 
-        if (is_active !== undefined) {
+        if (isActive !== undefined) {
             whereClause += ' AND u.is_active = ?';
-            params.push((is_active === 'true' || is_active === '1' || is_active === true) ? 1 : 0);
+            params.push((isActive === 'true' || isActive === '1' || isActive === true) ? 1 : 0);
         }
 
         if (search) {
@@ -257,7 +257,7 @@ exports.getAllUsersWithHR = async (req, res) => {
         const total = countResult[0].total;
 
         // Data query with joins - create new params array with same values plus limit/offset
-        const dataParams = [...params, parseInt(limit), offset];
+        const dataParams = [...params, parseInt(limit, 10), offset];
         const dataQuery = `
             SELECT 
                 u.id,
@@ -314,28 +314,28 @@ exports.getAllUsersWithHR = async (req, res) => {
     }
 };
 
-exports.createUserWithHR = async (req, res) => {
+module.exports.createUserWithHR = async (req, res) => {
     try {
         const {
             email,
             password,
-            first_name,
-            last_name,
+            first_name: firstName,
+            last_name: lastName,
             phone,
-            user_role,
-            department_id,
+            user_role: userRole,
+            department_id: departmentId,
             position,
-            hire_date,
-            employee_type,
-            basic_salary,
-            work_location_id,
-            manager_id,
-            date_of_birth,
+            hire_date: hireDate,
+            employee_type: employeeType,
+            basic_salary: basicSalary,
+            work_location_id: workLocationId,
+            manager_id: managerId,
+            date_of_birth: dateOfBirth,
             address
         } = req.body;
 
         // Validate required fields
-        if (!email || !password || !first_name || !last_name || !user_role) {
+        if (!email || !password || !firstName || !lastName || !userRole) {
             return res.status(400).json({
                 success: false,
                 message: 'Email, password, first name, last name, and role are required'
@@ -361,10 +361,10 @@ exports.createUserWithHR = async (req, res) => {
         // Generate employee_id
         const [maxId] = await db.execute('SELECT MAX(id) as max_id FROM users');
         const nextId = (maxId[0].max_id || 0) + 1;
-        const employee_id = `EMP${String(nextId).padStart(4, '0')}`;
+        const employeeId = `EMP${String(nextId).padStart(4, '0')}`;
 
         // Full name
-        const full_name = `${first_name} ${last_name}`;
+        const fullName = `${firstName} ${lastName}`;
 
         // Insert user
         const query = `
@@ -373,13 +373,29 @@ exports.createUserWithHR = async (req, res) => {
                 user_role, department_id, position, hire_date, employee_type,
                 basic_salary, work_location_id, manager_id, date_of_birth, address,
                 status, is_active, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', TRUE, NOW(), NOW())
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', TRUE, NOW(), NOW()
+            )
         `;
 
         const [result] = await db.execute(query, [
-            employee_id, email, hashedPassword, first_name, last_name, full_name, phone,
-            user_role, department_id, position, hire_date, employee_type || 'full_time',
-            basic_salary, work_location_id, manager_id, date_of_birth, address
+            employeeId,
+            email,
+            hashedPassword,
+            firstName,
+            lastName,
+            fullName,
+            phone,
+            userRole,
+            departmentId,
+            position,
+            hireDate,
+            employeeType || 'full_time',
+            basicSalary,
+            workLocationId,
+            managerId,
+            dateOfBirth,
+            address
         ]);
 
         res.status(201).json({
@@ -387,12 +403,12 @@ exports.createUserWithHR = async (req, res) => {
             message: 'Employee/User created successfully',
             user: {
                 id: result.insertId,
-                employee_id,
+                employee_id: employeeId,
                 email,
-                first_name,
-                last_name,
-                full_name,
-                user_role
+                first_name: firstName,
+                last_name: lastName,
+                full_name: fullName,
+                user_role: userRole
             }
         });
     } catch (error) {
@@ -405,7 +421,7 @@ exports.createUserWithHR = async (req, res) => {
     }
 };
 
-exports.updateUserWithHR = async (req, res) => {
+module.exports.updateUserWithHR = async (req, res) => {
     try {
         const { id } = req.params;
         const updateFields = { ...req.body };
@@ -471,19 +487,19 @@ exports.updateUserWithHR = async (req, res) => {
     }
 };
 
-exports.resetUserPassword = async (req, res) => {
+module.exports.resetUserPassword = async (req, res) => {
     try {
         const { id } = req.params;
-        const { new_password } = req.body;
+        const { new_password: newPassword } = req.body;
 
-        if (!new_password || new_password.length < 6) {
+        if (!newPassword || newPassword.length < 6) {
             return res.status(400).json({
                 success: false,
                 message: 'Password must be at least 6 characters'
             });
         }
 
-        const hashedPassword = await bcrypt.hash(new_password, 10);
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         await db.execute(
             'UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?',
@@ -504,7 +520,7 @@ exports.resetUserPassword = async (req, res) => {
     }
 };
 
-exports.toggleUserActive = async (req, res) => {
+module.exports.toggleUserActive = async (req, res) => {
     try {
         const { id } = req.params;
 

@@ -8,17 +8,16 @@ try {
     console.log('Analytics controller loaded successfully');
 } catch (error) {
     console.error('Error loading analytics controller:', error);
-    
+
     // Fallback routes with mock responses
     router.get('/test', (req, res) => {
-        res.json({ 
+        res.json({
             message: 'Analytics API is available but controller failed to load',
-            error: error.message 
+            error: error.message
         });
     });
-    
+
     module.exports = router;
-    return;
 }
 
 // Test route
@@ -327,7 +326,7 @@ router.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         endpoints: [
             '/analytics/cases',
-            '/analytics/price-comparison', 
+            '/analytics/price-comparison',
             '/analytics/case-history',
             '/analytics/technicians',
             '/analytics/assignee-workload'
@@ -336,7 +335,7 @@ router.get('/health', (req, res) => {
 });
 
 // Error handling middleware
-router.use((error, req, res, next) => {
+router.use((error, req, res) => {
     console.error('Analytics API Error:', error);
     res.status(500).json({
         success: false,
