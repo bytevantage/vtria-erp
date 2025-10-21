@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -133,6 +133,8 @@ const EnterpriseInventoryManagement = () => {
     invoice_number: '',
     po_number: ''
   });
+  const [serialNumberText, setSerialNumberText] = useState('');
+  const serialNumberTextareaRef = useRef(null);
   const [itemForm, setItemForm] = useState({
     item_code: '',
     item_name: '',
@@ -157,6 +159,31 @@ const EnterpriseInventoryManagement = () => {
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  // Fallback: global keydown handler to ensure comma/space insert works in the serial textarea
+  useEffect(() => {
+    const handler = (e) => {
+      const ta = serialNumberTextareaRef.current;
+      if (!ta) return;
+      if (document.activeElement !== ta) return;
+      if (e.key === ',' || e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        const start = ta.selectionStart || 0;
+        const end = ta.selectionEnd || 0;
+        const insert = e.key === ',' ? ',' : ' ';
+        const before = serialNumberText.slice(0, start);
+        const after = serialNumberText.slice(end);
+        const next = before + insert + after;
+        setSerialNumberText(next);
+        setPurchaseForm(prev => ({ ...prev, serial_numbers: next }));
+        setTimeout(() => {
+          try { ta.selectionStart = ta.selectionEnd = start + 1; } catch {}
+        }, 0);
+      }
+    };
+    document.addEventListener('keydown', handler, true);
+    return () => document.removeEventListener('keydown', handler, true);
+  }, [serialNumberText]);
 
   const loadInitialData = async () => {
     try {
@@ -539,6 +566,19 @@ const EnterpriseInventoryManagement = () => {
   // Handle add purchase record
   const handleAddPurchase = async () => {
     try {
+      // Process serial numbers from text input
+      const serialNumbers = serialNumberText
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      // Validate serial numbers match quantity if serial numbers are provided
+      const quantity = parseInt(purchaseForm.quantity);
+      if (serialNumbers.length > 0 && serialNumbers.length !== quantity) {
+        setError(`Serial number count (${serialNumbers.length}) must match quantity (${quantity})`);
+        return;
+      }
+
       // Calculate total cost with discount and tax
       const baseAmount = parseFloat(purchaseForm.quantity) * parseFloat(purchaseForm.unit_cost);
       const discountAmount = (baseAmount * parseFloat(purchaseForm.vendor_discount)) / 100;
@@ -548,6 +588,7 @@ const EnterpriseInventoryManagement = () => {
 
       const purchaseData = {
         ...purchaseForm,
+        serial_numbers: serialNumbers,
         total_cost: totalCost,
         discount_amount: discountAmount,
         tax_amount: taxAmount
@@ -570,9 +611,10 @@ const EnterpriseInventoryManagement = () => {
         invoice_number: '',
         po_number: ''
       });
+      setSerialNumberText('');
     } catch (error) {
       logger.error('Failed to add purchase record:', error);
-      setError('Failed to add purchase record');
+      setError('Failed to add purchase record: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -2561,17 +2603,81 @@ const EnterpriseInventoryManagement = () => {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Serial Numbers"
-                value={(purchaseForm.serial_numbers || []).join(', ')}
-                onChange={(e) => {
-                  const serials = e.target.value.split(',').map(s => s.trim()).filter(s => s);
-                  setPurchaseForm({ ...purchaseForm, serial_numbers: serials });
-                }}
-                helperText="Comma-separated serial numbers (if applicable)"
-                multiline
-              />
+              <div style={{ position: 'relative', width: '100%' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '4px',
+                  fontSize: '0.875rem',
+                  color: 'rgba(0, 0, 0, 0.6)'
+                }}>
+                  Serial Numbers
+                </label>
+                <textarea
+                  ref={serialNumberTextareaRef}
+                  value={serialNumberText}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSerialNumberText(value);
+                    // Update form with raw text
+                    setPurchaseForm(prev => ({
+                      ...prev,
+                      serial_numbers: value
+                    }));
+                  }}
+                  onKeyDown={(e) => {
+                    const ta = serialNumberTextareaRef.current;
+                    if (!ta) return;
+                    // Manually insert comma/space at caret if browser suppresses them
+                    if (e.key === ',' || e.key === ' ' || e.code === 'Space') {
+                      e.preventDefault();
+                      const start = ta.selectionStart || 0;
+                      const end = ta.selectionEnd || 0;
+                      const insert = e.key === ',' ? ',' : ' ';
+                      const before = serialNumberText.slice(0, start);
+                      const after = serialNumberText.slice(end);
+                      const next = before + insert + after;
+                      setSerialNumberText(next);
+                      setPurchaseForm(prev => ({ ...prev, serial_numbers: next }));
+                      setTimeout(() => {
+                        try { ta.selectionStart = ta.selectionEnd = start + 1; } catch {}
+                      }, 0);
+                      return;
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Process into array on blur
+                    const serials = e.target.value
+                      .split(',')
+                      .map(s => s.trim())
+                      .filter(s => s);
+                    setPurchaseForm(prev => ({
+                      ...prev,
+                      serial_numbers: serials
+                    }));
+                  }}
+                  style={{
+                    width: '100%',
+                    minHeight: '80px',
+                    padding: '16.5px 14px',
+                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                    borderRadius: '4px',
+                    fontFamily: 'monospace',
+                    fontSize: '1rem',
+                    lineHeight: '1.5',
+                    resize: 'vertical'
+                  }}
+                  data-testid="serial-numbers-input"
+                />
+                <p style={{
+                  margin: '3px 14px 0',
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  fontSize: '0.75rem',
+                  textAlign: 'left',
+                  marginTop: '4px'
+                }}>
+                  {`Comma-separated serial numbers (if applicable)${serialNumberText ? ` - Count: ${serialNumberText.split(',').filter(s => s.trim()).length}` : ''}`}
+                </p>
+              </div>
             </Grid>
 
             {/* Cost Breakdown */}
@@ -2618,6 +2724,7 @@ const EnterpriseInventoryManagement = () => {
               invoice_number: '',
               po_number: ''
             });
+            setSerialNumberText('');
           }}>Cancel</Button>
           <Button variant="contained" onClick={handleAddPurchase}>Add Purchase Record</Button>
         </DialogActions>

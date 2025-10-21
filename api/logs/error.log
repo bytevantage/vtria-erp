@@ -5819,3 +5819,150 @@
 2025-10-12T20:36:39.443Z ERROR: Error on PUT /api/purchase-order/1:
 2025-10-21T06:45:27.227Z ERROR: Failed to initialize email transporter:
 2025-10-21T06:45:34.202Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:11:14.349Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:11:28.598Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:11:38.367Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:11:59.764Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:12:22.400Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:13:05.182Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:15:14.124Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:15:30.118Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:15:38.369Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:15:43.490Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:15:53.100Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:02.128Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:07.638Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:11.905Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:15.885Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:20.946Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:25.276Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:53.111Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:56.791Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:16:59.986Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:03.326Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:07.319Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:19.215Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:21.830Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:22.833Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:32.177Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:43.337Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:47.571Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:17:52.483Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:03.273Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:05.691Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:10.195Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:20.535Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:22.575Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:32.417Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:34.071Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:45.363Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:18:46.709Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:19:01.411Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:19:22.591Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:19:47.271Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:19:48.974Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:05.596Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:09.750Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:16.785Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:22.605Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:28.338Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:29.716Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:34.568Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:36.487Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:39.374Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:43.561Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:49.704Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:50.969Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:54.001Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:54.791Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:21:58.553Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:05.932Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:11.295Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:15.296Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:15.974Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:23.612Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:25.832Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:29.900Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:35.119Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:41.876Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:48.249Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:51.260Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:22:52.253Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:23:05.575Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:23:07.475Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:23:53.670Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:14.207Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:27.046Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:35.306Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:40.757Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:44.480Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:48.116Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:24:52.381Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:10.116Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:14.544Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:18.374Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:22.221Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:26.459Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:30.986Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:47.907Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:53.587Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:55.909Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:25:57.878Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:26:05.173Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:26:08.110Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:26:17.255Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:26:23.214Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:26:34.201Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:27:34.142Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:27:37.946Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:41:01.039Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:41:14.018Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:41:22.046Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:41:30.570Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:41:39.966Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:41:46.684Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:42:01.752Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:42:27.393Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:42:35.419Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:43:19.856Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:43:28.412Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:43:33.606Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:43:37.455Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:43:41.298Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:44:10.858Z ERROR: Failed to initialize email transporter:
+2025-10-21T07:44:33.430Z ERROR: Failed to initialize email transporter:
+2025-10-21T09:02:48.108Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:52.329Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:53.206Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:53.392Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:53.577Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:53.742Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:53.921Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:54.092Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:02:54.293Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-21T09:09:42.889Z ERROR: Error fetching production dashboard:
+2025-10-21T09:09:42.923Z ERROR: Stack trace:
+2025-10-21T09:09:45.003Z ERROR: Error fetching production dashboard:
+2025-10-21T09:09:45.008Z ERROR: Stack trace:
+2025-10-21T09:09:51.246Z ERROR: Authentication error:
+2025-10-21T09:09:51.286Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-10-21T09:09:51.310Z ERROR: Authentication error:
+2025-10-21T09:09:51.363Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-10-21T09:09:51.431Z ERROR: Authentication error:
+2025-10-21T09:09:51.436Z ERROR: Error on GET /api/production/quality/inspections:
+2025-10-21T09:09:51.446Z ERROR: Authentication error:
+2025-10-21T09:09:51.449Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-10-21T09:09:54.480Z ERROR: Authentication error:
+2025-10-21T09:09:54.499Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-10-21T09:09:54.521Z ERROR: Authentication error:
+2025-10-21T09:09:54.541Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-10-21T09:09:54.669Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-10-21T09:09:54.728Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-10-21T09:10:13.804Z ERROR: Authentication error:
+2025-10-21T09:10:13.815Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-10-21T09:10:13.829Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-10-21T09:10:13.839Z ERROR: Authentication error:
+2025-10-21T09:10:13.845Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-10-21T09:10:13.861Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-10-21T09:42:47.333Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
+2025-10-27T14:51:34.295Z ERROR: Failed to initialize email transporter:
