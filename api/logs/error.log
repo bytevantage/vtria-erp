@@ -5817,3 +5817,5 @@
 2025-10-12T20:35:43.780Z ERROR: Stack trace:
 2025-10-12T20:36:39.434Z ERROR: Validation Error:
 2025-10-12T20:36:39.443Z ERROR: Error on PUT /api/purchase-order/1:
+2025-10-21T06:45:27.227Z ERROR: Failed to initialize email transporter:
+2025-10-21T06:45:34.202Z ERROR: Failed to initialize email transporter:
