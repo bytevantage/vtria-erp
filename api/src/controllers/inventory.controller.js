@@ -250,6 +250,34 @@ class InventoryController {
                 storage_location, storage_conditions, shelf_life_days
             } = req.body;
 
+            // Determine track_serial_numbers from category default if not explicitly provided
+            let finalTrackSerial = track_serial_numbers;
+            if (finalTrackSerial === undefined || finalTrackSerial === null) {
+                try {
+                    // Prefer inventory_categories first
+                    const [catRows] = await db.execute(
+                        'SELECT requires_serial_tracking FROM inventory_categories WHERE id = ?',
+                        [category_id]
+                    );
+                    if (catRows.length > 0 && typeof catRows[0].requires_serial_tracking !== 'undefined') {
+                        finalTrackSerial = Boolean(catRows[0].requires_serial_tracking);
+                    } else {
+                        // Fallback to main categories if present
+                        const [mainRows] = await db.execute(
+                            'SELECT requires_serial_tracking FROM inventory_main_categories WHERE id = ?',
+                            [category_id]
+                        );
+                        if (mainRows.length > 0 && typeof mainRows[0].requires_serial_tracking !== 'undefined') {
+                            finalTrackSerial = Boolean(mainRows[0].requires_serial_tracking);
+                        } else {
+                            finalTrackSerial = false;
+                        }
+                    }
+                } catch (err) {
+                    finalTrackSerial = false;
+                }
+            }
+
             // Generate item code
             const item_code = await generateItemCode(item_type);
 
@@ -265,7 +293,7 @@ class InventoryController {
                 item_code, item_name, description, category_id, unit_id, item_type,
                 minimum_stock || 0, maximum_stock, reorder_point || 0, reorder_quantity || 0,
                 standard_cost || 0, weight_per_unit, dimensions_length, dimensions_width, dimensions_height,
-                track_serial_numbers || false, track_batch_numbers || false, track_expiry_dates || false,
+                finalTrackSerial || false, track_batch_numbers || false, track_expiry_dates || false,
                 storage_location, storage_conditions, shelf_life_days, req.user.id
             ]);
 

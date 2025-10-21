@@ -180,7 +180,6 @@ class EnhancedInventoryController {
     }
   }
 
-  // Create new enhanced inventory item
   async createEnhancedItem(req, res) {
     try {
       const {
@@ -211,6 +210,20 @@ class EnhancedInventoryController {
         location_code,
         bin_location
       } = req.body;
+
+      // Determine serial tracking default from category if not provided
+      let finalRequiresSerial = requires_serial_tracking;
+      if (finalRequiresSerial === undefined || finalRequiresSerial === null) {
+        try {
+          const [catRows] = await db.execute(
+            'SELECT requires_serial_tracking FROM inventory_main_categories WHERE id = ?',
+            [main_category_id]
+          );
+          finalRequiresSerial = catRows.length > 0 ? Boolean(catRows[0].requires_serial_tracking) : false;
+        } catch (err) {
+          finalRequiresSerial = false;
+        }
+      }
 
       // Validate required fields
       if (!item_code || !item_name || !main_category_id) {

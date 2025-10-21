@@ -349,13 +349,27 @@ class EnterpriseInventoryController {
         });
       }
 
+      // Determine requires_serial_tracking from category default if not provided
+      let finalRequiresSerial = requires_serial_tracking;
+      if (finalRequiresSerial === undefined || finalRequiresSerial === null) {
+        try {
+          const [catRows] = await db.execute(
+            'SELECT requires_serial_tracking FROM inventory_main_categories WHERE id = ?',
+            [category_id]
+          );
+          finalRequiresSerial = catRows.length > 0 ? Boolean(catRows[0].requires_serial_tracking) : false;
+        } catch (err) {
+          finalRequiresSerial = false;
+        }
+      }
+
       // Create inventory item
       const [result] = await db.execute(`
         INSERT INTO inventory_items 
         (item_code, item_name, description, category_id, unit_of_measurement,
-         unit_cost, reorder_level, max_stock_level, abc_classification, status,
+         unit_cost, reorder_level, max_stock_level, abc_classification, requires_serial_tracking, status,
          created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())
       `, [
         item_code,
         item_name,
@@ -365,8 +379,9 @@ class EnterpriseInventoryController {
         unit_cost || 0,
         reorder_level || 0,
         max_stock_level || 0,
-        abc_classification
-      ]);
+    abc_classification,
+    finalRequiresSerial ? 1 : 0
+  ]);
 
       const itemId = result.insertId;
 
