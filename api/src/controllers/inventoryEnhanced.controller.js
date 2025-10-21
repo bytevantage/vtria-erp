@@ -16,8 +16,10 @@ class EnhancedInventoryController {
           COUNT(DISTINCT isc.id) as subcategory_count,
           COUNT(DISTINCT iie.id) as item_count
         FROM inventory_main_categories imc
-        LEFT JOIN inventory_sub_categories isc ON imc.id = isc.main_category_id AND isc.is_active = 1
-        LEFT JOIN inventory_items_enhanced iie ON imc.id = iie.main_category_id AND iie.item_status = 'active'
+        LEFT JOIN inventory_sub_categories isc ON imc.id = isc.main_category_id
+          AND isc.is_active = 1
+        LEFT JOIN inventory_items_enhanced iie ON imc.id = iie.main_category_id
+          AND iie.item_status = 'active'
         WHERE imc.is_active = 1
         GROUP BY imc.id
         ORDER BY imc.category_name
@@ -49,7 +51,8 @@ class EnhancedInventoryController {
           COUNT(iie.id) as item_count
         FROM inventory_sub_categories isc
         LEFT JOIN inventory_main_categories imc ON isc.main_category_id = imc.id
-        LEFT JOIN inventory_items_enhanced iie ON isc.id = iie.sub_category_id AND iie.item_status = 'active'
+        LEFT JOIN inventory_items_enhanced iie ON isc.id = iie.sub_category_id
+          AND iie.item_status = 'active'
         WHERE isc.main_category_id = ? AND isc.is_active = 1
         GROUP BY isc.id
         ORDER BY isc.subcategory_name
@@ -89,16 +92,16 @@ class EnhancedInventoryController {
       } = req.query;
 
       // Build status condition
-      let statusCondition = "iie.item_status = 'active'"; // default to active
+      let statusCondition = 'iie.item_status = \'active\''; // default to active
       if (status === 'inactive') {
-        statusCondition = "iie.item_status = 'inactive'";
+        statusCondition = 'iie.item_status = \'inactive\'';
       } else if (status === 'all') {
-        statusCondition = "1=1"; // show all statuses
+        statusCondition = '1=1'; // show all statuses
       }
 
       // Build simple query with filters
-      let conditions = [statusCondition];
-      let queryParams = [];
+      const conditions = [statusCondition];
+      const queryParams = [];
 
       if (category) {
         conditions.push('iie.main_category_id = ?');
@@ -130,7 +133,7 @@ class EnhancedInventoryController {
         queryParams.push(searchTerm, searchTerm, searchTerm, searchTerm);
       }
 
-      const whereClause = 'WHERE ' + conditions.join(' AND ');
+      const whereClause = `WHERE ${conditions.join(' AND ')}`;
       const offset = (parseInt(page) - 1) * parseInt(limit);
 
       // Execute query
@@ -183,50 +186,51 @@ class EnhancedInventoryController {
   async createEnhancedItem(req, res) {
     try {
       const {
-        item_code,
-        item_name,
+        item_code: itemCode,
+        item_name: itemName,
         description,
-        main_category_id,
-        sub_category_id,
+        main_category_id: mainCategoryId,
+        sub_category_id: subCategoryId,
         brand,
-        model_number,
-        part_number,
+        model_number: modelNumber,
+        part_number: partNumber,
         manufacturer,
         specifications,
-        requires_serial_tracking = false,
-        requires_batch_tracking = false,
-        shelf_life_days,
-        minimum_stock = 0,
-        maximum_stock,
-        reorder_point = 0,
-        reorder_quantity = 0,
-        standard_cost = 0,
-        selling_price = 0,
-        gst_rate = 18.00,
-        vendor_discount = 0,
-        primary_unit = 'NOS',
-        secondary_unit,
-        conversion_factor = 1,
-        location_code,
-        bin_location
+        requires_serial_tracking: requiresSerialTracking = false,
+        requires_batch_tracking: requiresBatchTracking = false,
+        shelf_life_days: shelfLifeDays,
+        minimum_stock: minimumStock = 0,
+        maximum_stock: maximumStock,
+        reorder_point: reorderPoint = 0,
+        reorder_quantity: reorderQuantity = 0,
+        standard_cost: standardCost = 0,
+        selling_price: sellingPrice = 0,
+        gst_rate: gstRate = 18.00,
+        vendor_discount: vendorDiscount = 0,
+        primary_unit: primaryUnit = 'NOS',
+        secondary_unit: secondaryUnit,
+        conversion_factor: conversionFactor = 1,
+        location_code: locationCode,
+        bin_location: binLocation
       } = req.body;
 
       // Determine serial tracking default from category if not provided
-      let finalRequiresSerial = requires_serial_tracking;
+      let finalRequiresSerial = requiresSerialTracking;
       if (finalRequiresSerial === undefined || finalRequiresSerial === null) {
         try {
           const [catRows] = await db.execute(
             'SELECT requires_serial_tracking FROM inventory_main_categories WHERE id = ?',
-            [main_category_id]
+            [mainCategoryId]
           );
-          finalRequiresSerial = catRows.length > 0 ? Boolean(catRows[0].requires_serial_tracking) : false;
+          finalRequiresSerial = catRows.length > 0 ?
+            Boolean(catRows[0].requires_serial_tracking) : false;
         } catch (err) {
           finalRequiresSerial = false;
         }
       }
 
       // Validate required fields
-      if (!item_code || !item_name || !main_category_id) {
+      if (!itemCode || !itemName || !mainCategoryId) {
         return res.status(400).json({
           success: false,
           message: 'Missing required fields: item_code, item_name, and main_category_id are required'
@@ -236,20 +240,20 @@ class EnhancedInventoryController {
       // Check if item_code already exists
       const [existingItem] = await db.execute(
         'SELECT id FROM inventory_items_enhanced WHERE item_code = ?',
-        [item_code]
+        [itemCode]
       );
 
       if (existingItem.length > 0) {
         return res.status(400).json({
           success: false,
-          message: `Item with code '${item_code}' already exists`
+          message: `Item with code '${itemCode}' already exists`
         });
       }
 
       // Validate that main_category exists
       const [categoryExists] = await db.execute(
         'SELECT id FROM inventory_main_categories WHERE id = ? AND is_active = 1',
-        [main_category_id]
+        [mainCategoryId]
       );
 
       if (categoryExists.length === 0) {
@@ -265,17 +269,19 @@ class EnhancedInventoryController {
           brand, model_number, part_number, manufacturer, specifications,
           requires_serial_tracking, requires_batch_tracking, shelf_life_days,
           minimum_stock, maximum_stock, reorder_point, reorder_quantity,
-          standard_cost, selling_price, gst_rate, vendor_discount, primary_unit, secondary_unit, conversion_factor,
+          standard_cost, selling_price, gst_rate, vendor_discount,
+          primary_unit, secondary_unit, conversion_factor,
           location_code, bin_location, created_by
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
-        item_code, item_name, description || null, main_category_id, sub_category_id || null,
-        brand || null, model_number || null, part_number || null, manufacturer || null,
+        itemCode, itemName, description || null, mainCategoryId, subCategoryId || null,
+        brand || null, modelNumber || null, partNumber || null, manufacturer || null,
         specifications ? JSON.stringify(specifications) : null,
-        requires_serial_tracking ? 1 : 0, requires_batch_tracking ? 1 : 0, shelf_life_days || null,
-        minimum_stock || 0, maximum_stock || null, reorder_point || 0, reorder_quantity || 0,
-        standard_cost || 0, selling_price || 0, gst_rate || 18.00, vendor_discount || 0, primary_unit || 'NOS', secondary_unit || null, conversion_factor || 1,
-        location_code || null, bin_location || null, req.user?.id || null
+        requiresSerialTracking ? 1 : 0, requiresBatchTracking ? 1 : 0, shelfLifeDays || null,
+        minimumStock || 0, maximumStock || null, reorderPoint || 0, reorderQuantity || 0,
+        standardCost || 0, sellingPrice || 0, gstRate || 18.00, vendorDiscount || 0,
+        primaryUnit || 'NOS', secondaryUnit || null, conversionFactor || 1,
+        locationCode || null, binLocation || null, req.user?.id || null
       ]);
 
       res.status(201).json({
@@ -304,7 +310,7 @@ class EnhancedInventoryController {
       const { status } = req.query;
 
       let whereCondition = 'item_id = ?';
-      let queryParams = [itemId];
+      const queryParams = [itemId];
 
       if (status) {
         whereCondition += ' AND status = ?';
@@ -344,16 +350,16 @@ class EnhancedInventoryController {
     try {
       const { itemId } = req.params;
       const {
-        serial_number,
-        batch_number,
-        manufacturing_date,
-        expiry_date,
-        purchase_date,
-        purchase_cost,
-        vendor_id,
-        grn_id,
-        warranty_start_date,
-        warranty_end_date,
+        serial_number: serialNumber,
+        batch_number: batchNumber,
+        manufacturing_date: manufacturingDate,
+        expiry_date: expiryDate,
+        purchase_date: purchaseDate,
+        purchase_cost: purchaseCost,
+        vendor_id: vendorId,
+        grn_id: grnId,
+        warranty_start_date: warrantyStartDate,
+        warranty_end_date: warrantyEndDate,
         notes
       } = req.body;
 
@@ -364,9 +370,9 @@ class EnhancedInventoryController {
           warranty_start_date, warranty_end_date, notes, status
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'in_stock')
       `, [
-        itemId, serial_number, batch_number, manufacturing_date, expiry_date,
-        purchase_date, purchase_cost, vendor_id, grn_id,
-        warranty_start_date, warranty_end_date, notes
+        itemId, serialNumber, batchNumber, manufacturingDate, expiryDate,
+        purchaseDate, purchaseCost, vendorId, grnId,
+        warrantyStartDate, warrantyEndDate, notes
       ]);
 
       res.status(201).json({
@@ -426,21 +432,21 @@ class EnhancedInventoryController {
     try {
       const { itemId } = req.params;
       const {
-        vendor_id,
-        purchase_order_id,
-        grn_id,
-        purchase_date,
-        quantity_purchased,
-        unit_cost,
-        discount_percentage = 0,
-        discount_amount = 0,
-        tax_percentage = 0,
-        tax_amount = 0,
-        total_cost,
-        batch_number,
-        expiry_date,
-        delivery_date,
-        quality_status = 'pending',
+        vendor_id: vendorId,
+        purchase_order_id: purchaseOrderId,
+        grn_id: grnId,
+        purchase_date: purchaseDate,
+        quantity_purchased: quantityPurchased,
+        unit_cost: unitCost,
+        discount_percentage: discountPercentage = 0,
+        discount_amount: discountAmount = 0,
+        tax_percentage: taxPercentage = 0,
+        tax_amount: taxAmount = 0,
+        total_cost: totalCost,
+        batch_number: batchNumber,
+        expiry_date: expiryDate,
+        delivery_date: deliveryDate,
+        quality_status: qualityStatus = 'pending',
         notes
       } = req.body;
 
@@ -452,10 +458,10 @@ class EnhancedInventoryController {
           delivery_date, quality_status, notes
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
-        itemId, vendor_id, purchase_order_id, grn_id, purchase_date,
-        quantity_purchased, unit_cost, discount_percentage, discount_amount,
-        tax_percentage, tax_amount, total_cost, batch_number, expiry_date,
-        delivery_date, quality_status, notes
+        itemId, vendorId, purchaseOrderId, grnId, purchaseDate,
+        quantityPurchased, unitCost, discountPercentage, discountAmount,
+        taxPercentage, taxAmount, totalCost, batchNumber, expiryDate,
+        deliveryDate, qualityStatus, notes
       ]);
 
       // Update item's last purchase cost and average cost
@@ -469,7 +475,7 @@ class EnhancedInventoryController {
             WHERE item_id = ? AND quality_status = 'accepted'
           )
         WHERE id = ?
-      `, [unit_cost, itemId, itemId]);
+      `, [unitCost, itemId, itemId]);
 
       res.status(201).json({
         success: true,
@@ -511,7 +517,8 @@ class EnhancedInventoryController {
           COUNT(iie.id) as item_count,
           SUM(iie.current_stock * iie.standard_cost) as category_value
         FROM inventory_main_categories imc
-        LEFT JOIN inventory_items_enhanced iie ON imc.id = iie.main_category_id AND iie.item_status = 'active'
+        LEFT JOIN inventory_items_enhanced iie ON imc.id = iie.main_category_id
+          AND iie.item_status = 'active'
         WHERE imc.is_active = 1
         GROUP BY imc.id, imc.category_name
         ORDER BY category_value DESC
@@ -598,14 +605,14 @@ class EnhancedInventoryController {
       await db.execute('START TRANSACTION');
 
       for (const update of updates) {
-        const { item_id, new_stock, notes } = update;
+        const { item_id: itemId, new_stock: newStock, notes } = update;
 
         // Update stock
         await db.execute(`
           UPDATE inventory_items_enhanced 
           SET current_stock = ?
           WHERE id = ?
-        `, [new_stock, item_id]);
+        `, [newStock, itemId]);
 
         // Log transaction
         await db.execute(`
@@ -613,7 +620,7 @@ class EnhancedInventoryController {
             item_id, transaction_type, reference_type, quantity,
             transaction_date, created_by, notes
           ) VALUES (?, 'adjustment', 'adjustment', ?, NOW(), ?, ?)
-        `, [item_id, new_stock, req.user?.id || 1, notes || 'Bulk stock adjustment']);
+        `, [itemId, newStock, req.user?.id || 1, notes || 'Bulk stock adjustment']);
       }
 
       await db.execute('COMMIT');
@@ -639,9 +646,13 @@ class EnhancedInventoryController {
   // Create new category
   async createCategory(req, res) {
     try {
-      const { category_name, description, requires_serial_tracking } = req.body;
+      const {
+        category_name: categoryName,
+        description,
+        requires_serial_tracking: requiresSerialTracking
+      } = req.body;
 
-      if (!category_name) {
+      if (!categoryName) {
         return res.status(400).json({
           success: false,
           message: 'Category name is required'
@@ -649,17 +660,25 @@ class EnhancedInventoryController {
       }
 
       // Generate a unique category_code from category_name
-      const category_code = category_name.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 20);
+      const categoryCode = categoryName.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 20);
 
       const [result] = await db.execute(`
-        INSERT INTO inventory_main_categories (category_code, category_name, description, requires_serial_tracking, is_active)
+        INSERT INTO inventory_main_categories (
+          category_code, category_name, description, requires_serial_tracking, is_active
+        )
         VALUES (?, ?, ?, ?, 1)
-      `, [category_code, category_name, description || null, requires_serial_tracking || false]);
+      `, [categoryCode, categoryName, description || null, requiresSerialTracking || false]);
 
       res.json({
         success: true,
         message: 'Category created successfully',
-        data: { id: result.insertId, category_code, category_name, description, requires_serial_tracking }
+        data: {
+          id: result.insertId,
+          categoryCode,
+          categoryName,
+          description,
+          requiresSerialTracking
+        }
       });
     } catch (error) {
       logger.error('Error creating category:', error);
@@ -675,9 +694,13 @@ class EnhancedInventoryController {
   async updateCategory(req, res) {
     try {
       const { id } = req.params;
-      const { category_name, description, requires_serial_tracking } = req.body;
+      const {
+        category_name: categoryName,
+        description,
+        requires_serial_tracking: requiresSerialTracking
+      } = req.body;
 
-      if (!category_name) {
+      if (!categoryName) {
         return res.status(400).json({
           success: false,
           message: 'Category name is required'
@@ -685,13 +708,13 @@ class EnhancedInventoryController {
       }
 
       // Generate a unique category_code from category_name
-      const category_code = category_name.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 20);
+      const categoryCode = categoryName.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 20);
 
       const [result] = await db.execute(`
-        UPDATE inventory_main_categories 
+        UPDATE inventory_main_categories
         SET category_code = ?, category_name = ?, description = ?, requires_serial_tracking = ?
         WHERE id = ? AND is_active = 1
-      `, [category_code, category_name, description || null, requires_serial_tracking || false, id]);
+      `, [categoryCode, categoryName, description || null, requiresSerialTracking || false, id]);
 
       if (result.affectedRows === 0) {
         return res.status(404).json({
@@ -791,7 +814,7 @@ class EnhancedInventoryController {
       }
 
       // Update the item
-      const [result] = await db.execute(`
+      await db.execute(`
         UPDATE inventory_items_enhanced 
         SET 
           item_code = ?,
@@ -895,7 +918,10 @@ class EnhancedInventoryController {
         `, [id]);
 
         if (serialNumbers[0].count > 0 || transactions[0].count > 0) {
-          logger.warn(`Cannot delete item ${id}: has ${serialNumbers[0].count} serial numbers and ${transactions[0].count} transactions`);
+          logger.warn(
+            `Cannot delete item ${id}: has ${serialNumbers[0].count} serial numbers and ` +
+            `${transactions[0].count} transactions`
+          );
           return res.status(400).json({
             success: false,
             message: 'Cannot permanently delete item with existing serial numbers or transaction history. Please archive instead.'

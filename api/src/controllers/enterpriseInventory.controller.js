@@ -10,13 +10,16 @@ class EnterpriseInventoryController {
   async getDashboard(req, res) {
     try {
       const [dashboardData] = await db.execute(`
-        SELECT 
+        SELECT
           COUNT(DISTINCT ii.id) as total_items,
           COALESCE(SUM(ii.current_stock * COALESCE(ii.average_cost, 0)), 0) as total_value,
-          COUNT(CASE WHEN ii.current_stock <= COALESCE(ii.minimum_stock, 0) THEN 1 END) as low_stock_items,
-          COUNT(CASE WHEN ii.current_stock > COALESCE(ii.maximum_stock, 999999) THEN 1 END) as overstock_items,
+          COUNT(CASE WHEN ii.current_stock <= COALESCE(ii.minimum_stock, 0) THEN 1 END)
+            as low_stock_items,
+          COUNT(CASE WHEN ii.current_stock > COALESCE(ii.maximum_stock, 999999) THEN 1 END)
+            as overstock_items,
           COUNT(CASE WHEN ii.current_stock = 0 THEN 1 END) as out_of_stock_items,
-          AVG(CASE WHEN ii.average_cost > 0 THEN ii.current_stock * ii.average_cost / ii.average_cost END) as avg_turnover
+          AVG(CASE WHEN ii.average_cost > 0 THEN ii.current_stock * ii.average_cost /
+            ii.average_cost END) as avg_turnover
         FROM inventory_items ii
         WHERE ii.is_active = TRUE
       `);
@@ -98,16 +101,14 @@ class EnterpriseInventoryController {
   async getAnalytics(req, res) {
     try {
       const { startDate, endDate, locationId } = req.query;
-      
-      let locationFilter = '';
+
       let dateFilter = '';
       const params = [];
-      
+
       if (locationId) {
-        locationFilter = 'AND iws.location_id = ?';
         params.push(locationId);
       }
-      
+
       if (startDate && endDate) {
         dateFilter = 'AND it.created_at BETWEEN ? AND ?';
         params.push(startDate, endDate);
@@ -161,19 +162,20 @@ class EnterpriseInventoryController {
 
       // Stockout risk analysis - simplified version
       const [stockoutRisk] = await db.execute(`
-        SELECT 
+        SELECT
           ii.id, ii.item_code, ii.item_name,
-          ii.current_stock, COALESCE(ii.minimum_stock, 0) as reorder_level, COALESCE(ii.maximum_stock, 999999) as max_stock_level,
-          CASE 
+          ii.current_stock, COALESCE(ii.minimum_stock, 0) as reorder_level,
+          COALESCE(ii.maximum_stock, 999999) as max_stock_level,
+          CASE
             WHEN ii.current_stock <= 0 THEN 'Critical'
             WHEN ii.current_stock <= COALESCE(ii.minimum_stock, 0) * 0.5 THEN 'High'
             WHEN ii.current_stock <= COALESCE(ii.minimum_stock, 0) THEN 'Medium'
             ELSE 'Low'
           END as risk_level,
           COALESCE(
-            (SELECT AVG(ABS(it.quantity)) 
-             FROM inventory_transactions it 
-             WHERE it.item_id = ii.id 
+            (SELECT AVG(ABS(it.quantity))
+             FROM inventory_transactions it
+             WHERE it.item_id = ii.id
              AND it.transaction_type IN ('sale', 'consumption', 'issue')
              AND it.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
             ), 0
@@ -181,11 +183,11 @@ class EnterpriseInventoryController {
         FROM inventory_items ii
         WHERE ii.is_active = TRUE
         HAVING risk_level IN ('Critical', 'High', 'Medium')
-        ORDER BY 
-          CASE risk_level 
-            WHEN 'Critical' THEN 1 
-            WHEN 'High' THEN 2 
-            WHEN 'Medium' THEN 3 
+        ORDER BY
+          CASE risk_level
+            WHEN 'Critical' THEN 1
+            WHEN 'High' THEN 2
+            WHEN 'Medium' THEN 3
           END
       `);
 
@@ -215,12 +217,12 @@ class EnterpriseInventoryController {
   // Get inventory items with advanced filtering
   async getInventoryItems(req, res) {
     try {
-      const { 
-        page = 1, 
-        limit = 50, 
-        search, 
-        category, 
-        location, 
+      const {
+        page = 1,
+        limit = 50,
+        search,
+        category,
+        location,
         status = 'all',
         abcClass,
         sortBy = 'item_name',
@@ -315,21 +317,21 @@ class EnterpriseInventoryController {
   async createInventoryItem(req, res) {
     try {
       const {
-        item_code,
-        item_name,
+        item_code: itemCode,
+        item_name: itemName,
         description,
-        category_id,
-        unit_of_measurement,
-        unit_cost,
-        reorder_level,
-        max_stock_level,
-        abc_classification = 'C',
-        initial_stock = 0,
-        location_id
+        category_id: categoryId,
+        unit_of_measurement: unitOfMeasurement,
+        unit_cost: unitCost,
+        reorder_level: reorderLevel,
+        max_stock_level: maxStockLevel,
+        abc_classification: abcClassification = 'C',
+        initial_stock: initialStock = 0,
+        location_id: locationId
       } = req.body;
 
       // Validate required fields
-      if (!item_code || !item_name || !category_id || !unit_of_measurement) {
+      if (!itemCode || !itemName || !categoryId || !unitOfMeasurement) {
         return res.status(400).json({
           success: false,
           message: 'Item code, name, category, and unit of measurement are required'
@@ -339,7 +341,7 @@ class EnterpriseInventoryController {
       // Check if item code already exists
       const [existing] = await db.execute(
         'SELECT id FROM inventory_items WHERE item_code = ?',
-        [item_code]
+        [itemCode]
       );
 
       if (existing.length > 0) {
@@ -350,14 +352,15 @@ class EnterpriseInventoryController {
       }
 
       // Determine requires_serial_tracking from category default if not provided
-      let finalRequiresSerial = requires_serial_tracking;
+      let finalRequiresSerial = req.body.requires_serial_tracking;
       if (finalRequiresSerial === undefined || finalRequiresSerial === null) {
         try {
           const [catRows] = await db.execute(
             'SELECT requires_serial_tracking FROM inventory_main_categories WHERE id = ?',
-            [category_id]
+            [categoryId]
           );
-          finalRequiresSerial = catRows.length > 0 ? Boolean(catRows[0].requires_serial_tracking) : false;
+          finalRequiresSerial = catRows.length > 0 ?
+            Boolean(catRows[0].requires_serial_tracking) : false;
         } catch (err) {
           finalRequiresSerial = false;
         }
@@ -365,49 +368,49 @@ class EnterpriseInventoryController {
 
       // Create inventory item
       const [result] = await db.execute(`
-        INSERT INTO inventory_items 
+        INSERT INTO inventory_items
         (item_code, item_name, description, category_id, unit_of_measurement,
-         unit_cost, reorder_level, max_stock_level, abc_classification, requires_serial_tracking, status,
-         created_at, updated_at)
+         unit_cost, reorder_level, max_stock_level, abc_classification,
+         requires_serial_tracking, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())
       `, [
-        item_code,
-        item_name,
+        itemCode,
+        itemName,
         description || null,
-        category_id,
-        unit_of_measurement,
-        unit_cost || 0,
-        reorder_level || 0,
-        max_stock_level || 0,
-    abc_classification,
-    finalRequiresSerial ? 1 : 0
-  ]);
+        categoryId,
+        unitOfMeasurement,
+        unitCost || 0,
+        reorderLevel || 0,
+        maxStockLevel || 0,
+        abcClassification,
+        finalRequiresSerial ? 1 : 0
+      ]);
 
       const itemId = result.insertId;
 
       // If initial stock is provided, create stock entry and transaction
-      if (initial_stock > 0 && location_id) {
+      if (initialStock > 0 && locationId) {
         // Create stock entry
         await db.execute(`
-          INSERT INTO inventory_warehouse_stock 
+          INSERT INTO inventory_warehouse_stock
           (item_id, location_id, current_stock, allocated_stock, available_stock,
            created_at, updated_at)
           VALUES (?, ?, ?, 0, ?, NOW(), NOW())
-        `, [itemId, location_id, initial_stock, initial_stock]);
+        `, [itemId, locationId, initialStock, initialStock]);
 
         // Create transaction
         await db.execute(`
-          INSERT INTO inventory_transactions 
+          INSERT INTO inventory_transactions
           (item_id, location_id, transaction_type, quantity, unit_cost,
            reference_type, reference_number, created_by, created_at)
           VALUES (?, ?, 'initial_stock', ?, ?, 'system', 'INIT', ?, NOW())
-        `, [itemId, location_id, initial_stock, unit_cost || 0, req.user?.id || 1]);
+        `, [itemId, locationId, initialStock, unitCost || 0, req.user?.id || 1]);
       }
 
       res.status(201).json({
         success: true,
         message: 'Inventory item created successfully',
-        data: { id: itemId, item_code, item_name }
+        data: { id: itemId, item_code: itemCode, item_name: itemName }
       });
     } catch (error) {
       logger.error('Error creating inventory item:', error);
@@ -424,15 +427,15 @@ class EnterpriseInventoryController {
     try {
       const { id } = req.params;
       const {
-        item_code,
-        item_name,
+        item_code: itemCode,
+        item_name: itemName,
         description,
-        category_id,
-        unit_of_measurement,
-        unit_cost,
-        reorder_level,
-        max_stock_level,
-        abc_classification,
+        category_id: categoryId,
+        unit_of_measurement: unitOfMeasurement,
+        unit_cost: unitCost,
+        reorder_level: reorderLevel,
+        max_stock_level: maxStockLevel,
+        abc_classification: abcClassification,
         status
       } = req.body;
 
@@ -450,10 +453,10 @@ class EnterpriseInventoryController {
       }
 
       // Check if item code already exists (excluding current item)
-      if (item_code) {
+      if (itemCode) {
         const [codeExists] = await db.execute(
           'SELECT id FROM inventory_items WHERE item_code = ? AND id != ?',
-          [item_code, id]
+          [itemCode, id]
         );
 
         if (codeExists.length > 0) {
@@ -465,22 +468,22 @@ class EnterpriseInventoryController {
       }
 
       await db.execute(`
-        UPDATE inventory_items 
+        UPDATE inventory_items
         SET item_code = ?, item_name = ?, description = ?, category_id = ?,
             unit_of_measurement = ?, unit_cost = ?, reorder_level = ?,
             max_stock_level = ?, abc_classification = ?, status = ?,
             updated_at = NOW()
         WHERE id = ?
       `, [
-        item_code,
-        item_name,
+        itemCode,
+        itemName,
         description || null,
-        category_id,
-        unit_of_measurement,
-        unit_cost || null,
-        reorder_level || null,
-        max_stock_level || null,
-        abc_classification || null,
+        categoryId,
+        unitOfMeasurement,
+        unitCost || null,
+        reorderLevel || null,
+        maxStockLevel || null,
+        abcClassification || null,
         status || 'active',
         id
       ]);
@@ -507,62 +510,62 @@ class EnterpriseInventoryController {
   async adjustStock(req, res) {
     try {
       const {
-        item_id,
-        location_id,
-        adjustment_type, // 'increase' or 'decrease'
+        item_id: itemId,
+        location_id: locationId,
+        adjustment_type: adjustmentType, // 'increase' or 'decrease'
         quantity,
         reason,
-        unit_cost,
+        unit_cost: unitCost,
         notes
       } = req.body;
 
-      if (!item_id || !location_id || !adjustment_type || !quantity) {
+      if (!itemId || !locationId || !adjustmentType || !quantity) {
         return res.status(400).json({
           success: false,
           message: 'Item ID, location ID, adjustment type, and quantity are required'
         });
       }
 
-      const adjustmentQuantity = adjustment_type === 'increase' ? quantity : -quantity;
-      const transactionType = adjustment_type === 'increase' ? 'adjustment_in' : 'adjustment_out';
+      const adjustmentQuantity = adjustmentType === 'increase' ? quantity : -quantity;
+      const transactionType = adjustmentType === 'increase' ? 'adjustment_in' : 'adjustment_out';
 
       // Get current stock
       const [currentStock] = await db.execute(
         'SELECT current_stock FROM inventory_warehouse_stock WHERE item_id = ? AND location_id = ?',
-        [item_id, location_id]
+        [itemId, locationId]
       );
 
       if (currentStock.length === 0) {
         // Create new stock entry
         await db.execute(`
-          INSERT INTO inventory_warehouse_stock 
+          INSERT INTO inventory_warehouse_stock
           (item_id, location_id, current_stock, allocated_stock, available_stock,
            created_at, updated_at)
           VALUES (?, ?, ?, 0, ?, NOW(), NOW())
-        `, [item_id, location_id, Math.max(0, adjustmentQuantity), Math.max(0, adjustmentQuantity)]);
+        `, [itemId, locationId, Math.max(0, adjustmentQuantity), Math.max(0, adjustmentQuantity)]);
       } else {
         // Update existing stock
         const newStock = Math.max(0, currentStock[0].current_stock + adjustmentQuantity);
         await db.execute(`
-          UPDATE inventory_warehouse_stock 
+          UPDATE inventory_warehouse_stock
           SET current_stock = ?, available_stock = current_stock - allocated_stock,
               updated_at = NOW()
           WHERE item_id = ? AND location_id = ?
-        `, [newStock, item_id, location_id]);
+        `, [newStock, itemId, locationId]);
       }
 
       // Create transaction record
       await db.execute(`
-        INSERT INTO inventory_transactions 
+        INSERT INTO inventory_transactions
         (item_id, location_id, transaction_type, quantity, unit_cost,
          reference_type, reference_number, notes, created_by, created_at)
         VALUES (?, ?, ?, ?, ?, 'adjustment', ?, ?, ?, NOW())
       `, [
-        item_id, 
-        location_id, 
-        transactionType, 
-        adjustmentQuantity, 
-        unit_cost || null,
+        itemId,
+        locationId,
+        transactionType,
+        adjustmentQuantity,
+        unitCost || null,
         reason || 'Stock Adjustment',
         notes || null,
         req.user?.id || 1
@@ -571,7 +574,7 @@ class EnterpriseInventoryController {
       // Update item's last transaction date
       await db.execute(
         'UPDATE inventory_items SET last_transaction_date = NOW() WHERE id = ?',
-        [item_id]
+        [itemId]
       );
 
       res.json({
@@ -592,22 +595,21 @@ class EnterpriseInventoryController {
   async transferStock(req, res) {
     try {
       const {
-        item_id,
-        from_location_id,
-        to_location_id,
+        item_id: itemId,
+        from_location_id: fromLocationId,
+        to_location_id: toLocationId,
         quantity,
-        notes,
-        transfer_reason
+        notes
       } = req.body;
 
-      if (!item_id || !from_location_id || !to_location_id || !quantity) {
+      if (!itemId || !fromLocationId || !toLocationId || !quantity) {
         return res.status(400).json({
           success: false,
           message: 'All transfer details are required'
         });
       }
 
-      if (from_location_id === to_location_id) {
+      if (fromLocationId === toLocationId) {
         return res.status(400).json({
           success: false,
           message: 'Source and destination locations cannot be the same'
@@ -617,7 +619,7 @@ class EnterpriseInventoryController {
       // Check if sufficient stock is available
       const [fromStock] = await db.execute(
         'SELECT current_stock, available_stock FROM inventory_warehouse_stock WHERE item_id = ? AND location_id = ?',
-        [item_id, from_location_id]
+        [itemId, fromLocationId]
       );
 
       if (fromStock.length === 0 || fromStock[0].available_stock < quantity) {
@@ -633,58 +635,70 @@ class EnterpriseInventoryController {
       try {
         // Reduce stock from source location
         await db.execute(`
-          UPDATE inventory_warehouse_stock 
+          UPDATE inventory_warehouse_stock
           SET current_stock = current_stock - ?,
               available_stock = current_stock - allocated_stock,
               updated_at = NOW()
           WHERE item_id = ? AND location_id = ?
-        `, [quantity, item_id, from_location_id]);
+        `, [quantity, itemId, fromLocationId]);
 
         // Increase stock in destination location
         const [toStock] = await db.execute(
           'SELECT current_stock FROM inventory_warehouse_stock WHERE item_id = ? AND location_id = ?',
-          [item_id, to_location_id]
+          [itemId, toLocationId]
         );
 
         if (toStock.length === 0) {
           // Create new stock entry
           await db.execute(`
-            INSERT INTO inventory_warehouse_stock 
+            INSERT INTO inventory_warehouse_stock
             (item_id, location_id, current_stock, allocated_stock, available_stock,
              created_at, updated_at)
             VALUES (?, ?, ?, 0, ?, NOW(), NOW())
-          `, [item_id, to_location_id, quantity, quantity]);
+          `, [itemId, toLocationId, quantity, quantity]);
         } else {
           // Update existing stock
           await db.execute(`
-            UPDATE inventory_warehouse_stock 
+            UPDATE inventory_warehouse_stock
             SET current_stock = current_stock + ?,
                 available_stock = current_stock - allocated_stock,
                 updated_at = NOW()
             WHERE item_id = ? AND location_id = ?
-          `, [quantity, item_id, to_location_id]);
+          `, [quantity, itemId, toLocationId]);
         }
 
         // Create transfer out transaction
         await db.execute(`
-          INSERT INTO inventory_transactions 
+          INSERT INTO inventory_transactions
           (item_id, location_id, transaction_type, quantity, reference_type,
            reference_number, notes, created_by, created_at)
           VALUES (?, ?, 'transfer_out', ?, 'transfer', ?, ?, ?, NOW())
-        `, [item_id, from_location_id, -quantity, `TRANSFER-${Date.now()}`, notes || null, req.user?.id || 1]);
+        `, [
+          itemId,
+          fromLocationId,
+          -quantity,
+          `TRANSFER-${Date.now()}`,
+          notes || null,
+          req.user?.id || 1
+        ]);
 
         // Create transfer in transaction
         await db.execute(`
-          INSERT INTO inventory_transactions 
+          INSERT INTO inventory_transactions
           (item_id, location_id, transaction_type, quantity, reference_type,
            reference_number, notes, created_by, created_at)
           VALUES (?, ?, 'transfer_in', ?, 'transfer', ?, ?, ?, NOW())
-        `, [item_id, to_location_id, quantity, `TRANSFER-${Date.now()}`, notes || null, req.user?.id || 1]);
-
-        // Update item's last transaction date
+        `, [
+          itemId,
+          toLocationId,
+          quantity,
+          `TRANSFER-${Date.now()}`,
+          notes || null,
+          req.user?.id || 1
+        ]);        // Update item's last transaction date
         await db.execute(
           'UPDATE inventory_items SET last_transaction_date = NOW() WHERE id = ?',
-          [item_id]
+          [itemId]
         );
 
         await db.execute('COMMIT');
@@ -837,11 +851,11 @@ class EnterpriseInventoryController {
   // Generate barcode for item
   async generateBarcode(req, res) {
     try {
-      const { item_id } = req.params;
-      
+      const { item_id: itemId } = req.params;
+
       const [item] = await db.execute(
         'SELECT item_code, item_name FROM inventory_items WHERE id = ?',
-        [item_id]
+        [itemId]
       );
 
       if (item.length === 0) {
@@ -853,7 +867,7 @@ class EnterpriseInventoryController {
 
       // Generate barcode data (you can integrate with barcode libraries)
       const barcodeData = {
-        itemId: item_id,
+        itemId: itemId,
         itemCode: item[0].item_code,
         itemName: item[0].item_name,
         barcode: `${item[0].item_code}-${Date.now()}`,

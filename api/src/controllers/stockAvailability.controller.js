@@ -5,7 +5,7 @@ class StockAvailabilityController {
     async checkStockAvailability(req, res) {
         try {
             const { productId, requiredQuantity, locationId } = req.query;
-            
+
             if (!productId || !requiredQuantity) {
                 return res.status(400).json({
                     success: false,
@@ -35,7 +35,8 @@ class StockAvailabilityController {
                     l.name as location_name,
                     COALESCE(s.quantity, 0) as current_stock,
                     COALESCE(reserved.reserved_qty, 0) as reserved_stock,
-                    (COALESCE(s.quantity, 0) - COALESCE(reserved.reserved_qty, 0)) as available_stock
+                    (COALESCE(s.quantity, 0) - COALESCE(reserved.reserved_qty, 0))
+                        as available_stock
                 FROM locations l
                 LEFT JOIN stock s ON l.id = s.location_id AND s.product_id = ?
                 LEFT JOIN (
@@ -78,7 +79,8 @@ class StockAvailabilityController {
                     iv.lead_time_days,
                     iv.unit_cost
                 FROM products p
-                LEFT JOIN inventory_item_vendors iiv ON p.id = iiv.item_id AND iiv.is_preferred = TRUE
+                LEFT JOIN inventory_item_vendors iiv ON p.id = iiv.item_id
+                    AND iiv.is_preferred = TRUE
                 LEFT JOIN inventory_vendors iv ON iiv.vendor_id = iv.id
                 WHERE p.id = ?
             `, [productId]);
@@ -177,7 +179,7 @@ class StockAvailabilityController {
                     }
 
                     const [stockRows] = await db.execute(stockQuery, params);
-                    
+
                     const totalStock = stockRows[0]?.total_stock || 0;
                     const totalReserved = stockRows[0]?.total_reserved || 0;
                     const availableStock = totalStock - totalReserved;
@@ -256,11 +258,13 @@ class StockAvailabilityController {
                         WHERE movement_type = 'reserved'
                         AND movement_date >= CURDATE()
                         GROUP BY product_id, location_id
-                    ) reserved ON s.product_id = reserved.product_id AND s.location_id = reserved.location_id
+                    ) reserved ON s.product_id = reserved.product_id
+                        AND s.location_id = reserved.location_id
                     ${locationId ? 'WHERE s.location_id = ?' : ''}
                     GROUP BY s.product_id
                 ) stock_summary ON p.id = stock_summary.product_id
-                LEFT JOIN inventory_item_vendors iiv ON p.id = iiv.item_id AND iiv.is_preferred = TRUE
+                LEFT JOIN inventory_item_vendors iiv ON p.id = iiv.item_id
+                    AND iiv.is_preferred = TRUE
                 LEFT JOIN inventory_vendors iv ON iiv.vendor_id = iv.id
                 WHERE p.reorder_point > 0 
                 AND COALESCE(stock_summary.available_stock, 0) <= p.reorder_point
@@ -323,13 +327,14 @@ class StockAvailabilityController {
                         WHERE s.product_id = ? AND s.location_id = ?
                     `, [productId, locationId, productId, locationId]);
 
-                    const availableStock = (stockCheck[0]?.current_stock || 0) - (stockCheck[0]?.reserved_stock || 0);
+                    const availableStock = (stockCheck[0]?.current_stock || 0) -
+                        (stockCheck[0]?.reserved_stock || 0);
 
                     if (availableStock >= quantity) {
-                        // Create reservation entry
                         await db.execute(`
-                            INSERT INTO stock_movements 
-                            (product_id, to_location_id, quantity, movement_type, reference_type, reference_id, movement_date, created_by)
+                            INSERT INTO stock_movements
+                            (product_id, to_location_id, quantity, movement_type,
+                             reference_type, reference_id, movement_date, created_by)
                             VALUES (?, ?, ?, 'reserved', ?, ?, NOW(), ?)
                         `, [productId, locationId, quantity, referenceType, referenceId, userId]);
 

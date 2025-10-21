@@ -9,17 +9,17 @@ const generateItemCode = async (itemType) => {
         'consumable': 'CS',
         'tool': 'TL'
     };
-    
+
     const prefix = prefixes[itemType] || 'IT';
     const year = new Date().getFullYear();
-    
+
     // Get the next sequence number for this type and year
     const [result] = await db.execute(
         `SELECT COUNT(*) as count FROM inventory_items 
          WHERE item_code LIKE ? AND YEAR(created_at) = ?`,
         [`VESPL/${prefix}/${year}/%`, year]
     );
-    
+
     const sequence = (result[0].count + 1).toString().padStart(3, '0');
     return `VESPL/${prefix}/${year}/${sequence}`;
 };
@@ -38,17 +38,17 @@ const generateTransactionCode = async (transactionType) => {
         'opening_stock': 'OS',
         'physical_count': 'PC'
     };
-    
+
     const prefix = prefixes[transactionType] || 'IT';
     const year = new Date().getFullYear();
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-    
+
     const [result] = await db.execute(
         `SELECT COUNT(*) as count FROM inventory_transactions 
          WHERE transaction_code LIKE ? AND YEAR(created_at) = ? AND MONTH(created_at) = ?`,
         [`VESPL/${prefix}/${year}${month}/%`, year, new Date().getMonth() + 1]
     );
-    
+
     const sequence = (result[0].count + 1).toString().padStart(4, '0');
     return `VESPL/${prefix}/${year}${month}/${sequence}`;
 };
@@ -124,15 +124,6 @@ class InventoryController {
     // Get all inventory items with filters
     async getAllItems(req, res) {
         try {
-            const { 
-                category, 
-                item_type, 
-                stock_status, 
-                search,
-                page = 1, 
-                limit = 20 
-            } = req.query;
-
             const query = `
                 SELECT 
                     i.id, i.item_code, i.item_name, i.description, i.item_type,
@@ -243,21 +234,27 @@ class InventoryController {
     async createItem(req, res) {
         try {
             const {
-                item_name, description, category_id, unit_id, item_type,
-                minimum_stock, maximum_stock, reorder_point, reorder_quantity,
-                standard_cost, weight_per_unit, dimensions_length, dimensions_width, dimensions_height,
-                track_serial_numbers, track_batch_numbers, track_expiry_dates,
-                storage_location, storage_conditions, shelf_life_days
+                item_name: itemName, description, category_id: categoryId, unit_id: unitId,
+                item_type: itemType,
+                minimum_stock: minimumStock, maximum_stock: maximumStock,
+                reorder_point: reorderPoint, reorder_quantity: reorderQuantity,
+                standard_cost: standardCost, weight_per_unit: weightPerUnit,
+                dimensions_length: dimensionsLength, dimensions_width: dimensionsWidth,
+                dimensions_height: dimensionsHeight,
+                track_serial_numbers: trackSerialNumbers, track_batch_numbers: trackBatchNumbers,
+                track_expiry_dates: trackExpiryDates,
+                storage_location: storageLocation, storage_conditions: storageConditions,
+                shelf_life_days: shelfLifeDays
             } = req.body;
 
             // Determine track_serial_numbers from category default if not explicitly provided
-            let finalTrackSerial = track_serial_numbers;
+            let finalTrackSerial = trackSerialNumbers;
             if (finalTrackSerial === undefined || finalTrackSerial === null) {
                 try {
                     // Prefer inventory_categories first
                     const [catRows] = await db.execute(
                         'SELECT requires_serial_tracking FROM inventory_categories WHERE id = ?',
-                        [category_id]
+                        [categoryId]
                     );
                     if (catRows.length > 0 && typeof catRows[0].requires_serial_tracking !== 'undefined') {
                         finalTrackSerial = Boolean(catRows[0].requires_serial_tracking);
@@ -265,7 +262,7 @@ class InventoryController {
                         // Fallback to main categories if present
                         const [mainRows] = await db.execute(
                             'SELECT requires_serial_tracking FROM inventory_main_categories WHERE id = ?',
-                            [category_id]
+                            [categoryId]
                         );
                         if (mainRows.length > 0 && typeof mainRows[0].requires_serial_tracking !== 'undefined') {
                             finalTrackSerial = Boolean(mainRows[0].requires_serial_tracking);
@@ -279,22 +276,24 @@ class InventoryController {
             }
 
             // Generate item code
-            const item_code = await generateItemCode(item_type);
+            const itemCode = await generateItemCode(itemType);
 
             const [result] = await db.execute(`
                 INSERT INTO inventory_items (
                     item_code, item_name, description, category_id, unit_id, item_type,
                     minimum_stock, maximum_stock, reorder_point, reorder_quantity,
-                    standard_cost, weight_per_unit, dimensions_length, dimensions_width, dimensions_height,
+                    standard_cost, weight_per_unit, dimensions_length, dimensions_width,
+                    dimensions_height,
                     track_serial_numbers, track_batch_numbers, track_expiry_dates,
                     storage_location, storage_conditions, shelf_life_days, created_by
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `, [
-                item_code, item_name, description, category_id, unit_id, item_type,
-                minimum_stock || 0, maximum_stock, reorder_point || 0, reorder_quantity || 0,
-                standard_cost || 0, weight_per_unit, dimensions_length, dimensions_width, dimensions_height,
-                finalTrackSerial || false, track_batch_numbers || false, track_expiry_dates || false,
-                storage_location, storage_conditions, shelf_life_days, req.user.id
+                itemCode, itemName, description, categoryId, unitId, itemType,
+                minimumStock || 0, maximumStock, reorderPoint || 0, reorderQuantity || 0,
+                standardCost || 0, weightPerUnit, dimensionsLength, dimensionsWidth,
+                dimensionsHeight,
+                finalTrackSerial || false, trackBatchNumbers || false, trackExpiryDates || false,
+                storageLocation, storageConditions, shelfLifeDays, req.user.id
             ]);
 
             res.status(201).json({
@@ -302,7 +301,7 @@ class InventoryController {
                 message: 'Inventory item created successfully',
                 data: {
                     id: result.insertId,
-                    item_code
+                    item_code: itemCode
                 }
             });
         } catch (error) {
@@ -331,7 +330,7 @@ class InventoryController {
 
             const fields = Object.keys(updateData);
             const values = Object.values(updateData);
-            
+
             if (fields.length === 0) {
                 return res.status(400).json({
                     success: false,
@@ -340,9 +339,10 @@ class InventoryController {
             }
 
             const setClause = fields.map(field => `${field} = ?`).join(', ');
-            
+
             await db.execute(
-                `UPDATE inventory_items SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+                `UPDATE inventory_items SET ${setClause},
+                 updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
                 [...values, id]
             );
 
@@ -364,15 +364,18 @@ class InventoryController {
     async createTransaction(req, res) {
         try {
             const {
-                item_id, transaction_type, reference_type, reference_id, reference_number,
-                quantity, unit_cost, batch_number, serial_number, expiry_date,
-                from_location, to_location, warehouse_location, remarks
+                item_id: itemId, transaction_type: transactionType, reference_type: referenceType,
+                reference_id: referenceId, reference_number: referenceNumber,
+                quantity, unit_cost: unitCost, batch_number: batchNumber,
+                serial_number: serialNumber, expiry_date: expiryDate,
+                from_location: fromLocation, to_location: toLocation,
+                warehouse_location: warehouseLocation, remarks
             } = req.body;
 
             // Get current stock
             const [currentItem] = await db.execute(
                 'SELECT current_stock, average_cost FROM inventory_items WHERE id = ?',
-                [item_id]
+                [itemId]
             );
 
             if (currentItem.length === 0) {
@@ -382,27 +385,27 @@ class InventoryController {
                 });
             }
 
-            const stock_before = parseFloat(currentItem[0].current_stock);
-            const current_avg_cost = parseFloat(currentItem[0].average_cost);
-            
+            const stockBefore = parseFloat(currentItem[0].current_stock);
+            const currentAvgCost = parseFloat(currentItem[0].average_cost);
+
             // Calculate new stock level
-            let stock_after;
+            let stockAfter;
             const qty = parseFloat(quantity);
-            
-            if (['purchase_receipt', 'production_receipt', 'return_receipt', 'opening_stock', 'stock_adjustment'].includes(transaction_type)) {
-                if (transaction_type === 'stock_adjustment') {
+
+            if (['purchase_receipt', 'production_receipt', 'return_receipt', 'opening_stock', 'stock_adjustment'].includes(transactionType)) {
+                if (transactionType === 'stock_adjustment') {
                     // For adjustments, quantity can be negative
-                    stock_after = stock_before + qty;
+                    stockAfter = stockBefore + qty;
                 } else {
                     // Positive transactions (receipts)
-                    stock_after = stock_before + Math.abs(qty);
+                    stockAfter = stockBefore + Math.abs(qty);
                 }
             } else {
                 // Negative transactions (issues)
-                stock_after = stock_before - Math.abs(qty);
+                stockAfter = stockBefore - Math.abs(qty);
             }
 
-            if (stock_after < 0) {
+            if (stockAfter < 0) {
                 return res.status(400).json({
                     success: false,
                     message: 'Insufficient stock for this transaction'
@@ -410,7 +413,7 @@ class InventoryController {
             }
 
             // Generate transaction code
-            const transaction_code = await generateTransactionCode(transaction_type);
+            const transactionCode = await generateTransactionCode(transactionType);
 
             // Start transaction
             await db.execute('START TRANSACTION');
@@ -419,25 +422,31 @@ class InventoryController {
                 // Insert transaction record
                 const [transResult] = await db.execute(`
                     INSERT INTO inventory_transactions (
-                        transaction_code, item_id, transaction_type, reference_type, reference_id, reference_number,
-                        quantity, unit_cost, stock_before, stock_after, batch_number, serial_number, expiry_date,
-                        from_location, to_location, warehouse_location, remarks, created_by, status
+                        transaction_code, item_id, transaction_type,
+                        reference_type, reference_id, reference_number,
+                        quantity, unit_cost, stock_before, stock_after,
+                        batch_number, serial_number, expiry_date,
+                        from_location, to_location, warehouse_location,
+                        remarks, created_by, status
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
                 `, [
-                    transaction_code, item_id, transaction_type, reference_type, reference_id, reference_number,
-                    quantity, unit_cost || 0, stock_before, stock_after, batch_number, serial_number, expiry_date,
-                    from_location, to_location, warehouse_location, remarks, req.user.id
+                    transactionCode, itemId, transactionType,
+                    referenceType, referenceId, referenceNumber,
+                    quantity, unitCost || 0, stockBefore,
+                    stockAfter, batchNumber, serialNumber,
+                    expiryDate, fromLocation, toLocation,
+                    warehouseLocation, remarks, req.user.id
                 ]);
 
                 // Calculate new average cost for receipts
-                let new_average_cost = current_avg_cost;
-                if (['purchase_receipt', 'production_receipt'].includes(transaction_type) && unit_cost > 0) {
-                    const total_value_before = stock_before * current_avg_cost;
-                    const transaction_value = Math.abs(qty) * unit_cost;
-                    const total_value_after = total_value_before + transaction_value;
-                    
-                    if (stock_after > 0) {
-                        new_average_cost = total_value_after / stock_after;
+                let newAverageCost = currentAvgCost;
+                if (['purchase_receipt', 'production_receipt'].includes(transactionType) && unitCost > 0) {
+                    const totalValueBefore = stockBefore * currentAvgCost;
+                    const transactionValue = Math.abs(qty) * unitCost;
+                    const totalValueAfter = totalValueBefore + transactionValue;
+
+                    if (stockAfter > 0) {
+                        newAverageCost = totalValueAfter / stockAfter;
                     }
                 }
 
@@ -449,7 +458,7 @@ class InventoryController {
                         ELSE last_purchase_cost 
                     END
                     WHERE id = ?
-                `, [stock_after, new_average_cost, transaction_type, unit_cost || 0, item_id]);
+                `, [stockAfter, newAverageCost, transactionType, unitCost || 0, itemId]);
 
                 await db.execute('COMMIT');
 
@@ -458,9 +467,9 @@ class InventoryController {
                     message: 'Stock transaction created successfully',
                     data: {
                         id: transResult.insertId,
-                        transaction_code,
-                        stock_before,
-                        stock_after
+                        transaction_code: transactionCode,
+                        stock_before: stockBefore,
+                        stock_after: stockAfter
                     }
                 });
             } catch (error) {
@@ -560,19 +569,22 @@ class InventoryController {
     // Get stock transactions
     async getTransactions(req, res) {
         try {
-            const { item_id, transaction_type, page = 1, limit = 20 } = req.query;
-            
+            const {
+                item_id: itemId, transaction_type: transactionType,
+                page = 1, limit = 20
+            } = req.query;
+
             const whereConditions = [];
             const params = [];
 
-            if (item_id) {
+            if (itemId) {
                 whereConditions.push('t.item_id = ?');
-                params.push(item_id);
+                params.push(itemId);
             }
 
-            if (transaction_type) {
+            if (transactionType) {
                 whereConditions.push('t.transaction_type = ?');
-                params.push(transaction_type);
+                params.push(transactionType);
             }
 
             const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
@@ -620,30 +632,33 @@ class InventoryController {
     // Get inventory batches with filters
     async getBatches(req, res) {
         try {
-            const { location_id, product_id, status = 'active', sort_by = 'purchase_date' } = req.query;
-            
+            const {
+                location_id: locationId, product_id: productId,
+                status = 'active', sort_by: sortBy = 'purchase_date'
+            } = req.query;
+
             let whereClause = 'WHERE 1=1';
             const params = [];
-            
-            if (location_id && location_id !== '0') {
+
+            if (locationId && locationId !== '0') {
                 whereClause += ' AND b.location_id = ?';
-                params.push(location_id);
+                params.push(locationId);
             }
-            
-            if (product_id && product_id !== '0') {
+
+            if (productId && productId !== '0') {
                 whereClause += ' AND b.product_id = ?';
-                params.push(product_id);
+                params.push(productId);
             }
-            
+
             if (status && status !== 'all') {
                 whereClause += ' AND b.status = ?';
                 params.push(status);
             }
-            
+
             // Validate sort_by to prevent SQL injection
             const validSortColumns = ['purchase_date', 'expiry_date', 'batch_value', 'available_quantity'];
-            const orderBy = validSortColumns.includes(sort_by) ? sort_by : 'purchase_date';
-            
+            const orderBy = validSortColumns.includes(sortBy) ? sortBy : 'purchase_date';
+
             const [batches] = await db.execute(`
                 SELECT 
                     b.id,
@@ -688,21 +703,21 @@ class InventoryController {
     // Get costing summary for different methods
     async getCostingSummary(req, res) {
         try {
-            const { location_id, product_id } = req.query;
-            
+            const { location_id: locationId, product_id: productId } = req.query;
+
             let whereClause = 'WHERE p.is_active = TRUE';
             const params = [];
-            
-            if (location_id && location_id !== '0') {
+
+            if (locationId && locationId !== '0') {
                 whereClause += ' AND l.id = ?';
-                params.push(location_id);
+                params.push(locationId);
             }
-            
-            if (product_id && product_id !== '0') {
+
+            if (productId && productId !== '0') {
                 whereClause += ' AND p.id = ?';
-                params.push(product_id);
+                params.push(productId);
             }
-            
+
             const [costingSummary] = await db.execute(`
                 SELECT 
                     p.id as product_id,
@@ -733,7 +748,8 @@ class InventoryController {
                     
                     -- Average Cost (weighted average)
                     COALESCE((
-                        SELECT SUM(ib.available_quantity * ib.purchase_price) / SUM(ib.available_quantity)
+                        SELECT SUM(ib.available_quantity * ib.purchase_price) /
+                               SUM(ib.available_quantity)
                         FROM inventory_batches ib 
                         WHERE ib.product_id = p.id AND ib.location_id = l.id 
                         AND ib.available_quantity > 0 AND ib.status = 'active'
@@ -754,7 +770,8 @@ class InventoryController {
                     
                 FROM products p
                 CROSS JOIN locations l
-                LEFT JOIN inventory_batches ib ON p.id = ib.product_id AND l.id = ib.location_id AND ib.status = 'active'
+                LEFT JOIN inventory_batches ib ON p.id = ib.product_id AND
+                    l.id = ib.location_id AND ib.status = 'active'
                 ${whereClause}
                 GROUP BY p.id, l.id
                 HAVING total_quantity > 0
@@ -778,15 +795,15 @@ class InventoryController {
     // Get available serial numbers for a product
     async getAvailableSerialNumbers(req, res) {
         try {
-            const { product_id, location_id } = req.query;
-            
-            if (!product_id || !location_id) {
+            const { product_id: productId, location_id: locationId } = req.query;
+
+            if (!productId || !locationId) {
                 return res.status(400).json({
                     success: false,
                     message: 'Product ID and Location ID are required'
                 });
             }
-            
+
             const [serialNumbers] = await db.execute(`
                 SELECT 
                     sn.id,
@@ -839,7 +856,7 @@ class InventoryController {
                     sn.status DESC, -- Available first, then reserved
                     compatibility_score DESC,
                     sn.warranty_end_date DESC
-            `, [product_id, location_id]);
+            `, [productId, locationId]);
 
             res.json({
                 success: true,
@@ -858,23 +875,24 @@ class InventoryController {
     // Allocate serial numbers to estimation
     async allocateSerialNumbers(req, res) {
         try {
-            const { 
-                estimation_id, 
-                estimation_item_id, 
-                serial_allocations,
-                allocated_by 
+            const {
+                estimation_id: estimationId,
+                estimation_item_id: estimationItemId,
+                serial_allocations: serialAllocations,
+                allocated_by: allocatedBy
             } = req.body;
-            
-            if (!estimation_id || !estimation_item_id || !serial_allocations || !Array.isArray(serial_allocations)) {
+
+            if (!estimationId || !estimationItemId || !serialAllocations ||
+                !Array.isArray(serialAllocations)) {
                 return res.status(400).json({
                     success: false,
                     message: 'Invalid request data'
                 });
             }
-            
+
             // Start transaction
             await db.execute('START TRANSACTION');
-            
+
             try {
                 // Get estimation details
                 const [estimationDetails] = await db.execute(`
@@ -882,36 +900,36 @@ class InventoryController {
                     FROM estimations e 
                     JOIN estimation_items ei ON e.id = ei.estimation_id 
                     WHERE ei.id = ?
-                `, [estimation_item_id]);
-                
+                `, [estimationItemId]);
+
                 if (estimationDetails.length === 0) {
                     throw new Error('Estimation item not found');
                 }
-                
-                const { location_id, product_id } = estimationDetails[0];
-                
+
+                const { location_id: locationId, product_id: productId } = estimationDetails[0];
+
                 // Process each serial allocation
-                for (const allocation of serial_allocations) {
-                    const { 
-                        serial_number_id, 
-                        unit_cost, 
-                        allocation_reason = 'technical_compatibility',
-                        technical_specification = ''
+                for (const allocation of serialAllocations) {
+                    const {
+                        serial_number_id: serialNumberId,
+                        unit_cost: unitCost,
+                        allocation_reason: allocationReason = 'technical_compatibility',
+                        technical_specification: technicalSpecification = ''
                     } = allocation;
-                    
+
                     // Get serial number details
                     const [serialDetails] = await db.execute(`
                         SELECT serial_number, warranty_start_date, warranty_end_date
                         FROM inventory_serial_numbers 
                         WHERE id = ? AND status = 'available'
-                    `, [serial_number_id]);
-                    
+                    `, [serialNumberId]);
+
                     if (serialDetails.length === 0) {
-                        throw new Error(`Serial number ID ${serial_number_id} not available`);
+                        throw new Error(`Serial number ID ${serialNumberId} not available`);
                     }
-                    
+
                     const serialData = serialDetails[0];
-                    
+
                     // Create allocation record
                     await db.execute(`
                         INSERT INTO estimation_serial_allocations (
@@ -922,45 +940,45 @@ class InventoryController {
                             allocated_by, status
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'tentative')
                     `, [
-                        estimation_id, estimation_item_id, product_id, location_id,
-                        serial_number_id, serialData.serial_number, unit_cost,
-                        allocation_reason, technical_specification,
+                        estimationId, estimationItemId, productId, locationId,
+                        serialNumberId, serialData.serial_number, unitCost,
+                        allocationReason, technicalSpecification,
                         serialData.warranty_start_date, serialData.warranty_end_date,
-                        allocated_by || req.user?.id
+                        allocatedBy || req.user?.id
                     ]);
-                    
+
                     // Update serial number status to reserved
                     await db.execute(`
                         UPDATE inventory_serial_numbers 
                         SET status = 'reserved', reserved_for = 'estimation', reserved_for_id = ?
                         WHERE id = ?
-                    `, [estimation_id, serial_number_id]);
+                    `, [estimationId, serialNumberId]);
                 }
-                
+
                 // Update estimation item allocation type
                 await db.execute(`
                     UPDATE estimation_items 
                     SET allocation_type = 'specific_serial'
                     WHERE id = ?
-                `, [estimation_item_id]);
-                
+                `, [estimationItemId]);
+
                 await db.execute('COMMIT');
-                
+
                 res.json({
                     success: true,
                     message: 'Serial numbers allocated successfully',
                     data: {
-                        estimation_id,
-                        estimation_item_id,
-                        allocated_count: serial_allocations.length
+                        estimation_id: estimationId,
+                        estimation_item_id: estimationItemId,
+                        allocated_count: serialAllocations.length
                     }
                 });
-                
+
             } catch (error) {
                 await db.execute('ROLLBACK');
                 throw error;
             }
-            
+
         } catch (error) {
             console.error('Error allocating serial numbers:', error);
             res.status(500).json({
@@ -975,26 +993,26 @@ class InventoryController {
     async reserveInventory(req, res) {
         try {
             const {
-                reservation_type = 'estimation',
-                reference_id,
-                reference_line_id,
-                product_id,
-                location_id,
-                reserved_quantity,
-                pricing_method = 'fifo',
-                reserved_by
+                reservation_type: reservationType = 'estimation',
+                reference_id: referenceId,
+                reference_line_id: referenceLineId,
+                product_id: productId,
+                location_id: locationId,
+                reserved_quantity: reservedQuantity,
+                pricing_method: pricingMethod = 'fifo',
+                reserved_by: reservedBy
             } = req.body;
-            
-            if (!reference_id || !product_id || !location_id || !reserved_quantity) {
+
+            if (!referenceId || !productId || !locationId || !reservedQuantity) {
                 return res.status(400).json({
                     success: false,
                     message: 'Missing required fields'
                 });
             }
-            
+
             // Calculate estimated unit cost based on pricing method
             let estimatedCostQuery;
-            switch (pricing_method) {
+            switch (pricingMethod) {
                 case 'fifo':
                     estimatedCostQuery = `
                         SELECT purchase_price as cost
@@ -1018,7 +1036,8 @@ class InventoryController {
                 case 'average':
                     estimatedCostQuery = `
                         SELECT 
-                            SUM(available_quantity * purchase_price) / SUM(available_quantity) as cost
+                            SUM(available_quantity * purchase_price) /
+                            SUM(available_quantity) as cost
                         FROM inventory_batches
                         WHERE product_id = ? AND location_id = ?
                         AND available_quantity > 0 AND status = 'active'
@@ -1033,14 +1052,14 @@ class InventoryController {
                         LIMIT 1
                     `;
             }
-            
-            const [costResult] = await db.execute(estimatedCostQuery, [product_id, location_id]);
-            const estimated_unit_cost = costResult.length > 0 ? costResult[0].cost : 0;
-            
+
+            const [costResult] = await db.execute(estimatedCostQuery, [productId, locationId]);
+            const estimatedUnitCost = costResult.length > 0 ? costResult[0].cost : 0;
+
             // Set expiry time (default 72 hours)
-            const expires_at = new Date();
-            expires_at.setHours(expires_at.getHours() + 72);
-            
+            const expiresAt = new Date();
+            expiresAt.setHours(expiresAt.getHours() + 72);
+
             // Create reservation
             const [result] = await db.execute(`
                 INSERT INTO inventory_reservations (
@@ -1050,22 +1069,22 @@ class InventoryController {
                     reserved_by, status
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
             `, [
-                reservation_type, reference_id, reference_line_id,
-                product_id, location_id, reserved_quantity,
-                pricing_method, estimated_unit_cost, expires_at,
-                reserved_by || req.user?.id
+                reservationType, referenceId, referenceLineId,
+                productId, locationId, reservedQuantity,
+                pricingMethod, estimatedUnitCost, expiresAt,
+                reservedBy || req.user?.id
             ]);
-            
+
             res.json({
                 success: true,
                 message: 'Inventory reserved successfully',
                 data: {
                     reservation_id: result.insertId,
-                    estimated_unit_cost,
-                    expires_at
+                    estimated_unit_cost: estimatedUnitCost,
+                    expires_at: expiresAt
                 }
             });
-            
+
         } catch (error) {
             console.error('Error reserving inventory:', error);
             res.status(500).json({

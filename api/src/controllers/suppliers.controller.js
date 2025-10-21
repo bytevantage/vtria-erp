@@ -4,14 +4,14 @@ class SuppliersController {
     // Get all suppliers
     async getAllSuppliers(req, res) {
         try {
-            const { is_active = true } = req.query;
+            const { is_active: isActive = true } = req.query;
 
             let whereClause = '';
             const params = [];
 
-            if (is_active !== undefined) {
+            if (isActive !== undefined) {
                 whereClause = 'WHERE is_active = ?';
-                params.push((is_active === 'true' || is_active === '1' || is_active === true) ? 1 : 0);
+                params.push((isActive === 'true' || isActive === '1' || isActive === true) ? 1 : 0);
             }
 
             const query = `
@@ -104,7 +104,7 @@ class SuppliersController {
             const {
                 name,
                 code,
-                contact_person,
+                contact_person: contactPerson,
                 email,
                 phone,
                 address,
@@ -113,8 +113,8 @@ class SuppliersController {
                 pincode,
                 gstin,
                 pan,
-                payment_terms,
-                credit_limit = 0,
+                payment_terms: paymentTerms,
+                credit_limit: creditLimit = 0,
                 rating = 'good'
             } = req.body;
 
@@ -128,7 +128,7 @@ class SuppliersController {
             const [result] = await db.execute(query, [
                 name,
                 code,
-                contact_person,
+                contactPerson,
                 email,
                 phone,
                 address,
@@ -137,8 +137,8 @@ class SuppliersController {
                 pincode,
                 gstin,
                 pan,
-                payment_terms,
-                credit_limit,
+                paymentTerms,
+                creditLimit,
                 rating
             ]);
 
@@ -165,7 +165,7 @@ class SuppliersController {
             const {
                 name,
                 code,
-                contact_person,
+                contact_person: contactPerson,
                 email,
                 phone,
                 address,
@@ -174,10 +174,10 @@ class SuppliersController {
                 pincode,
                 gstin,
                 pan,
-                payment_terms,
-                credit_limit,
+                payment_terms: paymentTerms,
+                credit_limit: creditLimit,
                 rating,
-                is_active
+                is_active: isActive
             } = req.body;
 
             const query = `
@@ -192,7 +192,7 @@ class SuppliersController {
             const [result] = await db.execute(query, [
                 name,
                 code,
-                contact_person,
+                contactPerson,
                 email,
                 phone,
                 address,
@@ -201,10 +201,10 @@ class SuppliersController {
                 pincode,
                 gstin,
                 pan,
-                payment_terms,
-                credit_limit,
+                paymentTerms,
+                creditLimit,
                 rating,
-                is_active,
+                isActive,
                 id
             ]);
 
