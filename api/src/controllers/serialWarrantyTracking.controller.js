@@ -5,15 +5,15 @@ class SerialWarrantyTrackingController {
     async generateSerialNumbers(req, res) {
         try {
             const {
-                product_id,
+                product_id: productId,
                 quantity,
-                batch_number,
-                manufacturing_date,
-                warranty_months = 12,
-                location_id = 1
+                batch_number: batchNumber,
+                manufacturing_date: manufacturingDate,
+                warranty_months: warrantyMonths = 12,
+                location_id: locationId = 1
             } = req.body;
 
-            const user_id = req.user?.id || 1;
+            const userId = req.user?.id || 1;
 
             // Get connection for transaction
             const connection = await req.db.getConnection();
@@ -27,7 +27,7 @@ class SerialWarrantyTrackingController {
                 // Get product details for serial number generation
                 const [productRows] = await connection.execute(
                     'SELECT name, sku FROM products WHERE id = ?',
-                    [product_id]
+                    [productId]
                 );
 
                 if (productRows.length === 0) {
@@ -39,8 +39,8 @@ class SerialWarrantyTrackingController {
                 // Generate serial numbers
                 for (let i = 0; i < quantity; i++) {
                     const serialNumber = await this.generateSerialNumber(connection, product.sku);
-                    const warrantyExpiry = moment(manufacturing_date)
-                        .add(warranty_months, 'months')
+                    const warrantyExpiry = moment(manufacturingDate)
+                        .add(warrantyMonths, 'months')
                         .format('YYYY-MM-DD');
 
                     const serialQuery = `
@@ -51,14 +51,14 @@ class SerialWarrantyTrackingController {
                     `;
 
                     const [result] = await connection.execute(serialQuery, [
-                        product_id,
+                        productId,
                         serialNumber,
-                        batch_number,
-                        manufacturing_date,
+                        batchNumber,
+                        manufacturingDate,
                         warrantyExpiry,
-                        warranty_months,
-                        location_id,
-                        user_id
+                        warrantyMonths,
+                        locationId,
+                        userId
                     ]);
 
                     serialNumbers.push({
@@ -93,7 +93,7 @@ class SerialWarrantyTrackingController {
     async getProductSerialNumbers(req, res) {
         try {
             const { productId } = req.params;
-            const { status, location_id, batch_number } = req.query;
+            const { status, location_id: locationId, batch_number: batchNumber } = req.query;
 
             let whereClause = 'WHERE psn.product_id = ?';
             const params = [productId];
@@ -103,14 +103,14 @@ class SerialWarrantyTrackingController {
                 params.push(status);
             }
 
-            if (location_id) {
+            if (locationId) {
                 whereClause += ' AND psn.location_id = ?';
-                params.push(location_id);
+                params.push(locationId);
             }
 
-            if (batch_number) {
+            if (batchNumber) {
                 whereClause += ' AND psn.batch_number = ?';
-                params.push(batch_number);
+                params.push(batchNumber);
             }
 
             const query = `
@@ -123,7 +123,8 @@ class SerialWarrantyTrackingController {
                     so.order_number,
                     CASE 
                         WHEN psn.warranty_expiry_date < CURDATE() THEN 'expired'
-                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 'expiring_soon'
+                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                            THEN 'expiring_soon'
                         ELSE 'active'
                     END as warranty_status
                 FROM product_serial_numbers psn
@@ -154,14 +155,14 @@ class SerialWarrantyTrackingController {
             const { serialId } = req.params;
             const {
                 status,
-                sales_order_id,
-                customer_id,
-                sold_date,
+                sales_order_id: salesOrderId,
+                customer_id: customerId,
+                sold_date: soldDate,
                 notes,
-                location_id
+                location_id: locationId
             } = req.body;
 
-            const user_id = req.user?.id || 1;
+            const userId = req.user?.id || 1;
 
             const query = `
                 UPDATE product_serial_numbers 
@@ -178,12 +179,12 @@ class SerialWarrantyTrackingController {
 
             const [result] = await req.db.execute(query, [
                 status,
-                sales_order_id || null,
-                customer_id || null,
-                sold_date || null,
-                location_id,
+                salesOrderId || null,
+                customerId || null,
+                soldDate || null,
+                locationId,
                 notes || null,
-                user_id,
+                userId,
                 serialId
             ]);
 
@@ -192,7 +193,7 @@ class SerialWarrantyTrackingController {
             }
 
             // Log status change
-            await this.logSerialNumberHistory(req.db, serialId, status, user_id, notes);
+            await this.logSerialNumberHistory(req.db, serialId, status, userId, notes);
 
             res.json({
                 success: true,
@@ -223,7 +224,8 @@ class SerialWarrantyTrackingController {
                     so.order_date,
                     CASE 
                         WHEN psn.warranty_expiry_date < CURDATE() THEN 'expired'
-                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 'expiring_soon'
+                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                            THEN 'expiring_soon'
                         ELSE 'active'
                     END as warranty_status,
                     DATEDIFF(psn.warranty_expiry_date, CURDATE()) as days_remaining
@@ -271,21 +273,21 @@ class SerialWarrantyTrackingController {
     async createWarrantyClaim(req, res) {
         try {
             const {
-                serial_number,
-                customer_name,
-                customer_phone,
-                customer_email,
-                issue_description,
-                claim_type = 'repair',
+                serial_number: serialNumber,
+                customer_name: customerName,
+                customer_phone: customerPhone,
+                customer_email: customerEmail,
+                issue_description: issueDescription,
+                claim_type: claimType = 'repair',
                 priority = 'normal'
             } = req.body;
 
-            const user_id = req.user?.id || 1;
+            const userId = req.user?.id || 1;
 
             // Get serial number info
             const [serialRows] = await req.db.execute(
                 'SELECT id, warranty_expiry_date FROM product_serial_numbers WHERE serial_number = ?',
-                [serial_number]
+                [serialNumber]
             );
 
             if (serialRows.length === 0) {
@@ -311,14 +313,14 @@ class SerialWarrantyTrackingController {
             const [result] = await req.db.execute(claimQuery, [
                 claimNumber,
                 serialInfo.id,
-                customer_name,
-                customer_phone,
-                customer_email,
-                issue_description,
-                claim_type,
+                customerName,
+                customerPhone,
+                customerEmail,
+                issueDescription,
+                claimType,
                 priority,
                 isWarrantyValid,
-                user_id
+                userId
             ]);
 
             res.json({
@@ -338,7 +340,7 @@ class SerialWarrantyTrackingController {
     // Get warranty claims
     async getWarrantyClaims(req, res) {
         try {
-            const { status, priority, warranty_valid } = req.query;
+            const { status, priority, warranty_valid: warrantyValid } = req.query;
 
             let whereClause = 'WHERE 1=1';
             const params = [];
@@ -353,9 +355,9 @@ class SerialWarrantyTrackingController {
                 params.push(priority);
             }
 
-            if (warranty_valid !== undefined) {
+            if (warrantyValid !== undefined) {
                 whereClause += ' AND wc.warranty_valid = ?';
-                params.push((warranty_valid === 'true' || warranty_valid === '1' || warranty_valid === true) ? 1 : 0);
+                params.push((warrantyValid === 'true' || warrantyValid === '1' || warrantyValid === true) ? 1 : 0);
             }
 
             const query = `
@@ -394,13 +396,13 @@ class SerialWarrantyTrackingController {
             const { claimId } = req.params;
             const {
                 status,
-                resolution_notes,
-                replacement_serial_number,
-                repair_cost,
-                handled_by
+                resolution_notes: resolutionNotes,
+                replacement_serial_number: replacementSerialNumber,
+                repair_cost: repairCost,
+                handled_by: handledBy
             } = req.body;
 
-            const user_id = req.user?.id || 1;
+            const userId = req.user?.id || 1;
 
             const query = `
                 UPDATE warranty_claims 
@@ -409,17 +411,19 @@ class SerialWarrantyTrackingController {
                     replacement_serial_number = ?,
                     repair_cost = ?,
                     handled_by = ?,
-                    resolved_date = CASE WHEN ? IN ('resolved', 'closed') THEN NOW() ELSE resolved_date END,
+                    resolved_date = CASE WHEN ? IN ('resolved', 'closed')
+                        THEN NOW()
+                        ELSE resolved_date END,
                     updated_at = NOW()
                 WHERE id = ?
             `;
 
             const [result] = await req.db.execute(query, [
                 status,
-                resolution_notes || null,
-                replacement_serial_number || null,
-                repair_cost || null,
-                handled_by || user_id,
+                resolutionNotes || null,
+                replacementSerialNumber || null,
+                repairCost || null,
+                handledBy || userId,
                 status,
                 claimId
             ]);
@@ -442,7 +446,7 @@ class SerialWarrantyTrackingController {
     // Get warranty expiry report
     async getWarrantyExpiryReport(req, res) {
         try {
-            const { days_ahead = 30 } = req.query;
+            const { days_ahead: daysAhead = 30 } = req.query;
 
             const query = `
                 SELECT 
@@ -457,8 +461,10 @@ class SerialWarrantyTrackingController {
                     so.order_number,
                     CASE 
                         WHEN psn.warranty_expiry_date < CURDATE() THEN 'expired'
-                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 'expiring_this_week'
-                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 'expiring_this_month'
+                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                            THEN 'expiring_this_week'
+                        WHEN psn.warranty_expiry_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                            THEN 'expiring_this_month'
                         ELSE 'active'
                     END as warranty_status
                 FROM product_serial_numbers psn
@@ -470,7 +476,7 @@ class SerialWarrantyTrackingController {
                 ORDER BY psn.warranty_expiry_date ASC
             `;
 
-            const [rows] = await req.db.execute(query, [days_ahead]);
+            const [rows] = await req.db.execute(query, [daysAhead]);
 
             res.json({
                 success: true,
