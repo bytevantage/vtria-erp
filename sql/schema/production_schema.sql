@@ -32,12 +32,16 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE TABLE IF NOT EXISTS clients (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE,
     phone VARCHAR(50),
     address TEXT,
+    city VARCHAR(100),
+    state VARCHAR(100),
     gst_number VARCHAR(50),
     contact_person VARCHAR(255),
     status ENUM('active', 'inactive') DEFAULT 'active',
+    deleted_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -45,21 +49,27 @@ CREATE TABLE IF NOT EXISTS clients (
 -- Sales enquiries table
 CREATE TABLE IF NOT EXISTS sales_enquiries (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    enquiry_id VARCHAR(50) UNIQUE NOT NULL,
     enquiry_number VARCHAR(50) UNIQUE NOT NULL,
     client_id INT NOT NULL,
     subject VARCHAR(255) NOT NULL,
+    project_name VARCHAR(255),
     description TEXT,
     status ENUM('open', 'closed', 'converted') DEFAULT 'open',
     priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
     expected_value DECIMAL(12,2),
     follow_up_date DATE,
-    created_by INT NOT NULL,
+    enquiry_date DATE,
+    enquiry_by INT NOT NULL,
     assigned_to INT,
+    case_id INT,
+    deleted_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(id),
-    FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (assigned_to) REFERENCES users(id)
+    FOREIGN KEY (enquiry_by) REFERENCES users(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id),
+    FOREIGN KEY (case_id) REFERENCES cases(id)
 );
 
 -- Quotations table
@@ -287,6 +297,92 @@ CREATE TABLE IF NOT EXISTS shift_assignments (
     FOREIGN KEY (employee_id) REFERENCES employees(id),
     FOREIGN KEY (shift_id) REFERENCES shifts(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+-- Estimations table
+CREATE TABLE IF NOT EXISTS estimations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    estimation_id VARCHAR(50) UNIQUE NOT NULL,
+    enquiry_id INT,
+    case_id INT,
+    date DATE,
+    status ENUM('draft', 'sent', 'approved', 'rejected') DEFAULT 'draft',
+    total_mrp DECIMAL(12,2) DEFAULT 0,
+    total_discount DECIMAL(12,2) DEFAULT 0,
+    total_final_price DECIMAL(12,2) DEFAULT 0,
+    notes TEXT,
+    created_by INT NOT NULL,
+    approved_by INT,
+    approved_at TIMESTAMP NULL,
+    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (enquiry_id) REFERENCES sales_enquiries(id),
+    FOREIGN KEY (case_id) REFERENCES cases(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (approved_by) REFERENCES users(id)
+);
+
+-- Estimation sections table
+CREATE TABLE IF NOT EXISTS estimation_sections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    estimation_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    order_index INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (estimation_id) REFERENCES estimations(id) ON DELETE CASCADE
+);
+
+-- Estimation subsections table
+CREATE TABLE IF NOT EXISTS estimation_subsections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    section_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    order_index INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (section_id) REFERENCES estimation_sections(id) ON DELETE CASCADE
+);
+
+-- Estimation items table
+CREATE TABLE IF NOT EXISTS estimation_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    estimation_id INT NOT NULL,
+    section_id INT,
+    subsection_id INT,
+    product_id INT,
+    description TEXT,
+    quantity DECIMAL(10,2) DEFAULT 1,
+    unit_price DECIMAL(10,2),
+    total_price DECIMAL(12,2),
+    order_index INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (estimation_id) REFERENCES estimations(id) ON DELETE CASCADE,
+    FOREIGN KEY (section_id) REFERENCES estimation_sections(id),
+    FOREIGN KEY (subsection_id) REFERENCES estimation_subsections(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Purchase requisitions table
+CREATE TABLE IF NOT EXISTS purchase_requisitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    requisition_number VARCHAR(50) UNIQUE NOT NULL,
+    estimation_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    total_amount DECIMAL(12,2),
+    status ENUM('draft', 'submitted', 'approved', 'rejected', 'processed') DEFAULT 'draft',
+    created_by INT NOT NULL,
+    approved_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (estimation_id) REFERENCES estimations(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (approved_by) REFERENCES users(id)
 );
 
 SELECT 'Production Database Schema Created Successfully!' as Status;

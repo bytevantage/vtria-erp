@@ -5974,3 +5974,20 @@
 2025-11-03T14:01:23.937Z ERROR: Failed to initialize email transporter:
 2025-11-03T14:02:49.076Z ERROR: Failed to initialize email transporter:
 2025-11-03T14:24:50.395Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:29:32.023Z ERROR: Error fetching manufacturing cases:
+2025-11-03T14:36:50.802Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:37:26.881Z ERROR: Error on GET /api/cases:
+2025-11-03T14:37:50.507Z ERROR: Error on GET /api/support/cases:
+2025-11-03T14:38:08.144Z ERROR: Error on GET /api/cases/all:
+2025-11-03T14:38:59.571Z ERROR: Authentication error:
+2025-11-03T14:38:59.610Z ERROR: Error on GET /api/estimations:
+2025-11-03T14:39:48.773Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:42:09.814Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:43:37.136Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:47:07.163Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:48:13.134Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:54:21.072Z ERROR: Failed to initialize email transporter:
+2025-11-03T16:08:12.311Z ERROR: Authentication error:
+2025-11-03T16:08:12.375Z ERROR: Error on GET /api/sales-enquiries:
+2025-11-03T16:09:03.310Z ERROR: Authentication error:
+2025-11-03T16:09:03.338Z ERROR: Error on GET /api/case-management/cases:
