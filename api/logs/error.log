@@ -5991,3 +5991,5 @@
 2025-11-03T16:08:12.375Z ERROR: Error on GET /api/sales-enquiries:
 2025-11-03T16:09:03.310Z ERROR: Authentication error:
 2025-11-03T16:09:03.338Z ERROR: Error on GET /api/case-management/cases:
+2025-11-03T16:27:16.231Z ERROR: Failed to initialize email transporter:
+2025-11-03T16:43:13.383Z ERROR: Failed to initialize email transporter:

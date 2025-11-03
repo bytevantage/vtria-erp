@@ -93,14 +93,60 @@ CREATE TABLE IF NOT EXISTS document_sequences (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Create clients table (needed for sales_enquiries foreign key)
+CREATE TABLE IF NOT EXISTS clients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    phone VARCHAR(50),
+    address TEXT,
+    city VARCHAR(100),
+    state VARCHAR(100),
+    gst_number VARCHAR(50),
+    contact_person VARCHAR(255),
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Create sales_enquiries table (needed for cases foreign key)
+CREATE TABLE IF NOT EXISTS sales_enquiries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    enquiry_id VARCHAR(50) UNIQUE NOT NULL,
+    enquiry_number VARCHAR(50) UNIQUE NOT NULL,
+    client_id INT NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    project_name VARCHAR(255),
+    description TEXT,
+    status ENUM('open', 'closed', 'converted') DEFAULT 'open',
+    priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
+    expected_value DECIMAL(12,2),
+    follow_up_date DATE,
+    enquiry_date DATE,
+    enquiry_by INT NOT NULL,
+    assigned_to INT,
+    case_id INT,
+    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (client_id) REFERENCES clients(id),
+    FOREIGN KEY (enquiry_by) REFERENCES users(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id)
+);
+
 -- Create cases table for ticketing system
 CREATE TABLE IF NOT EXISTS cases (
     id INT AUTO_INCREMENT PRIMARY KEY,
     case_number VARCHAR(50) UNIQUE NOT NULL,
+    enquiry_id INT,
+    project_name VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     status ENUM('open', 'closed', 'pending') DEFAULT 'open',
     current_state ENUM('enquiry', 'quotation', 'order', 'production', 'delivery', 'closed') DEFAULT 'enquiry',
+    sub_state VARCHAR(100),
     priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
     created_by INT NOT NULL,
     assigned_to INT,
@@ -108,8 +154,14 @@ CREATE TABLE IF NOT EXISTS cases (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (assigned_to) REFERENCES users(id)
+    FOREIGN KEY (assigned_to) REFERENCES users(id),
+    FOREIGN KEY (enquiry_id) REFERENCES sales_enquiries(id)
 );
+
+-- Add foreign key from sales_enquiries to cases (circular dependency handled after both tables exist)
+ALTER TABLE sales_enquiries 
+ADD CONSTRAINT fk_sales_enquiries_case 
+FOREIGN KEY (case_id) REFERENCES cases(id);
 
 -- Create case_notes table for ticketing system
 CREATE TABLE IF NOT EXISTS case_notes (
