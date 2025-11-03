@@ -5966,3 +5966,11 @@
 2025-10-21T09:10:13.861Z ERROR: Error on GET /api/production/shopfloor/utilization:
 2025-10-21T09:42:47.333Z ERROR: Error on POST /api/inventory-enhanced/purchase-history:
 2025-10-27T14:51:34.295Z ERROR: Failed to initialize email transporter:
+2025-11-03T13:26:20.695Z ERROR: Failed to initialize email transporter:
+2025-11-03T13:28:33.742Z ERROR: Error on HEAD /api/health:
+2025-11-03T13:54:58.858Z ERROR: Failed to initialize email transporter:
+2025-11-03T13:55:19.750Z ERROR: Error on GET /api/health:
+2025-11-03T13:59:25.583Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:01:23.937Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:02:49.076Z ERROR: Failed to initialize email transporter:
+2025-11-03T14:24:50.395Z ERROR: Failed to initialize email transporter:
