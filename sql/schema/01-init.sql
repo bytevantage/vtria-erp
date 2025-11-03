@@ -141,6 +141,7 @@ CREATE TABLE IF NOT EXISTS cases (
     id INT AUTO_INCREMENT PRIMARY KEY,
     case_number VARCHAR(50) UNIQUE NOT NULL,
     enquiry_id INT,
+    client_id INT,
     project_name VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -148,6 +149,12 @@ CREATE TABLE IF NOT EXISTS cases (
     current_state ENUM('enquiry', 'quotation', 'order', 'production', 'delivery', 'closed') DEFAULT 'enquiry',
     sub_state VARCHAR(100),
     priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
+    is_sla_breached BOOLEAN DEFAULT FALSE,
+    state_entered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expected_state_completion TIMESTAMP NULL,
+    last_activity_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    requires_approval BOOLEAN DEFAULT FALSE,
+    approval_pending_from VARCHAR(50),
     created_by INT NOT NULL,
     assigned_to INT,
     deleted_at TIMESTAMP NULL,
@@ -155,7 +162,8 @@ CREATE TABLE IF NOT EXISTS cases (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (assigned_to) REFERENCES users(id),
-    FOREIGN KEY (enquiry_id) REFERENCES sales_enquiries(id)
+    FOREIGN KEY (enquiry_id) REFERENCES sales_enquiries(id),
+    FOREIGN KEY (client_id) REFERENCES clients(id)
 );
 
 -- Add foreign key from sales_enquiries to cases (circular dependency handled after both tables exist)

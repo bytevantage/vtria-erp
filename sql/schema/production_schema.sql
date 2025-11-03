@@ -385,4 +385,164 @@ CREATE TABLE IF NOT EXISTS purchase_requisitions (
     FOREIGN KEY (approved_by) REFERENCES users(id)
 );
 
+-- Case state transitions table
+CREATE TABLE IF NOT EXISTS case_state_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT NOT NULL,
+    from_state VARCHAR(50),
+    to_state VARCHAR(50) NOT NULL,
+    notes TEXT,
+    created_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+-- Basic case workflow definitions (simplified)
+CREATE TABLE IF NOT EXISTS case_workflow_definitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    state_name VARCHAR(50) NOT NULL,
+    sub_state_name VARCHAR(50),
+    step_order INT DEFAULT 0,
+    display_name VARCHAR(255),
+    description TEXT,
+    sla_hours INT DEFAULT 24,
+    requires_approval BOOLEAN DEFAULT FALSE,
+    approval_role VARCHAR(50),
+    is_client_visible BOOLEAN DEFAULT TRUE,
+    is_billable BOOLEAN DEFAULT TRUE,
+    resource_type VARCHAR(50) DEFAULT 'user',
+    notify_on_entry BOOLEAN DEFAULT FALSE,
+    notify_on_sla_breach BOOLEAN DEFAULT TRUE,
+    escalation_hours INT DEFAULT 48,
+    escalation_to VARCHAR(100),
+    UNIQUE KEY unique_state_substate (state_name, sub_state_name)
+);
+
+-- Case workflow status (simplified)
+CREATE TABLE IF NOT EXISTS case_workflow_status (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_number VARCHAR(50) UNIQUE NOT NULL,
+    current_state VARCHAR(50),
+    sub_state VARCHAR(50),
+    state_entered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expected_completion TIMESTAMP NULL,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Case substate transitions
+CREATE TABLE IF NOT EXISTS case_substate_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT NOT NULL,
+    from_state VARCHAR(50),
+    from_sub_state VARCHAR(50),
+    to_state VARCHAR(50),
+    to_sub_state VARCHAR(50),
+    transition_type VARCHAR(50) DEFAULT 'normal',
+    approval_required BOOLEAN DEFAULT FALSE,
+    approved_by INT,
+    approved_at TIMESTAMP NULL,
+    approval_notes TEXT,
+    notes TEXT,
+    created_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (approved_by) REFERENCES users(id)
+);
+
+-- Case performance metrics
+CREATE TABLE IF NOT EXISTS case_performance_metrics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT NOT NULL,
+    total_cycle_time_hours DECIMAL(10,2),
+    sla_compliance_percentage DECIMAL(5,2) DEFAULT 100,
+    escalation_count INT DEFAULT 0,
+    rework_count INT DEFAULT 0,
+    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
+);
+
+-- Notification templates (basic)
+CREATE TABLE IF NOT EXISTS notification_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    template_name VARCHAR(255) NOT NULL,
+    template_type VARCHAR(50) NOT NULL,
+    subject_template TEXT,
+    body_template TEXT,
+    notification_channels JSON,
+    trigger_hours_before INT DEFAULT 0,
+    max_frequency_hours INT DEFAULT 24,
+    client_visible BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Notification queue
+CREATE TABLE IF NOT EXISTS notification_queue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT,
+    template_id INT,
+    recipient_type VARCHAR(50),
+    recipient_id INT,
+    recipient_role VARCHAR(50),
+    recipient_email VARCHAR(255),
+    subject TEXT,
+    message_body TEXT,
+    notification_channels JSON,
+    scheduled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    sent_at TIMESTAMP NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    retry_count INT DEFAULT 0,
+    failed_reason TEXT,
+    trigger_event VARCHAR(100),
+    context_data JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (template_id) REFERENCES notification_templates(id)
+);
+
+-- Escalation rules
+CREATE TABLE IF NOT EXISTS escalation_rules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    rule_name VARCHAR(255) NOT NULL,
+    trigger_type VARCHAR(50) DEFAULT 'time_based',
+    state_name VARCHAR(50),
+    sub_state_name VARCHAR(50),
+    priority_level VARCHAR(20),
+    hours_overdue INT DEFAULT 24,
+    escalate_to_role VARCHAR(50),
+    escalate_after_hours INT DEFAULT 48,
+    max_escalation_levels INT DEFAULT 3,
+    send_notification BOOLEAN DEFAULT TRUE,
+    auto_reassign BOOLEAN DEFAULT FALSE,
+    reassignment_logic VARCHAR(100),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Case escalations
+CREATE TABLE IF NOT EXISTS case_escalations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT NOT NULL,
+    escalation_rule_id INT,
+    escalation_level INT DEFAULT 1,
+    triggered_by VARCHAR(50) DEFAULT 'automatic',
+    escalated_from_user INT,
+    escalated_to_user INT,
+    escalated_to_role VARCHAR(50),
+    triggered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP NULL,
+    resolution_action VARCHAR(100),
+    resolution_notes TEXT,
+    hours_to_resolution DECIMAL(8,2),
+    client_impact_level VARCHAR(20) DEFAULT 'low',
+    created_by INT,
+    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (escalation_rule_id) REFERENCES escalation_rules(id),
+    FOREIGN KEY (escalated_from_user) REFERENCES users(id),
+    FOREIGN KEY (escalated_to_user) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
 SELECT 'Production Database Schema Created Successfully!' as Status;
