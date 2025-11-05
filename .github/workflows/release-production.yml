@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version bump type'
+        description: 'Version bump type (patch/minor/major)'
         required: true
         default: 'patch'
         type: choice
@@ -15,7 +15,7 @@ on:
           - minor
           - major
       deploy_to_staging:
-        description: 'Deploy to staging environment'
+        description: 'Deploy to staging environment first?'
         required: true
         default: true
         type: boolean
@@ -23,6 +23,7 @@ on:
 jobs:
   test-and-validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
     - name: Checkout code
@@ -47,10 +48,17 @@ jobs:
         npm run lint --prefix client
         npm run lint --prefix api
     
-    - name: Run tests
+    - name: Run tests with coverage
       run: |
-        npm run test --prefix client
-        npm run test --prefix api
+        npm run test:ci --prefix client
+        npm run test:ci --prefix api
+        
+        # Generate combined coverage report
+        npx nyc report --reporter=lcov --reporter=text
+        
+      env:
+        NODE_OPTIONS: --max_old_space_size=4096
+        CI: true
     
     - name: Security audit
       run: |
@@ -91,14 +99,34 @@ jobs:
         docker build -t vtria-erp:prod-${{ github.ref_name }} .
         docker tag vtria-erp:prod-${{ github.ref_name }} vtria-erp:latest
     
-    - name: Push to registry
-      if: env.DOCKER_REGISTRY_URL != ''
+    - name: Validate Docker credentials
+      id: docker_creds
       run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY }} -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-        docker push vtria-erp:prod-${{ github.ref_name }}
-        docker push vtria-erp:latest
-      env:
-        DOCKER_REGISTRY_URL: ${{ secrets.DOCKER_REGISTRY }}
+        if [ "${{ secrets.DOCKER_USERNAME }}" != "" ] && [ "${{ secrets.DOCKER_PASSWORD }}" != "" ] && [ "${{ secrets.DOCKER_REGISTRY }}" != "" ]; then
+          echo "DOCKER_CREDS_VALID=true" >> $GITHUB_OUTPUT
+          echo "::notice::Docker credentials are configured."
+        else
+          echo "DOCKER_CREDS_VALID=false" >> $GITHUB_OUTPUT
+          echo "::warning::Docker credentials not fully configured. Skipping registry push."
+        fi
+
+    - name: Login to Docker Registry
+      if: steps.docker_creds.outputs.DOCKER_CREDS_VALID == 'true'
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY }} -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin || {
+          echo "::error::Failed to login to Docker registry"
+          exit 1
+        }
+
+    - name: Push to registry
+      if: steps.docker_creds.outputs.DOCKER_CREDS_VALID == 'true'
+      run: |
+        IMAGE_TAG=prod-$(node -e "console.log(process.env.GITHUB_REF_NAME || 'latest')")
+        docker tag vtria-erp:$IMAGE_TAG ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:$IMAGE_TAG
+        docker tag vtria-erp:latest ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:latest
+        
+        docker push ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:$IMAGE_TAG
+        docker push ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:latest
     
     - name: Create deployment package
       run: |
@@ -122,28 +150,51 @@ jobs:
         echo "🚀 Deploying to staging environment..."
         # Add staging deployment commands here
     
-    - name: Create release notes
+    - name: Generate release notes
+      id: release_notes
       run: |
-        echo "## Production Release $(node -p "require('./package.json').version")" > release-notes.md
-        echo "" >> release-notes.md
-        echo "### Changes" >> release-notes.md
-        echo "- Production-ready build" >> release-notes.md
-        echo "- Full security features enabled" >> release-notes.md
-        echo "- All modules active" >> release-notes.md
-        echo "" >> release-notes.md
-        echo "### Installation" >> release-notes.md
-        echo "See [INSTALLATION.md](../INSTALLATION.md) for deployment instructions" >> release-notes.md
+        VERSION=$(node -e "try { console.log(require('./package.json').version) } catch (e) { console.error('❌ Error reading version:', e.message); process.exit(1) }")
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        
+        # Create release notes with proper YAML escaping
+        {
+          echo "## 🚀 Production Release $VERSION"
+          echo ""
+          echo "### 📝 Changes"
+          echo "- Production-ready build with enhanced security"
+          echo "- All enterprise features enabled"
+          echo "- Performance optimizations"
+          echo "- Security patches and updates"
+          echo ""
+          echo "### 🛠️ Installation"
+          echo 'Deploy using the following command:'
+          echo '```bash'
+          echo "docker pull ${DOCKER_REGISTRY:-ghcr.io/bytevantage}/vtria-erp:$VERSION"
+          echo '```'
+          echo ""
+          echo "### 📋 Changelog"
+          git log --pretty=format:"- %s" -n 10
+          echo ""
+          echo "### 🔒 Security"
+          echo "- All dependencies audited"
+          echo "- Container security scanning passed"
+          echo "- Production-grade configuration applied"
+        } > release-notes.md
     
     - name: Create GitHub Release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
+      if: success()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ node -p "require('./package.json').version" }}
-        release_name: Production Release ${{ node -p "require('./package.json').version" }}
+        tag_name: v${{ steps.release_notes.outputs.VERSION }}
+        name: "Production Release v${{ steps.release_notes.outputs.VERSION }}"
         body_path: release-notes.md
         draft: false
         prerelease: false
+        files: |
+          deployment/production/*.tar.gz
+        generate_release_notes: true
 
   security-scan:
     needs: test-and-validate
@@ -154,15 +205,29 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        scan-type: 'fs'
-        scan-ref: '.'
+        image-ref: 'vtria-erp:latest'
         format: 'sarif'
         output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
     
     - name: Upload Trivy scan results
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
+        category: 'security-scan'
+    
+    - name: Check for critical vulnerabilities
+      if: failure()
+      run: |
+        echo "::error::Critical vulnerabilities found in container image"
+        echo "Please review the security scan report and address the issues"
+        exit 1

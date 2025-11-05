@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version bump type'
+        description: 'Version bump type (patch/minor/major)'
         required: true
         default: 'patch'
         type: choice
@@ -58,14 +58,34 @@ jobs:
         docker build -t vtria-erp:demo-${{ github.ref_name }} .
         docker tag vtria-erp:demo-${{ github.ref_name }} vtria-erp:latest-demo
     
-    - name: Push to registry (if configured)
-      if: env.DOCKER_REGISTRY_URL != ''
+    - name: Validate Docker credentials
+      id: docker_creds
       run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY }} -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-        docker push vtria-erp:demo-${{ github.ref_name }}
-        docker push vtria-erp:latest-demo
-      env:
-        DOCKER_REGISTRY_URL: ${{ secrets.DOCKER_REGISTRY }}
+        if [ "${{ secrets.DOCKER_USERNAME }}" != "" ] && [ "${{ secrets.DOCKER_PASSWORD }}" != "" ] && [ "${{ secrets.DOCKER_REGISTRY }}" != "" ]; then
+          echo "DOCKER_CREDS_VALID=true" >> $GITHUB_OUTPUT
+          echo "::notice::Docker credentials are configured."
+        else
+          echo "DOCKER_CREDS_VALID=false" >> $GITHUB_OUTPUT
+          echo "::notice::Docker credentials not fully configured. Skipping registry push."
+        fi
+
+    - name: Login to Docker Registry
+      if: steps.docker_creds.outputs.DOCKER_CREDS_VALID == 'true'
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY }} -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin || {
+          echo "::error::Failed to login to Docker registry"
+          exit 1
+        }
+
+    - name: Push to registry
+      if: steps.docker_creds.outputs.DOCKER_CREDS_VALID == 'true'
+      run: |
+        IMAGE_TAG=demo-$(node -e "console.log(process.env.GITHUB_REF_NAME || 'latest')")
+        docker tag vtria-erp:$IMAGE_TAG ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:$IMAGE_TAG
+        docker tag vtria-erp:latest-demo ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:latest-demo
+        
+        docker push ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:$IMAGE_TAG
+        docker push ${{ secrets.DOCKER_REGISTRY }}/vtria-erp:latest-demo
     
     - name: Create deployment package
       run: |
@@ -83,10 +103,45 @@ jobs:
         path: deployment/demo/
         retention-days: 30
     
-    - name: Notify team
+    - name: Generate release info
+      id: release_info
       if: always()
       run: |
-        echo "🚀 Demo release completed successfully!"
-        echo "Version: $(node -p "require('./package.json').version")"
-        echo "Branch: main"
-        echo "Commit: ${{ github.sha }}"
+        VERSION=$(node -e "try { console.log(require('./package.json').version) } catch (e) { console.error('❌ Error reading version:', e.message); process.exit(1) }")
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        
+        # Create release notes
+        {
+          echo "## 🎉 Demo Release $VERSION"
+          echo ""
+          echo "### 🚀 Deployment Info"
+          echo "- **Version:** $VERSION"
+          echo "- **Branch:** main"
+          echo "- **Commit:** ${{ github.sha }}"
+          echo ""
+          echo "### 🔗 Access"
+          echo "- **Demo URL:** https://demo.vtria.com"
+          echo "- **Health Check:** https://demo.vtria.com/health"
+          echo ""
+          echo "### 🔒 Credentials"
+          echo '- **Email:** demo@vtria.com'
+          echo '- **Password:** Demo@123456'
+          echo ""
+          echo "### 📋 Changelog"
+          git log --pretty=format:"- %s" -n 5
+        } > release-notes.md
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      if: success() && github.event_name == 'workflow_dispatch'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: demo-v${{ steps.release_info.outputs.VERSION }}
+        name: "Demo Release v${{ steps.release_info.outputs.VERSION }}"
+        body_path: release-notes.md
+        draft: false
+        prerelease: true
+        files: |
+          deployment/demo/*.tar.gz
+        generate_release_notes: true
