@@ -102,11 +102,11 @@ exports.getApprovedSalesOrders = async (req, res) => {
         const query = `
             SELECT 
                 so.id,
-                so.sales_order_id,
+                so.sales_order_id as order_number,
                 so.order_date,
-                so.total_amount,
-                so.advance_amount,
-                so.balance_amount,
+                so.grand_total as total_amount,
+                0 as advance_amount,
+                so.grand_total as balance_amount,
                 so.status,
                 q.quotation_id,
                 se.enquiry_id,

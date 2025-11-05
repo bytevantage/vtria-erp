@@ -541,7 +541,7 @@ function App() {
 
 export default function AppWrapper() {
   return (
-    <Router basename="/vtria-erp">
+    <Router basename="">
       <LicenseProvider>
         <AuthProvider>
           <App />

@@ -1,12 +1,17 @@
 
-> api@1.0.0 start
+> api@1.1.0 start
 > node src/server.js
 
-[dotenv@17.2.2] injecting env (45) from .env -- tip: ⚙️  override existing env vars with { override: true }
-ERROR: Failed to initialize email transporter:
-[dotenv@17.2.2] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.2] injecting env (46) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.2] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+✅ Environment validation passed
+📍 Environment: development
+🔌 Database: localhost:3306/vtria_erp
+🚪 Server Port: 3001
+
 Rate limiting disabled due to missing dependencies
 Redis disabled - using in-memory cache fallback
+Analytics controller loaded successfully
 
 ============================================================
 🚀 VTRIA ERP API Server Started Successfully
@@ -19,7 +24,3258 @@ Redis disabled - using in-memory cache fallback
 ============================================================
 
 INFO: SLA Scheduler and Notification Service disabled for testing
-❌ Port 3001 is already in use
-Database connected as id 1977
-Database connection successful
-SIGTERM received, shutting down gracefully
+[DB Pool] Connection 54 acquired
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+✅ Database connection successful, result: [ [ { test: 1 } ], [ `test` BIGINT(2) NOT NULL ] ]
+📊 Connection pool configured: 50 max connections
+WARN: Failed to initialize email transporter, email notifications may not work:
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 55 acquired
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/employees?page=1&limit=10 ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?page=1&limit=10 ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 acquired
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 acquired
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees/dashboard/data ===
+INFO: GET /api/employees/dashboard/data
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=5&sortBy=created_at&sortOrder=desc ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/dashboard/data ===
+INFO: GET /api/employees/dashboard/data
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=5&sortBy=created_at&sortOrder=desc ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/employees/attendance/records?start_date=2025-11-05&end_date=2025-11-05 ===
+INFO: GET /api/employees/attendance/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/attendance/records?start_date=2025-11-05&end_date=2025-11-05 ===
+INFO: GET /api/employees/attendance/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/applications? ===
+INFO: GET /api/leave-policy/applications
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/leave-policy/types ===
+INFO: GET /api/leave-policy/types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/types ===
+INFO: GET /api/leave-policy/types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/applications? ===
+INFO: GET /api/leave-policy/applications
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-enquiries?limit=5 ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 62 acquired
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 acquired
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/sales-enquiries?limit=5 ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+=== INCOMING REQUEST: GET /api/audit/dashboard?days=7 ===
+INFO: GET /api/audit/dashboard
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management ===
+INFO: GET /api/case-management
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/high-value-changes?days=7&threshold=50000 ===
+INFO: GET /api/audit/high-value-changes
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+Error fetching audit dashboard: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getAuditDashboard (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:449:47)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    action,\n' +
+    '                    COUNT(*) as count,\n' +
+    '                    DATE(created_at) as date\n' +
+    '                FROM audit_logs \n' +
+    '                WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)\n' +
+    '                GROUP BY action, DATE(created_at)\n' +
+    '                ORDER BY date DESC, count DESC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+=== INCOMING REQUEST: GET /api/audit/pending-approvals ===
+INFO: GET /api/audit/pending-approvals
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/audit/system-health ===
+INFO: GET /api/audit/system-health
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+Error fetching pending approvals: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getPendingApprovals (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:318:49)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    al.id,\n' +
+    '                    al.table_name,\n' +
+    '                    al.record_id,\n' +
+    '                    al.action,\n' +
+    '                    al.business_reason,\n' +
+    '                    al.user_name as requested_by,\n' +
+    '                    al.case_number,\n' +
+    '                    al.created_at,\n' +
+    '                    sc.value_difference,\n' +
+    '                    sc.justification as scope_justification\n' +
+    '                FROM audit_logs al\n' +
+    '                LEFT JOIN scope_changes sc ON (\n' +
+    '                    sc.entity_type = CASE \n' +
+    "                        WHEN al.table_name = 'quotations' THEN 'quotation'\n" +
+    "                        WHEN al.table_name = 'purchase_requisitions' THEN 'purchase_requisition'\n" +
+    '                        ELSE al.table_name\n' +
+    '                    END\n' +
+    '                    AND sc.entity_id = al.record_id\n' +
+    "                    AND sc.approval_status = 'pending'\n" +
+    '                )\n' +
+    '                WHERE al.approval_required = TRUE \n' +
+    '                AND al.approved_by IS NULL\n' +
+    '                ORDER BY al.created_at ASC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+[DB Pool] Connection 63 released back to pool
+Error fetching high-value changes: Error: Table 'vtria_erp.scope_changes' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getHighValueChanges (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:258:49)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    sc.*,\n' +
+    '                    u.full_name as requested_by_name,\n' +
+    '                    approver.full_name as approved_by_name,\n' +
+    '                    c.case_number,\n' +
+    '                    c.project_name,\n' +
+    '                    cl.company_name as client_name\n' +
+    '                FROM scope_changes sc\n' +
+    '                LEFT JOIN users u ON sc.requested_by = u.id\n' +
+    '                LEFT JOIN users approver ON sc.approved_by = approver.id\n' +
+    '                LEFT JOIN cases c ON sc.case_id = c.id\n' +
+    '                LEFT JOIN clients cl ON c.client_id = cl.id\n' +
+    '                WHERE sc.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)\n' +
+    '                AND ABS(sc.value_difference) >= ?\n' +
+    '                ORDER BY ABS(sc.value_difference) DESC, sc.created_at DESC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.scope_changes' doesn't exist"
+}
+[DB Pool] Connection 57 released back to pool
+Error fetching system health: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getSystemHealth (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:622:40)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    "                    'audit_logs' as table_name,\n" +
+    '                    COUNT(*) as record_count,\n' +
+    '                    MAX(created_at) as latest_entry\n' +
+    '                FROM audit_logs\n' +
+    '                UNION ALL\n' +
+    '                SELECT \n' +
+    "                    'scope_changes' as table_name,\n" +
+    '                    COUNT(*) as record_count,\n' +
+    '                    MAX(created_at) as latest_entry\n' +
+    '                FROM scope_changes\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+=== INCOMING REQUEST: GET /api/analytics/price-comparison?category=all&priceRange=all ===
+INFO: GET /api/analytics/price-comparison
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/analytics/technicians?department=all&status=all ===
+INFO: GET /api/analytics/technicians
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/analytics/assignee-workload?department=all&workload=all&sortBy=efficiency ===
+INFO: GET /api/analytics/assignee-workload
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/company-config ===
+INFO: GET /api/company-config
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/tax-config ===
+INFO: GET /api/company-config/tax-config
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/company-config ===
+INFO: GET /api/company-config
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/company-config/tax-config ===
+INFO: GET /api/company-config/tax-config
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config ===
+INFO: GET /api/company-config
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/company-config/tax-config ===
+INFO: GET /api/company-config/tax-config
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-enquiries?limit=5 ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 62 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/audit/dashboard?days=7 ===
+INFO: GET /api/audit/dashboard
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management ===
+INFO: GET /api/case-management
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/high-value-changes?days=7&threshold=50000 ===
+INFO: GET /api/audit/high-value-changes
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/pending-approvals ===
+INFO: GET /api/audit/pending-approvals
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/system-health ===
+INFO: GET /api/audit/system-health
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+Error fetching high-value changes: Error: Table 'vtria_erp.scope_changes' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getHighValueChanges (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:258:49)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    sc.*,\n' +
+    '                    u.full_name as requested_by_name,\n' +
+    '                    approver.full_name as approved_by_name,\n' +
+    '                    c.case_number,\n' +
+    '                    c.project_name,\n' +
+    '                    cl.company_name as client_name\n' +
+    '                FROM scope_changes sc\n' +
+    '                LEFT JOIN users u ON sc.requested_by = u.id\n' +
+    '                LEFT JOIN users approver ON sc.approved_by = approver.id\n' +
+    '                LEFT JOIN cases c ON sc.case_id = c.id\n' +
+    '                LEFT JOIN clients cl ON c.client_id = cl.id\n' +
+    '                WHERE sc.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)\n' +
+    '                AND ABS(sc.value_difference) >= ?\n' +
+    '                ORDER BY ABS(sc.value_difference) DESC, sc.created_at DESC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.scope_changes' doesn't exist"
+}
+[DB Pool] Connection 62 released back to pool
+Error fetching pending approvals: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getPendingApprovals (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:318:49)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    al.id,\n' +
+    '                    al.table_name,\n' +
+    '                    al.record_id,\n' +
+    '                    al.action,\n' +
+    '                    al.business_reason,\n' +
+    '                    al.user_name as requested_by,\n' +
+    '                    al.case_number,\n' +
+    '                    al.created_at,\n' +
+    '                    sc.value_difference,\n' +
+    '                    sc.justification as scope_justification\n' +
+    '                FROM audit_logs al\n' +
+    '                LEFT JOIN scope_changes sc ON (\n' +
+    '                    sc.entity_type = CASE \n' +
+    "                        WHEN al.table_name = 'quotations' THEN 'quotation'\n" +
+    "                        WHEN al.table_name = 'purchase_requisitions' THEN 'purchase_requisition'\n" +
+    '                        ELSE al.table_name\n' +
+    '                    END\n' +
+    '                    AND sc.entity_id = al.record_id\n' +
+    "                    AND sc.approval_status = 'pending'\n" +
+    '                )\n' +
+    '                WHERE al.approval_required = TRUE \n' +
+    '                AND al.approved_by IS NULL\n' +
+    '                ORDER BY al.created_at ASC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+[DB Pool] Connection 63 released back to pool
+Error fetching audit dashboard: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getAuditDashboard (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:449:47)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    action,\n' +
+    '                    COUNT(*) as count,\n' +
+    '                    DATE(created_at) as date\n' +
+    '                FROM audit_logs \n' +
+    '                WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)\n' +
+    '                GROUP BY action, DATE(created_at)\n' +
+    '                ORDER BY date DESC, count DESC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+[DB Pool] Connection 57 released back to pool
+Error fetching system health: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getSystemHealth (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:622:40)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    "                    'audit_logs' as table_name,\n" +
+    '                    COUNT(*) as record_count,\n' +
+    '                    MAX(created_at) as latest_entry\n' +
+    '                FROM audit_logs\n' +
+    '                UNION ALL\n' +
+    '                SELECT \n' +
+    "                    'scope_changes' as table_name,\n" +
+    '                    COUNT(*) as record_count,\n' +
+    '                    MAX(created_at) as latest_entry\n' +
+    '                FROM scope_changes\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/company-config ===
+INFO: GET /api/company-config
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/tax-config ===
+INFO: GET /api/company-config/tax-config
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=100&status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/estimation ===
+INFO: GET /api/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 62 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-orders ===
+INFO: GET /api/sales-orders
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/order ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-requisition/open-quotations-grouped ===
+INFO: GET /api/purchase-requisition/open-quotations-grouped
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-requisition ===
+INFO: GET /api/purchase-requisition
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 55 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/grn ===
+INFO: GET /api/grn
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-order/approved ===
+INFO: GET /api/purchase-order/approved
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/purchase-order ===
+INFO: GET /api/purchase-order
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-requisition ===
+INFO: GET /api/purchase-requisition
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/production/dashboard ===
+INFO: GET /api/production/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases/ready ===
+INFO: GET /api/production/cases/ready
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/master/manufacturing-units ===
+INFO: GET /api/production/master/manufacturing-units
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/production/master/operations ===
+INFO: GET /api/production/master/operations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+=== INCOMING REQUEST: GET /api/production/master/categories ===
+INFO: GET /api/production/master/categories
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/production/quality/inspections ===
+INFO: GET /api/production/quality/inspections
+DEBUG: verifyToken called, BYPASS_AUTH: true
+DEBUG: GET /api/production/quality/inspections started with query params: {}
+DEBUG: Executing main query: 
+        SELECT 
+          qi.*,
+          COALESCE(wo.work_order_number, 'N/A') as work_order_number,
+          COALESCE(mc.manufacturing_case_number, 'N/A') as manufacturing_case_number,
+          COALESCE(p.name, 'N/A') as product_name,
+          COALESCE(qc.checkpoint_name, 'N/A') as checkpoint_name,
+          COALESCE(u.full_name, 'N/A') as inspector_name
+        FROM quality_inspections_enhanced qi
+        LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id
+        LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id
+        LEFT JOIN products p ON qi.product_id = p.id
+        LEFT JOIN quality_checkpoints qc ON qi.checkpoint_id = qc.id
+        LEFT JOIN users u ON qi.inspector_id = u.id
+        WHERE 1=1
+       ORDER BY qi.inspection_date DESC LIMIT 20 OFFSET 0
+DEBUG: Main query params: []
+DEBUG: Executing query...
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/metrics/dashboard ===
+INFO: GET /api/production/quality/metrics/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/defect-types ===
+INFO: GET /api/production/quality/defect-types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/checkpoints ===
+INFO: GET /api/production/quality/checkpoints
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/metrics/dashboard ===
+INFO: GET /api/production/quality/metrics/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/inspections ===
+INFO: GET /api/production/quality/inspections
+DEBUG: verifyToken called, BYPASS_AUTH: true
+DEBUG: GET /api/production/quality/inspections started with query params: {}
+DEBUG: Executing main query: 
+        SELECT 
+          qi.*,
+          COALESCE(wo.work_order_number, 'N/A') as work_order_number,
+          COALESCE(mc.manufacturing_case_number, 'N/A') as manufacturing_case_number,
+          COALESCE(p.name, 'N/A') as product_name,
+          COALESCE(qc.checkpoint_name, 'N/A') as checkpoint_name,
+          COALESCE(u.full_name, 'N/A') as inspector_name
+        FROM quality_inspections_enhanced qi
+        LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id
+        LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id
+        LEFT JOIN products p ON qi.product_id = p.id
+        LEFT JOIN quality_checkpoints qc ON qi.checkpoint_id = qc.id
+        LEFT JOIN users u ON qi.inspector_id = u.id
+        WHERE 1=1
+       ORDER BY qi.inspection_date DESC LIMIT 20 OFFSET 0
+DEBUG: Main query params: []
+DEBUG: Executing query...
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/production/quality/defect-types ===
+INFO: GET /api/production/quality/defect-types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/production/quality/checkpoints ===
+INFO: GET /api/production/quality/checkpoints
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 55 released back to pool
+DEBUG: Query executed successfully, rows returned: 0
+INFO: No quality inspections found, returning empty array
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+DEBUG: Query executed successfully, rows returned: 0
+INFO: No quality inspections found, returning empty array
+=== INCOMING REQUEST: GET /api/production/shopfloor/dashboard ===
+INFO: GET /api/production/shopfloor/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machine-utilization ===
+INFO: GET /api/production/shopfloor/machine-utilization
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machines ===
+INFO: GET /api/production/shopfloor/machines
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/operation-tracking ===
+INFO: GET /api/production/shopfloor/operation-tracking
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/dashboard ===
+INFO: GET /api/production/shopfloor/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machine-utilization ===
+INFO: GET /api/production/shopfloor/machine-utilization
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machines ===
+INFO: GET /api/production/shopfloor/machines
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/operation-tracking ===
+INFO: GET /api/production/shopfloor/operation-tracking
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/production/planning/schedules ===
+INFO: GET /api/production/planning/schedules
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/records ===
+INFO: GET /api/production/planning/waste/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/categories ===
+INFO: GET /api/production/planning/waste/categories
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/oee/records ===
+INFO: GET /api/production/planning/oee/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/schedules ===
+INFO: GET /api/production/planning/schedules
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/records ===
+INFO: GET /api/production/planning/waste/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/categories ===
+INFO: GET /api/production/planning/waste/categories
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/production/planning/oee/records ===
+INFO: GET /api/production/planning/oee/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/categories/main ===
+INFO: GET /api/inventory-enhanced/categories/main
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/dashboard ===
+INFO: GET /api/inventory-enhanced/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced?status=all ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced?status=all ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/financial/dashboard/kpis?period=current_month ===
+INFO: GET /api/financial/dashboard/kpis
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/customer-outstanding ===
+INFO: GET /api/financial/customer-outstanding
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/dashboard/kpis?period=current_month ===
+INFO: GET /api/financial/dashboard/kpis
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/customer-outstanding ===
+INFO: GET /api/financial/customer-outstanding
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/financial/invoices?page=1&limit=20 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-orders/approved ===
+INFO: GET /api/sales-orders/approved
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/financial/payments?page=1&limit=20 ===
+INFO: GET /api/financial/payments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/payments?page=1&limit=20 ===
+INFO: GET /api/financial/payments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees?page=1&limit=10 ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?page=1&limit=10 ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees/dashboard/data ===
+INFO: GET /api/employees/dashboard/data
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=5&sortBy=created_at&sortOrder=desc ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/dashboard/data ===
+INFO: GET /api/employees/dashboard/data
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=5&sortBy=created_at&sortOrder=desc ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/employees/attendance/records?start_date=2025-11-05&end_date=2025-11-05 ===
+INFO: GET /api/employees/attendance/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/attendance/records?start_date=2025-11-05&end_date=2025-11-05 ===
+INFO: GET /api/employees/attendance/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/leave-policy/types ===
+INFO: GET /api/leave-policy/types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/applications? ===
+INFO: GET /api/leave-policy/applications
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/types ===
+INFO: GET /api/leave-policy/types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/leave-policy/applications? ===
+INFO: GET /api/leave-policy/applications
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/sales-enquiries?limit=5 ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 63 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/audit/dashboard?days=7 ===
+INFO: GET /api/audit/dashboard
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management ===
+INFO: GET /api/case-management
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/high-value-changes?days=7&threshold=50000 ===
+INFO: GET /api/audit/high-value-changes
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/pending-approvals ===
+INFO: GET /api/audit/pending-approvals
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/audit/system-health ===
+INFO: GET /api/audit/system-health
+RBAC: Bypassing permission check for audit:read in development mode
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+Error fetching high-value changes: Error: Table 'vtria_erp.scope_changes' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getHighValueChanges (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:258:49)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    sc.*,\n' +
+    '                    u.full_name as requested_by_name,\n' +
+    '                    approver.full_name as approved_by_name,\n' +
+    '                    c.case_number,\n' +
+    '                    c.project_name,\n' +
+    '                    cl.company_name as client_name\n' +
+    '                FROM scope_changes sc\n' +
+    '                LEFT JOIN users u ON sc.requested_by = u.id\n' +
+    '                LEFT JOIN users approver ON sc.approved_by = approver.id\n' +
+    '                LEFT JOIN cases c ON sc.case_id = c.id\n' +
+    '                LEFT JOIN clients cl ON c.client_id = cl.id\n' +
+    '                WHERE sc.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)\n' +
+    '                AND ABS(sc.value_difference) >= ?\n' +
+    '                ORDER BY ABS(sc.value_difference) DESC, sc.created_at DESC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.scope_changes' doesn't exist"
+}
+[DB Pool] Connection 54 released back to pool
+Error fetching audit dashboard: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getAuditDashboard (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:449:47)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    action,\n' +
+    '                    COUNT(*) as count,\n' +
+    '                    DATE(created_at) as date\n' +
+    '                FROM audit_logs \n' +
+    '                WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)\n' +
+    '                GROUP BY action, DATE(created_at)\n' +
+    '                ORDER BY date DESC, count DESC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+[DB Pool] Connection 55 released back to pool
+Error fetching system health: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getSystemHealth (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:622:40)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    "                    'audit_logs' as table_name,\n" +
+    '                    COUNT(*) as record_count,\n' +
+    '                    MAX(created_at) as latest_entry\n' +
+    '                FROM audit_logs\n' +
+    '                UNION ALL\n' +
+    '                SELECT \n' +
+    "                    'scope_changes' as table_name,\n" +
+    '                    COUNT(*) as record_count,\n' +
+    '                    MAX(created_at) as latest_entry\n' +
+    '                FROM scope_changes\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+[DB Pool] Connection 62 released back to pool
+Error fetching pending approvals: Error: Table 'vtria_erp.audit_logs' doesn't exist
+    at PromisePool.execute (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getPendingApprovals (/Users/srbhandary/Documents/Projects/vtria-erp/api/src/controllers/audit.controller.js:318:49)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at /Users/srbhandary/Documents/Projects/vtria-erp/api/src/middleware/rbac.middleware.js:98:16
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/srbhandary/Documents/Projects/vtria-erp/api/node_modules/router/lib/layer.js:152:17) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: '\n' +
+    '                SELECT \n' +
+    '                    al.id,\n' +
+    '                    al.table_name,\n' +
+    '                    al.record_id,\n' +
+    '                    al.action,\n' +
+    '                    al.business_reason,\n' +
+    '                    al.user_name as requested_by,\n' +
+    '                    al.case_number,\n' +
+    '                    al.created_at,\n' +
+    '                    sc.value_difference,\n' +
+    '                    sc.justification as scope_justification\n' +
+    '                FROM audit_logs al\n' +
+    '                LEFT JOIN scope_changes sc ON (\n' +
+    '                    sc.entity_type = CASE \n' +
+    "                        WHEN al.table_name = 'quotations' THEN 'quotation'\n" +
+    "                        WHEN al.table_name = 'purchase_requisitions' THEN 'purchase_requisition'\n" +
+    '                        ELSE al.table_name\n' +
+    '                    END\n' +
+    '                    AND sc.entity_id = al.record_id\n' +
+    "                    AND sc.approval_status = 'pending'\n" +
+    '                )\n' +
+    '                WHERE al.approval_required = TRUE \n' +
+    '                AND al.approved_by IS NULL\n' +
+    '                ORDER BY al.created_at ASC\n' +
+    '            ',
+  sqlState: '42S02',
+  sqlMessage: "Table 'vtria_erp.audit_logs' doesn't exist"
+}
+=== INCOMING REQUEST: GET /api/analytics/price-comparison?category=all&priceRange=all ===
+INFO: GET /api/analytics/price-comparison
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/analytics/technicians?department=all&status=all ===
+INFO: GET /api/analytics/technicians
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/analytics/assignee-workload?department=all&workload=all&sortBy=efficiency ===
+INFO: GET /api/analytics/assignee-workload
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/company-config ===
+INFO: GET /api/company-config
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/tax-config ===
+INFO: GET /api/company-config/tax-config
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/company-config ===
+INFO: GET /api/company-config
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/tax-config ===
+INFO: GET /api/company-config/tax-config
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: PUT /api/company-config/tax-config ===
+INFO: PUT /api/company-config/tax-config
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: PUT /api/company-config/tax-config ===
+INFO: PUT /api/company-config/tax-config
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: POST /api/database/clear ===
+INFO: POST /api/database/clear
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/database/info ===
+INFO: GET /api/database/info
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=100&status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET / ===
+INFO: GET /
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/stats/overview ===
+INFO: GET /api/case-management/stats/overview
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/enquiry?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/enquiry
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/estimation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/quotation?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/quotation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/order?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/production?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/production
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/case-management/state/delivery?limit=10&offset=0 ===
+INFO: GET /api/case-management/state/delivery
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees?limit=100&status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/clients ===
+INFO: GET /api/clients
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/employees?limit=100&status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-enquiries ===
+INFO: GET /api/sales-enquiries
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/estimation ===
+INFO: GET /api/estimation
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 56 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/quotations/enhanced/all ===
+INFO: GET /api/quotations/enhanced/all
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-orders ===
+INFO: GET /api/sales-orders
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/case-management/state/order ===
+INFO: GET /api/case-management/state/order
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/purchase-requisition ===
+INFO: GET /api/purchase-requisition
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-requisition/open-quotations-grouped ===
+INFO: GET /api/purchase-requisition/open-quotations-grouped
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/estimations ===
+INFO: GET /api/estimations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+INFO: Fetching estimations...
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 55 released back to pool
+INFO: Database connection test: [ { test: 1 } ]
+INFO: Executing estimation query...
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 55 released back to pool
+INFO: Query executed successfully, found: 0 estimations
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/purchase-order ===
+INFO: GET /api/purchase-order
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-requisition ===
+INFO: GET /api/purchase-requisition
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+=== INCOMING REQUEST: GET /api/grn ===
+INFO: GET /api/grn
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/purchase-order/approved ===
+INFO: GET /api/purchase-order/approved
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/vendors ===
+INFO: GET /api/vendors
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/company-config/locations ===
+INFO: GET /api/company-config/locations
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/production/dashboard ===
+INFO: GET /api/production/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/cases ===
+INFO: GET /api/production/cases
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/master/manufacturing-units ===
+INFO: GET /api/production/master/manufacturing-units
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/master/categories ===
+INFO: GET /api/production/master/categories
+DEBUG: verifyToken called, BYPASS_AUTH: true
+=== INCOMING REQUEST: GET /api/production/master/operations ===
+INFO: GET /api/production/master/operations
+DEBUG: verifyToken called, BYPASS_AUTH: true
+=== INCOMING REQUEST: GET /api/production/cases/ready ===
+INFO: GET /api/production/cases/ready
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/production/quality/metrics/dashboard ===
+INFO: GET /api/production/quality/metrics/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/inspections ===
+INFO: GET /api/production/quality/inspections
+DEBUG: verifyToken called, BYPASS_AUTH: true
+DEBUG: GET /api/production/quality/inspections started with query params: {}
+DEBUG: Executing main query: 
+        SELECT 
+          qi.*,
+          COALESCE(wo.work_order_number, 'N/A') as work_order_number,
+          COALESCE(mc.manufacturing_case_number, 'N/A') as manufacturing_case_number,
+          COALESCE(p.name, 'N/A') as product_name,
+          COALESCE(qc.checkpoint_name, 'N/A') as checkpoint_name,
+          COALESCE(u.full_name, 'N/A') as inspector_name
+        FROM quality_inspections_enhanced qi
+        LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id
+        LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id
+        LEFT JOIN products p ON qi.product_id = p.id
+        LEFT JOIN quality_checkpoints qc ON qi.checkpoint_id = qc.id
+        LEFT JOIN users u ON qi.inspector_id = u.id
+        WHERE 1=1
+       ORDER BY qi.inspection_date DESC LIMIT 20 OFFSET 0
+DEBUG: Main query params: []
+DEBUG: Executing query...
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/checkpoints ===
+INFO: GET /api/production/quality/checkpoints
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/defect-types ===
+INFO: GET /api/production/quality/defect-types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/metrics/dashboard ===
+INFO: GET /api/production/quality/metrics/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/inspections ===
+INFO: GET /api/production/quality/inspections
+DEBUG: verifyToken called, BYPASS_AUTH: true
+DEBUG: GET /api/production/quality/inspections started with query params: {}
+DEBUG: Executing main query: 
+        SELECT 
+          qi.*,
+          COALESCE(wo.work_order_number, 'N/A') as work_order_number,
+          COALESCE(mc.manufacturing_case_number, 'N/A') as manufacturing_case_number,
+          COALESCE(p.name, 'N/A') as product_name,
+          COALESCE(qc.checkpoint_name, 'N/A') as checkpoint_name,
+          COALESCE(u.full_name, 'N/A') as inspector_name
+        FROM quality_inspections_enhanced qi
+        LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id
+        LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id
+        LEFT JOIN products p ON qi.product_id = p.id
+        LEFT JOIN quality_checkpoints qc ON qi.checkpoint_id = qc.id
+        LEFT JOIN users u ON qi.inspector_id = u.id
+        WHERE 1=1
+       ORDER BY qi.inspection_date DESC LIMIT 20 OFFSET 0
+DEBUG: Main query params: []
+DEBUG: Executing query...
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/production/quality/checkpoints ===
+INFO: GET /api/production/quality/checkpoints
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/quality/defect-types ===
+INFO: GET /api/production/quality/defect-types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 56 released back to pool
+DEBUG: Query executed successfully, rows returned: 0
+INFO: No quality inspections found, returning empty array
+[DB Pool] Connection 54 released back to pool
+DEBUG: Query executed successfully, rows returned: 0
+INFO: No quality inspections found, returning empty array
+=== INCOMING REQUEST: GET /api/production/shopfloor/dashboard ===
+INFO: GET /api/production/shopfloor/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machines ===
+INFO: GET /api/production/shopfloor/machines
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machine-utilization ===
+INFO: GET /api/production/shopfloor/machine-utilization
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/operation-tracking ===
+INFO: GET /api/production/shopfloor/operation-tracking
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/dashboard ===
+INFO: GET /api/production/shopfloor/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machines ===
+INFO: GET /api/production/shopfloor/machines
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/machine-utilization ===
+INFO: GET /api/production/shopfloor/machine-utilization
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/production/shopfloor/operation-tracking ===
+INFO: GET /api/production/shopfloor/operation-tracking
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/categories/main ===
+INFO: GET /api/inventory-enhanced/categories/main
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/dashboard ===
+INFO: GET /api/inventory-enhanced/dashboard
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced?status=all ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/inventory-enhanced/items/enhanced?status=all ===
+INFO: GET /api/inventory-enhanced/items/enhanced
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/production/planning/schedules ===
+INFO: GET /api/production/planning/schedules
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/categories ===
+INFO: GET /api/production/planning/waste/categories
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/records ===
+INFO: GET /api/production/planning/waste/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/oee/records ===
+INFO: GET /api/production/planning/oee/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/schedules ===
+INFO: GET /api/production/planning/schedules
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/categories ===
+INFO: GET /api/production/planning/waste/categories
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 63 released back to pool
+=== INCOMING REQUEST: GET /api/production/planning/waste/records ===
+INFO: GET /api/production/planning/waste/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/production/planning/oee/records ===
+INFO: GET /api/production/planning/oee/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/financial/dashboard/kpis?period=current_month ===
+INFO: GET /api/financial/dashboard/kpis
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/financial/customer-outstanding ===
+INFO: GET /api/financial/customer-outstanding
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 63 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/dashboard/kpis?period=current_month ===
+INFO: GET /api/financial/dashboard/kpis
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 63 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 55 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/customer-outstanding ===
+INFO: GET /api/financial/customer-outstanding
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 63 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 55 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/financial/invoices?limit=100 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/financial/invoices?page=1&limit=20 ===
+INFO: GET /api/financial/invoices
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/sales-orders/approved ===
+INFO: GET /api/sales-orders/approved
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/financial/payments?page=1&limit=20 ===
+INFO: GET /api/financial/payments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/financial/payments?page=1&limit=20 ===
+INFO: GET /api/financial/payments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/employees?page=1&limit=10 ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 57 released back to pool
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/master/departments ===
+INFO: GET /api/employees/master/departments
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?page=1&limit=10 ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/employees/dashboard/data ===
+INFO: GET /api/employees/dashboard/data
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=5&sortBy=created_at&sortOrder=desc ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/dashboard/data ===
+INFO: GET /api/employees/dashboard/data
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?limit=5&sortBy=created_at&sortOrder=desc ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 56 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /api/employees/attendance/records?start_date=2025-11-05&end_date=2025-11-05 ===
+INFO: GET /api/employees/attendance/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/attendance/records?start_date=2025-11-05&end_date=2025-11-05 ===
+INFO: GET /api/employees/attendance/records
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 57 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/employees?status=active ===
+INFO: GET /api/employees
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/leave-policy/applications? ===
+INFO: GET /api/leave-policy/applications
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 54 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/types ===
+INFO: GET /api/leave-policy/types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 57 acquired from pool
+=== INCOMING REQUEST: GET /api/leave-policy/types ===
+INFO: GET /api/leave-policy/types
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 56 acquired from pool
+=== INCOMING REQUEST: GET /api/employees/current ===
+INFO: GET /api/employees/current
+=== INCOMING REQUEST: GET /api/leave-policy/applications? ===
+INFO: GET /api/leave-policy/applications
+DEBUG: verifyToken called, BYPASS_AUTH: true
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 57 released back to pool
+[DB Pool] Connection 56 released back to pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 62 acquired from pool
+=== INCOMING REQUEST: GET /api/auth/me ===
+INFO: GET /api/auth/me
+[DB Pool] Connection 54 acquired from pool
+[DB Pool] Connection 54 released back to pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: POST /api/auth/login ===
+INFO: POST /api/auth/login
+[DB Pool] Connection 62 acquired from pool
+[DB Pool] Connection 62 released back to pool
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health
+=== INCOMING REQUEST: GET /health ===
+INFO: GET /health

@@ -43,16 +43,23 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate, location]);
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     setError('');
-    const result = await login(values.email, values.password);
-
-    if (result.success) {
-      // Navigate to dashboard or return URL after successful login
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
-    } else {
-      setError(result.error);
+    try {
+      const result = await login(values.email, values.password);
+      
+      if (result && result.success) {
+        // Navigate to dashboard or return URL after successful login
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
+      } else {
+        setError(result?.error || 'Login failed. Please try again.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.message || 'An error occurred during login');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -86,8 +93,10 @@ const Login = () => {
               initialValues={{ email: '', password: '' }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
+              validateOnBlur={false}
+              validateOnChange={false}
             >
-              {({ values, errors, touched, handleChange, handleBlur }) => (
+              {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
                 <Form style={{ width: '100%', marginTop: '1rem' }}>
                   <TextField
                     margin="normal"
@@ -124,9 +133,9 @@ const Login = () => {
                     fullWidth
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
-                    disabled={loading}
+                    disabled={isSubmitting || loading}
                   >
-                    {loading ? <CircularProgress size={24} /> : 'Sign In'}
+                    {(isSubmitting || loading) ? <CircularProgress size={24} /> : 'Sign In'}
                   </Button>
                 </Form>
               )}

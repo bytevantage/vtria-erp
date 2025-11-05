@@ -4,22 +4,21 @@ FROM node:20-alpine AS development
 WORKDIR /usr/src/app
 
 # Install system dependencies for puppeteer with better error handling
-RUN apk update && \
+RUN apk update --no-cache && \
     apk add --no-cache \
     chromium \
     nss \
     freetype \
-    freetype-dev \
     harfbuzz \
     ca-certificates \
     ttf-freefont || \
     (echo "Chromium installation failed, installing minimal dependencies" && \
-    apk add --no-cache nss freetype ca-certificates ttf-freefont && \
-    echo "Warning: Chromium not installed, PDF generation may not work")
+    apk add --no-cache chromium ca-certificates ttf-freefont && \
+    echo "Warning: Some Chromium dependencies not installed, PDF generation may have issues")
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Copy package files
 COPY package*.json ./
@@ -42,22 +41,21 @@ FROM node:20-alpine AS production
 WORKDIR /usr/src/app
 
 # Install system dependencies for puppeteer with better error handling
-RUN apk update && \
+RUN apk update --no-cache && \
     apk add --no-cache \
     chromium \
     nss \
     freetype \
-    freetype-dev \
     harfbuzz \
     ca-certificates \
     ttf-freefont || \
     (echo "Chromium installation failed, installing minimal dependencies" && \
-    apk add --no-cache nss freetype ca-certificates ttf-freefont && \
-    echo "Warning: Chromium not installed, PDF generation may not work")
+    apk add --no-cache chromium ca-certificates ttf-freefont && \
+    echo "Warning: Some Chromium dependencies not installed, PDF generation may have issues")
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Copy package files
 COPY package*.json ./

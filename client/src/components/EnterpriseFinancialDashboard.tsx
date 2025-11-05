@@ -200,7 +200,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
     try {
       const response = await fetch(`/api/financial/dashboard/kpis?period=${selectedPeriod}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -221,7 +221,7 @@ const EnterpriseFinancialDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/financial/cash-flow', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 

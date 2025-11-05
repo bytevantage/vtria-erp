@@ -163,7 +163,7 @@ const ShopFloorDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/shopfloor/dashboard', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -179,7 +179,7 @@ const ShopFloorDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/shopfloor/machines', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -193,9 +193,9 @@ const ShopFloorDashboard: React.FC = () => {
 
   const fetchUtilization = async () => {
     try {
-      const response = await fetch('/api/production/shopfloor/utilization', {
+      const response = await fetch('/api/production/shopfloor/machine-utilization', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -209,9 +209,9 @@ const ShopFloorDashboard: React.FC = () => {
 
   const fetchOperations = async () => {
     try {
-      const response = await fetch('/api/production/shopfloor/operations', {
+      const response = await fetch('/api/production/shopfloor/operation-tracking', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -229,7 +229,7 @@ const ShopFloorDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newMachine,
@@ -258,11 +258,11 @@ const ShopFloorDashboard: React.FC = () => {
 
   const handleLogUtilization = async () => {
     try {
-      const response = await fetch('/api/production/shopfloor/utilization', {
+      const response = await fetch('/api/production/shopfloor/machine-utilization', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newUtilization,
@@ -290,11 +290,11 @@ const ShopFloorDashboard: React.FC = () => {
 
   const handleStartOperation = async () => {
     try {
-      const response = await fetch('/api/production/shopfloor/operations/start', {
+      const response = await fetch('/api/production/shopfloor/operation-tracking/start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newOperation,

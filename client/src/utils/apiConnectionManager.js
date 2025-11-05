@@ -92,7 +92,7 @@ class ApiConnectionManager {
       try {
         // Find active API URL
         const baseUrl = await this.findActiveApiUrl();
-        const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+        const url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
         // Make the request
         const response = await fetch(url, {

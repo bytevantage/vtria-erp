@@ -1,0 +1,168 @@
+name: Production Release
+
+on:
+  push:
+    branches: [ production ]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      deploy_to_staging:
+        description: 'Deploy to staging environment'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        npm install --prefix client
+        npm install --prefix api
+    
+    - name: Run linting
+      run: |
+        npm run lint --prefix client
+        npm run lint --prefix api
+    
+    - name: Run tests
+      run: |
+        npm run test --prefix client
+        npm run test --prefix api
+    
+    - name: Security audit
+      run: |
+        npm audit --audit-level high
+        npm audit --audit-level high --prefix client
+        npm audit --audit-level high --prefix api
+    
+    - name: Build application
+      run: |
+        npm run build --prefix client
+
+  release-production:
+    needs: test-and-validate
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Create production release
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        node scripts/version-manager.js release-production ${{ github.event.inputs.version_type || 'patch' }}
+    
+    - name: Build Docker image
+      run: |
+        docker build -t vtria-erp:prod-${{ github.ref_name }} .
+        docker tag vtria-erp:prod-${{ github.ref_name }} vtria-erp:latest
+    
+    - name: Push to registry
+      if: env.DOCKER_REGISTRY != ''
+      run: |
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login ${{ secrets.DOCKER_REGISTRY }} -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker push vtria-erp:prod-${{ github.ref_name }}
+        docker push vtria-erp:latest
+      env:
+        DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+    
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment/production
+        tar -czf deployment/production/vtria-erp-production-${{ github.ref_name }}.tar.gz \
+          --exclude=node_modules \
+          --exclude=.git \
+          --exclude=deployment \
+          .
+    
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-release
+        path: deployment/production/
+        retention-days: 90
+    
+    - name: Deploy to staging (if requested)
+      if: github.event.inputs.deploy_to_staging == 'true'
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        # Add staging deployment commands here
+    
+    - name: Create release notes
+      run: |
+        echo "## Production Release $(node -p "require('./package.json').version")" > release-notes.md
+        echo "" >> release-notes.md
+        echo "### Changes" >> release-notes.md
+        echo "- Production-ready build" >> release-notes.md
+        echo "- Full security features enabled" >> release-notes.md
+        echo "- All modules active" >> release-notes.md
+        echo "" >> release-notes.md
+        echo "### Installation" >> release-notes.md
+        echo "See [INSTALLATION.md](../INSTALLATION.md) for deployment instructions" >> release-notes.md
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ node -p "require('./package.json').version" }}
+        release_name: Production Release ${{ node -p "require('./package.json').version" }}
+        body_path: release-notes.md
+        draft: false
+        prerelease: false
+
+  security-scan:
+    needs: test-and-validate
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'

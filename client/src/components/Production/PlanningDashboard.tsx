@@ -68,6 +68,7 @@ interface WasteRecord {
   product_name?: string;
   waste_date: string;
   quantity_wasted: number;
+  waste_quantity?: number;
   unit_cost: number;
   total_waste_cost: number;
   waste_reason: string;
@@ -94,12 +95,21 @@ interface PlanningMetrics {
   schedules_delayed: number;
 }
 
+const defaultMetrics: PlanningMetrics = {
+  total_schedules: 0,
+  active_schedules: 0,
+  total_waste_cost_month: 0,
+  average_oee: 0,
+  schedules_on_track: 0,
+  schedules_delayed: 0,
+};
+
 const PlanningDashboard: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // Data states
-  const [metrics, setMetrics] = useState<PlanningMetrics | null>(null);
+  const [metrics, setMetrics] = useState<PlanningMetrics>(defaultMetrics);
   const [schedules, setSchedules] = useState<ProductionSchedule[]>([]);
   const [wasteCategories, setWasteCategories] = useState<WasteCategory[]>([]);
   const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>([]);
@@ -149,6 +159,7 @@ const PlanningDashboard: React.FC = () => {
 
   const loadDashboardData = async () => {
     setLoading(true);
+    setMetrics({ ...defaultMetrics });
     try {
       await Promise.all([
         fetchSchedules(),
@@ -167,21 +178,22 @@ const PlanningDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/planning/schedules', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
         const result = await response.json();
-        setSchedules(result.data || []);
+        const data = Array.isArray(result.data) ? result.data : [];
+        setSchedules(data);
 
         // Calculate metrics from schedules
-        const total = result.data?.length || 0;
-        const active = result.data?.filter((s: ProductionSchedule) =>
+        const total = data.length;
+        const active = data.filter((s: ProductionSchedule) =>
           s.status === 'approved' || s.status === 'in_progress'
-        ).length || 0;
+        ).length;
 
         setMetrics(prev => ({
-          ...prev!,
+          ...prev,
           total_schedules: total,
           active_schedules: active,
           schedules_on_track: 0,
@@ -197,7 +209,7 @@ const PlanningDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/planning/waste/categories', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -213,20 +225,33 @@ const PlanningDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/planning/waste/records', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
         const result = await response.json();
-        setWasteRecords(result.data || []);
+        const data = Array.isArray(result.data) ? result.data : [];
+        const normalizedRecords: WasteRecord[] = data.map((record: any) => {
+          const quantity = Number(record.quantity_wasted ?? record.waste_quantity ?? 0);
+          const totalCost = Number(record.total_waste_cost ?? record.total_cost ?? 0);
+          return {
+            ...record,
+            quantity_wasted: quantity,
+            waste_quantity: quantity,
+            unit_cost: Number(record.unit_cost ?? 0),
+            total_waste_cost: totalCost,
+          };
+        });
+
+        setWasteRecords(normalizedRecords);
 
         // Calculate total waste cost
-        const totalCost = result.data?.reduce((sum: number, record: WasteRecord) =>
-          sum + record.total_waste_cost, 0
-        ) || 0;
+        const totalCost = normalizedRecords.reduce((sum, record) =>
+          sum + (record.total_waste_cost || 0), 0
+        );
 
         setMetrics(prev => ({
-          ...prev!,
+          ...prev,
           total_waste_cost_month: totalCost,
         }));
       }
@@ -239,22 +264,30 @@ const PlanningDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/planning/oee/records', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
         const result = await response.json();
-        setOEERecords(result.data || []);
+        const data = Array.isArray(result.data) ? result.data : [];
+        const normalizedRecords: OEERecord[] = data.map((record: any) => ({
+          ...record,
+          availability_percentage: Number(record.availability_percentage ?? 0),
+          performance_percentage: Number(record.performance_percentage ?? 0),
+          quality_percentage: Number(record.quality_percentage ?? 0),
+          oee_percentage: Number(record.oee_percentage ?? 0),
+          target_oee: Number(record.target_oee ?? 0),
+        }));
+
+        setOEERecords(normalizedRecords);
 
         // Calculate average OEE
-        const avgOEE = result.data?.length > 0
-          ? result.data.reduce((sum: number, record: OEERecord) =>
-            sum + record.oee_percentage, 0
-          ) / result.data.length
+        const avgOEE = normalizedRecords.length > 0
+          ? normalizedRecords.reduce((sum, record) => sum + (record.oee_percentage || 0), 0) / normalizedRecords.length
           : 0;
 
         setMetrics(prev => ({
-          ...prev!,
+          ...prev,
           average_oee: avgOEE,
         }));
       }
@@ -269,7 +302,7 @@ const PlanningDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify(newSchedule),
       });
@@ -297,7 +330,7 @@ const PlanningDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newWaste,
@@ -333,7 +366,7 @@ const PlanningDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newOEE,
@@ -396,6 +429,15 @@ const PlanningDashboard: React.FC = () => {
     return 'error';
   };
 
+  const parsedMetrics = {
+    averageOEE: Number(metrics.average_oee ?? 0),
+    totalWasteCostMonth: Number(metrics.total_waste_cost_month ?? 0),
+    activeSchedules: Number(metrics.active_schedules ?? 0),
+    totalSchedules: Number(metrics.total_schedules ?? 0),
+    schedulesOnTrack: Number(metrics.schedules_on_track ?? 0),
+    schedulesDelayed: Number(metrics.schedules_delayed ?? 0),
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
@@ -425,90 +467,88 @@ const PlanningDashboard: React.FC = () => {
       {loading && <LinearProgress sx={{ mb: 2 }} />}
 
       {/* KPI Cards */}
-      {metrics && (
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography color="textSecondary" gutterBottom>
-                      Active Schedules
-                    </Typography>
-                    <Typography variant="h4">
-                      {metrics.active_schedules}
-                    </Typography>
-                    <Typography variant="caption">
-                      of {metrics.total_schedules} total
-                    </Typography>
-                  </Box>
-                  <Schedule sx={{ fontSize: 48, color: 'primary.main', opacity: 0.3 }} />
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography color="textSecondary" gutterBottom>
+                    Active Schedules
+                  </Typography>
+                  <Typography variant="h4">
+                    {parsedMetrics.activeSchedules}
+                  </Typography>
+                  <Typography variant="caption">
+                    of {parsedMetrics.totalSchedules} total
+                  </Typography>
                 </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography color="textSecondary" gutterBottom>
-                      Average OEE
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      color={metrics.average_oee >= 85 ? 'success.main' : 'warning.main'}
-                    >
-                      {metrics.average_oee.toFixed(1)}%
-                    </Typography>
-                  </Box>
-                  <Speed sx={{ fontSize: 48, color: 'success.main', opacity: 0.3 }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography color="textSecondary" gutterBottom>
-                      Waste Cost (Month)
-                    </Typography>
-                    <Typography variant="h4" color="error.main">
-                      ₹{metrics.total_waste_cost_month.toLocaleString()}
-                    </Typography>
-                  </Box>
-                  <Delete sx={{ fontSize: 48, color: 'error.main', opacity: 0.3 }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography color="textSecondary" gutterBottom>
-                      Schedule Performance
-                    </Typography>
-                    <Typography variant="h4" color="success.main">
-                      {metrics.schedules_on_track}
-                    </Typography>
-                    <Typography variant="caption" color="error.main">
-                      {metrics.schedules_delayed} Delayed
-                    </Typography>
-                  </Box>
-                  <Assessment sx={{ fontSize: 48, color: 'info.main', opacity: 0.3 }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+                <Schedule sx={{ fontSize: 48, color: 'primary.main', opacity: 0.3 }} />
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
-      )}
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography color="textSecondary" gutterBottom>
+                    Average OEE
+                  </Typography>
+                  <Typography
+                    variant="h4"
+                    color={parsedMetrics.averageOEE >= 85 ? 'success.main' : 'warning.main'}
+                  >
+                    {parsedMetrics.averageOEE.toFixed(1)}%
+                  </Typography>
+                </Box>
+                <Speed sx={{ fontSize: 48, color: 'success.main', opacity: 0.3 }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography color="textSecondary" gutterBottom>
+                    Waste Cost (Month)
+                  </Typography>
+                  <Typography variant="h4" color="error.main">
+                    ₹{parsedMetrics.totalWasteCostMonth.toLocaleString()}
+                  </Typography>
+                </Box>
+                <Delete sx={{ fontSize: 48, color: 'error.main', opacity: 0.3 }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography color="textSecondary" gutterBottom>
+                    Schedule Performance
+                  </Typography>
+                  <Typography variant="h4" color="success.main">
+                    {parsedMetrics.schedulesOnTrack}
+                  </Typography>
+                  <Typography variant="caption" color="error.main">
+                    {parsedMetrics.schedulesDelayed} Delayed
+                  </Typography>
+                </Box>
+                <Assessment sx={{ fontSize: 48, color: 'info.main', opacity: 0.3 }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Tabs */}
       <Card>

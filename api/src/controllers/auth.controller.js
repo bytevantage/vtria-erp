@@ -2,6 +2,72 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../config/database');
 
+// Check if any users exist and create initial admin if needed
+exports.setupInitialAdmin = async (req, res) => {
+    try {
+        // Check if any users exist
+        const [users] = await db.execute('SELECT COUNT(*) as count FROM users');
+        
+        if (users[0].count > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'System already initialized. Users exist in the database.'
+            });
+        }
+
+        const { email, password, full_name } = req.body;
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Create initial admin user
+        const [result] = await db.execute(
+            'INSERT INTO users (email, password_hash, full_name, user_role, status) VALUES (?, ?, ?, ?, ?)',
+            [email, hashedPassword, full_name, 'admin', 'active']
+        );
+
+        res.status(201).json({
+            success: true,
+            message: 'Initial admin user created successfully',
+            data: { 
+                id: result.insertId, 
+                email, 
+                full_name, 
+                user_role: 'admin',
+                instructions: 'You can now login with these credentials.'
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error creating initial admin user',
+            error: error.message
+        });
+    }
+};
+
+// Check if system is initialized
+exports.checkSystemStatus = async (req, res) => {
+    try {
+        const [users] = await db.execute('SELECT COUNT(*) as count FROM users WHERE status = "active"');
+        
+        res.json({
+            success: true,
+            data: {
+                initialized: users[0].count > 0,
+                userCount: users[0].count
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error checking system status',
+            error: error.message
+        });
+    }
+};
+
 exports.register = async (req, res) => {
     try {
         const { email, password, full_name, user_role } = req.body;

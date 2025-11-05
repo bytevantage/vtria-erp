@@ -477,26 +477,28 @@ const AttendanceManagement: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  attendanceRecords.map((record) => (
-                    <TableRow key={record.id} hover>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Avatar sx={{ mr: 2, bgcolor: 'primary.main', width: 32, height: 32 }}>
-                            {getInitials(
-                              record.employee_name.split(' ')[0],
-                              record.employee_name.split(' ')[1] || ''
-                            )}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              {record.employee_name}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {record.employee_employee_id}
-                            </Typography>
+                  attendanceRecords.map((record) => {
+                    const employeeName = record.employee_name?.trim() || 'Unknown Employee';
+                    const nameParts = employeeName.split(/\s+/);
+                    const [firstName = '', lastName = ''] = nameParts;
+
+                    return (
+                      <TableRow key={record.id} hover>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Avatar sx={{ mr: 2, bgcolor: 'primary.main', width: 32, height: 32 }}>
+                              {getInitials(firstName, lastName)}
+                            </Avatar>
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {employeeName}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {record.employee_employee_id ?? '—'}
+                              </Typography>
+                            </Box>
                           </Box>
-                        </Box>
-                      </TableCell>
+                        </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <AccessTime fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
@@ -535,8 +537,8 @@ const AttendanceManagement: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={record.attendance_status.toUpperCase()}
-                          color={getStatusColor(record.attendance_status, record.is_late) as any}
+                          label={(record.attendance_status || 'unknown').toUpperCase()}
+                          color={getStatusColor(record.attendance_status || 'unknown', record.is_late) as any}
                           size="small"
                         />
                       </TableCell>
@@ -555,7 +557,8 @@ const AttendanceManagement: React.FC = () => {
                         )}
                       </TableCell>
                     </TableRow>
-                  ))
+                  );
+                  })
                 )}
               </TableBody>
             </Table>

@@ -112,7 +112,7 @@ const FinancialDashboard: React.FC = () => {
     try {
       const response = await fetch(`/api/financial/dashboard/kpis?period=${selectedPeriod}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -133,7 +133,7 @@ const FinancialDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/financial/customer-outstanding', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -155,7 +155,7 @@ const FinancialDashboard: React.FC = () => {
       // Since sales-summary endpoint doesn't exist, use invoices data to calculate sales summary
       const response = await fetch('/api/financial/invoices?limit=100', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 
@@ -180,7 +180,7 @@ const FinancialDashboard: React.FC = () => {
       // Since GST summary endpoint doesn't exist, use invoice data to calculate GST summary
       const response = await fetch('/api/financial/invoices?limit=100', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
 

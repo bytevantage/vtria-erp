@@ -1,53 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
+import { getAuthHeaders } from '../utils/auth';
 import {
     Box,
     Card,
     CardContent,
     Typography,
     Grid,
-    Chip,
     Button,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
+    Chip,
+    CircularProgress,
+    Alert,
     IconButton,
     Tooltip,
-    Alert,
+    TextField,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Paper,
     LinearProgress,
-    CircularProgress,
-    Divider
 } from '@mui/material';
 import {
+    DragIndicator as DragIcon,
     Visibility as ViewIcon,
-    ArrowForward as TransitionIcon,
     Timeline as TimelineIcon,
+    Refresh as RefreshIcon,
     Search as SearchIcon,
-    Refresh as RefreshIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
-
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('vtria_token') || 'demo-token';
-    return { Authorization: `Bearer ${token}` };
-};
-
 const CaseDashboard = () => {
-    console.log('CaseDashboard component loading...');
-    const navigate = useNavigate();
-
-    // Define case states and their display names
     const CASE_STATES = {
         ENQUIRY: 'enquiry',
         ESTIMATION: 'estimation',
@@ -332,7 +321,7 @@ const CaseDashboard = () => {
                 errorMessage = `Server Error (${error.response.status}): ${error.response.data?.message || error.message}`;
             } else if (error.request) {
                 // Request was made but no response received
-                errorMessage = `Network Error: No response from server. Check your connection and server status.`;
+                errorMessage = 'Network Error: No response from server. Check your connection and server status.';
                 shouldRetry = retryCount < maxRetries;
             } else {
                 // Something else happened

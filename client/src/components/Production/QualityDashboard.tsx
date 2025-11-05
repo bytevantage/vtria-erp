@@ -156,7 +156,7 @@ const QualityDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/quality/metrics/dashboard', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -172,7 +172,7 @@ const QualityDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/quality/inspections', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -188,7 +188,7 @@ const QualityDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/quality/checkpoints', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -204,7 +204,7 @@ const QualityDashboard: React.FC = () => {
     try {
       const response = await fetch('/api/production/quality/defect-types', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
       });
       if (response.ok) {
@@ -222,7 +222,7 @@ const QualityDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newInspection,
@@ -254,7 +254,7 @@ const QualityDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify({
           ...newCheckpoint,
@@ -285,7 +285,7 @@ const QualityDashboard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('vtria_token')}`,
         },
         body: JSON.stringify(newDefect),
       });
@@ -393,7 +393,7 @@ const QualityDashboard: React.FC = () => {
                       Pass Rate
                     </Typography>
                     <Typography variant="h4" color="success.main">
-                      {metrics.pass_rate.toFixed(1)}%
+                      {metrics?.pass_rate?.toFixed(1) ?? '0.0'}%
                     </Typography>
                   </Box>
                   <CheckCircle sx={{ fontSize: 48, color: 'success.main', opacity: 0.3 }} />

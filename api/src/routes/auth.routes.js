@@ -17,6 +17,17 @@ const validateLogin = [
     body('password').notEmpty().withMessage('Password is required')
 ];
 
+const validateInitialSetup = [
+    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+    body('full_name').notEmpty().withMessage('Full name is required')
+];
+
+// System setup routes
+router.post('/setup-initial-admin', validateInitialSetup, authController.setupInitialAdmin);
+router.get('/system-status', authController.checkSystemStatus);
+
+// Regular auth routes
 router.post('/register', validateRegistration, authController.register);
 router.post('/login', validateLogin, authController.login);
 router.get('/me', authController.me);

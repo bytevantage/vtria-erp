@@ -86,6 +86,7 @@ process.on('SIGINT', () => {
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
+const { checkSystemInitialized } = require('./middleware/setup.middleware');
 const clientRoutes = require('./routes/client.routes');
 const vendorRoutes = require('./routes/vendor.routes');
 const salesEnquiryRoutes = require('./routes/salesEnquiry.routes');
@@ -196,7 +197,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', checkSystemInitialized, authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/sales-enquiries', salesEnquiryRoutes);

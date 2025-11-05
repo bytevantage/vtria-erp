@@ -1,0 +1,87 @@
+{
+  "version": "production",
+  "environment": "production",
+  "app": {
+    "name": "VTRIA ERP",
+    "description": "Enterprise Resource Planning System",
+    "logo": "/assets/logo.png",
+    "theme": "production",
+    "footer": "© 2024 Bytevantage Enterprise Solutions"
+  },
+  "features": {
+    "demo_mode": false,
+    "sample_data": false,
+    "reset_data": false,
+    "time_limit": "unlimited",
+    "max_users": "license_based",
+    "modules": {
+      "employee_management": true,
+      "production_planning": true,
+      "quality_control": true,
+      "financial_dashboard": true,
+      "sales_orders": true,
+      "shop_floor": true,
+      "inventory": true,
+      "attendance": true,
+      "reports": true,
+      "user_management": true,
+      "system_settings": true,
+      "database_backup": true,
+      "api_access": true,
+      "export_data": true
+    },
+    "restricted_features": []
+  },
+  "security": {
+    "session_timeout": 28800,
+    "password_complexity": "high",
+    "two_factor_auth": true,
+    "ip_whitelist": true,
+    "audit_logging": true,
+    "encryption": "aes-256",
+    "jwt_expiry": "8h"
+  },
+  "database": {
+    "auto_seed": false,
+    "sample_data_path": "",
+    "reset_on_restart": false,
+    "backup_enabled": true,
+    "backup_schedule": "daily",
+    "backup_retention": 30
+  },
+  "ui": {
+    "demo_banner": false,
+    "help_text": true,
+    "tooltips": true,
+    "tutorial_mode": false,
+    "reset_button": false
+  },
+  "api": {
+    "rate_limiting": true,
+    "rate_limit": "1000/hour",
+    "api_keys": true,
+    "webhooks": true,
+    "integrations": true
+  },
+  "notifications": {
+    "email": true,
+    "sms": true,
+    "push": true,
+    "in_app": true
+  },
+  "deployment": {
+    "type": "docker",
+    "single_container": false,
+    "external_database": true,
+    "ssl_required": true,
+    "domain": "client.vtria-erp.com",
+    "load_balancer": true,
+    "monitoring": true
+  },
+  "compliance": {
+    "data_protection": true,
+    "gdpr_compliant": true,
+    "audit_trail": true,
+    "data_retention_policy": true
+  }
+}

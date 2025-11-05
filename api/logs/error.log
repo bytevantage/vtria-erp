@@ -5993,3 +5993,495 @@
 2025-11-03T16:09:03.338Z ERROR: Error on GET /api/case-management/cases:
 2025-11-03T16:27:16.231Z ERROR: Failed to initialize email transporter:
 2025-11-03T16:43:13.383Z ERROR: Failed to initialize email transporter:
+2025-11-04T16:30:17.430Z ERROR: Failed to initialize email transporter:
+2025-11-04T16:31:21.573Z ERROR: Error fetching manufacturing cases:
+2025-11-04T16:31:24.697Z ERROR: Error fetching employees:
+2025-11-04T16:31:29.279Z ERROR: Error fetching enhanced inventory items:
+2025-11-04T16:37:47.698Z ERROR: Failed to initialize email transporter:
+2025-11-04T16:39:04.618Z ERROR: Authentication error:
+2025-11-04T16:39:04.629Z ERROR: Error on GET /api/quotations/enhanced/all:
+2025-11-04T16:39:48.666Z ERROR: Error fetching enhanced inventory items:
+2025-11-04T16:45:51.957Z ERROR: Failed to initialize email transporter:
+2025-11-04T16:47:02.862Z ERROR: Error fetching employees:
+2025-11-04T16:47:07.211Z ERROR: Error fetching employees:
+2025-11-04T16:52:28.006Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:06:09.974Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:12:27.437Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:21:15.483Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:23:57.789Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:27:16.368Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:31:05.774Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:35:35.395Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:38:16.734Z ERROR: Error fetching production dashboard:
+2025-11-04T17:38:16.738Z ERROR: Stack trace:
+2025-11-04T17:38:16.755Z ERROR: Error fetching manufacturing cases:
+2025-11-04T17:38:16.781Z ERROR: Error fetching cases ready for production:
+2025-11-04T17:38:16.812Z ERROR: Error fetching manufacturing cases:
+2025-11-04T17:38:16.830Z ERROR: Error fetching manufacturing units:
+2025-11-04T17:42:52.065Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:44:23.499Z ERROR: Error fetching cases ready for production:
+2025-11-04T17:49:27.606Z ERROR: Error fetching cases ready for production:
+2025-11-04T17:50:14.520Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:50:54.127Z ERROR: Error fetching cases ready for production:
+2025-11-04T17:53:33.388Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:54:58.137Z ERROR: Authentication error:
+2025-11-04T17:54:58.147Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-11-04T17:54:58.160Z ERROR: Authentication error:
+2025-11-04T17:54:58.173Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T17:54:58.192Z ERROR: Authentication error:
+2025-11-04T17:54:58.204Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-11-04T17:54:58.219Z ERROR: Authentication error:
+2025-11-04T17:54:58.223Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-11-04T17:58:26.296Z ERROR: Failed to initialize email transporter:
+2025-11-04T17:59:10.664Z ERROR: Authentication error:
+2025-11-04T17:59:10.673Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-11-04T17:59:10.685Z ERROR: Authentication error:
+2025-11-04T17:59:10.694Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T17:59:10.712Z ERROR: Authentication error:
+2025-11-04T17:59:10.715Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-11-04T17:59:10.733Z ERROR: Authentication error:
+2025-11-04T17:59:10.739Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-11-04T18:01:19.041Z ERROR: Authentication error:
+2025-11-04T18:01:19.045Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-11-04T18:01:19.063Z ERROR: Authentication error:
+2025-11-04T18:01:19.065Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T18:01:19.077Z ERROR: Authentication error:
+2025-11-04T18:01:19.084Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-11-04T18:01:19.100Z ERROR: Authentication error:
+2025-11-04T18:01:19.107Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-11-04T18:04:22.675Z ERROR: Authentication error:
+2025-11-04T18:04:22.679Z ERROR: Error on GET /api/production/quality/metrics/dashboard:
+2025-11-04T18:04:22.687Z ERROR: Authentication error:
+2025-11-04T18:04:22.692Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T18:04:22.703Z ERROR: Authentication error:
+2025-11-04T18:04:22.706Z ERROR: Error on GET /api/production/quality/checkpoints:
+2025-11-04T18:04:22.721Z ERROR: Authentication error:
+2025-11-04T18:04:22.725Z ERROR: Error on GET /api/production/quality/defect-types:
+2025-11-04T18:04:25.808Z ERROR: Authentication error:
+2025-11-04T18:04:25.816Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:04:25.831Z ERROR: Authentication error:
+2025-11-04T18:04:25.835Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:04:25.851Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:04:25.862Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:04:29.066Z ERROR: Authentication error:
+2025-11-04T18:04:29.069Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:04:29.090Z ERROR: Authentication error:
+2025-11-04T18:04:29.098Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:04:29.111Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:04:29.121Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:04:55.328Z ERROR: Authentication error:
+2025-11-04T18:04:55.332Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:04:55.338Z ERROR: Authentication error:
+2025-11-04T18:04:55.343Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:04:55.364Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:04:55.388Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:05:25.414Z ERROR: Authentication error:
+2025-11-04T18:05:25.416Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:05:25.422Z ERROR: Authentication error:
+2025-11-04T18:05:25.426Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:05:25.432Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:05:25.439Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:05:55.366Z ERROR: Authentication error:
+2025-11-04T18:05:55.368Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:05:55.375Z ERROR: Authentication error:
+2025-11-04T18:05:55.379Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:05:55.387Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:05:55.393Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:06:25.370Z ERROR: Authentication error:
+2025-11-04T18:06:25.374Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:06:25.383Z ERROR: Authentication error:
+2025-11-04T18:06:25.386Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:06:25.394Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:06:25.399Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:06:55.377Z ERROR: Authentication error:
+2025-11-04T18:06:55.380Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:06:55.385Z ERROR: Authentication error:
+2025-11-04T18:06:55.387Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:06:55.395Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:06:55.401Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:07:10.903Z ERROR: Authentication error:
+2025-11-04T18:07:10.908Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:07:10.938Z ERROR: Authentication error:
+2025-11-04T18:07:10.949Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:07:10.963Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:07:10.987Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:07:42.517Z ERROR: Authentication error:
+2025-11-04T18:07:42.520Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:07:42.527Z ERROR: Authentication error:
+2025-11-04T18:07:42.531Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:07:42.538Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:07:42.545Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:08:12.542Z ERROR: Authentication error:
+2025-11-04T18:08:12.549Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:08:12.566Z ERROR: Authentication error:
+2025-11-04T18:08:12.569Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:08:12.584Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:08:12.616Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:08:42.647Z ERROR: Authentication error:
+2025-11-04T18:08:42.653Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:08:42.664Z ERROR: Authentication error:
+2025-11-04T18:08:42.674Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:08:42.686Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:08:42.694Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:09:13.227Z ERROR: Authentication error:
+2025-11-04T18:09:13.237Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:09:13.325Z ERROR: Authentication error:
+2025-11-04T18:09:13.338Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:09:13.358Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:09:13.575Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:09:42.849Z ERROR: Authentication error:
+2025-11-04T18:09:42.854Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:09:42.982Z ERROR: Authentication error:
+2025-11-04T18:09:42.987Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:09:43.121Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:09:43.128Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:10:12.992Z ERROR: Authentication error:
+2025-11-04T18:10:13.004Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:10:13.013Z ERROR: Authentication error:
+2025-11-04T18:10:13.018Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:10:13.071Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:10:13.106Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:10:56.685Z ERROR: Authentication error:
+2025-11-04T18:10:56.692Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:10:56.699Z ERROR: Authentication error:
+2025-11-04T18:10:56.704Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:10:56.722Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:10:56.737Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:11:36.709Z ERROR: Authentication error:
+2025-11-04T18:11:36.715Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:11:36.739Z ERROR: Authentication error:
+2025-11-04T18:11:36.742Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:11:36.772Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:11:36.778Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:12:06.800Z ERROR: Authentication error:
+2025-11-04T18:12:06.825Z ERROR: Error on GET /api/production/shopfloor/dashboard:
+2025-11-04T18:12:06.860Z ERROR: Authentication error:
+2025-11-04T18:12:06.888Z ERROR: Error on GET /api/production/shopfloor/machines:
+2025-11-04T18:12:06.995Z ERROR: Error on GET /api/production/shopfloor/operations:
+2025-11-04T18:12:07.037Z ERROR: Error on GET /api/production/shopfloor/utilization:
+2025-11-04T18:12:09.121Z ERROR: Error fetching operation tracking:
+2025-11-04T18:12:09.257Z ERROR: Error fetching production machines:
+2025-11-04T18:12:09.331Z ERROR: Error fetching machine utilization log:
+2025-11-04T18:12:09.453Z ERROR: Error fetching shop floor dashboard:
+2025-11-04T18:12:14.587Z ERROR: Error fetching production schedules:
+2025-11-04T18:12:14.612Z ERROR: Error fetching waste categories:
+2025-11-04T18:12:14.633Z ERROR: Error fetching OEE records:
+2025-11-04T18:12:14.673Z ERROR: Error fetching waste records:
+2025-11-04T18:18:34.581Z ERROR: Failed to initialize email transporter:
+2025-11-04T18:19:12.678Z ERROR: Error fetching waste records:
+2025-11-04T18:19:12.717Z ERROR: Error fetching OEE records:
+2025-11-04T18:19:12.731Z ERROR: Error fetching production schedules:
+2025-11-04T18:23:04.109Z ERROR: Authentication error:
+2025-11-04T18:23:04.116Z ERROR: Error on GET /api/inventory-enhanced/dashboard:
+2025-11-04T18:39:44.700Z ERROR: Error fetching quality metrics:
+2025-11-04T18:39:44.740Z ERROR: Error fetching quality inspections:
+2025-11-04T18:39:53.248Z ERROR: Error fetching shop floor dashboard:
+2025-11-04T18:39:53.262Z ERROR: Error fetching production machines:
+2025-11-04T18:39:53.293Z ERROR: Error fetching machine utilization log:
+2025-11-04T18:39:53.298Z ERROR: Error fetching operation tracking:
+2025-11-04T18:39:56.592Z ERROR: Error fetching production schedules:
+2025-11-04T18:39:56.608Z ERROR: Error fetching waste records:
+2025-11-04T18:39:56.679Z ERROR: Error fetching OEE records:
+2025-11-04T18:55:54.774Z ERROR: Error fetching quality inspections:
+2025-11-04T18:55:54.816Z ERROR: Error fetching quality metrics:
+2025-11-04T18:55:54.895Z ERROR: Error fetching quality inspections:
+2025-11-04T18:55:54.932Z ERROR: Error fetching quality metrics:
+2025-11-04T18:58:07.157Z ERROR: Error fetching quality metrics:
+2025-11-04T18:58:07.168Z ERROR: Error fetching quality inspections:
+2025-11-04T18:58:07.313Z ERROR: Error fetching quality inspections:
+2025-11-04T18:58:07.410Z ERROR: Error fetching quality metrics:
+2025-11-04T18:58:13.037Z ERROR: Error fetching quality metrics:
+2025-11-04T18:58:13.051Z ERROR: Error fetching quality inspections:
+2025-11-04T18:58:13.101Z ERROR: Error fetching quality metrics:
+2025-11-04T18:58:13.122Z ERROR: Error fetching quality inspections:
+2025-11-04T19:10:01.289Z ERROR: Error fetching quality metrics:
+2025-11-04T19:10:01.357Z ERROR: Error fetching quality metrics:
+2025-11-04T19:10:01.378Z ERROR: Error fetching quality inspections:
+2025-11-04T19:10:01.450Z ERROR: Error fetching quality inspections:
+2025-11-04T19:18:03.802Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:19:46.177Z ERROR: Error fetching quality inspections:
+2025-11-04T19:19:46.463Z ERROR: Error fetching quality inspections:
+2025-11-04T19:23:47.130Z ERROR: Error fetching quality inspections:
+2025-11-04T19:23:47.223Z ERROR: Error fetching quality inspections:
+2025-11-04T19:24:02.782Z ERROR: Error fetching quality inspections:
+2025-11-04T19:24:02.865Z ERROR: Error fetching quality inspections:
+2025-11-04T19:24:12.335Z ERROR: Error fetching quality inspections:
+2025-11-04T19:24:12.366Z ERROR: Error fetching quality inspections:
+2025-11-04T19:27:50.032Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:28:03.597Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:28:43.143Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:29:15.449Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:30:49.102Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:31:12.309Z ERROR: Failed to initialize email transporter:
+2025-11-04T19:36:33.788Z ERROR: Authentication error:
+2025-11-04T19:36:33.809Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T19:36:54.395Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T19:36:54.400Z ERROR: ERROR 💥
+2025-11-04T19:36:54.809Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T19:36:54.814Z ERROR: ERROR 💥
+2025-11-04T19:40:00.453Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T19:40:00.458Z ERROR: ERROR 💥
+2025-11-04T19:48:49.367Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-04T19:48:49.371Z ERROR: ERROR 💥
+2025-11-05T03:40:42.596Z ERROR: Error on GET /api/production/quality/inspections:
+2025-11-05T03:40:42.601Z ERROR: ERROR 💥
+2025-11-05T03:46:26.848Z ERROR: Error in getQualityInspections
+2025-11-05T03:47:49.782Z ERROR: Error in getQualityInspections
+2025-11-05T03:48:43.384Z ERROR: Error in getQualityInspections: Incorrect arguments to mysqld_stmt_execute; context={"query":"\n        SELECT \n          qi.*,\n          COALESCE(wo.work_order_number, 'N/A') as work_order_number,\n          COALESCE(mc.manufacturing_case_number, 'N/A') as manufacturing_case_number,\n          COALESCE(p.name, 'N/A') as product_name,\n          COALESCE(qc.checkpoint_name, 'N/A') as checkpoint_name,\n          COALESCE(u.full_name, 'N/A') as inspector_name\n        FROM quality_inspections_enhanced qi\n        LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id\n        LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id\n        LEFT JOIN products p ON qi.product_id = p.id\n        LEFT JOIN quality_checkpoints qc ON qi.checkpoint_id = qc.id\n        LEFT JOIN users u ON qi.inspector_id = u.id\n        WHERE 1=1\n       ORDER BY qi.inspection_date DESC LIMIT ? OFFSET ?","filterParams":[],"mainParams":[20,0]}
+2025-11-05T03:52:02.096Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:52:02.106Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:52:02.120Z ERROR: Error fetching operation tracking:
+2025-11-05T03:52:02.173Z ERROR: Error fetching production machines:
+2025-11-05T03:52:32.113Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:52:32.125Z ERROR: Error fetching production machines:
+2025-11-05T03:52:32.131Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:52:32.144Z ERROR: Error fetching operation tracking:
+2025-11-05T03:53:02.115Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:53:02.127Z ERROR: Error fetching production machines:
+2025-11-05T03:53:02.139Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:53:02.145Z ERROR: Error fetching operation tracking:
+2025-11-05T03:53:32.170Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:53:32.182Z ERROR: Error fetching production machines:
+2025-11-05T03:53:32.198Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:53:32.205Z ERROR: Error fetching operation tracking:
+2025-11-05T03:54:02.149Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:54:02.165Z ERROR: Error fetching production machines:
+2025-11-05T03:54:02.176Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:54:02.180Z ERROR: Error fetching operation tracking:
+2025-11-05T03:54:32.193Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:54:32.229Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:54:32.251Z ERROR: Error fetching operation tracking:
+2025-11-05T03:54:32.259Z ERROR: Error fetching production machines:
+2025-11-05T03:55:02.818Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:55:02.841Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:55:02.853Z ERROR: Error fetching production machines:
+2025-11-05T03:55:02.863Z ERROR: Error fetching operation tracking:
+2025-11-05T03:55:08.308Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:56:24.697Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:56:24.721Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:56:24.736Z ERROR: Error fetching operation tracking:
+2025-11-05T03:56:24.748Z ERROR: Error fetching production machines:
+2025-11-05T03:56:55.796Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:56:55.812Z ERROR: Error fetching production machines:
+2025-11-05T03:56:55.827Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:56:55.833Z ERROR: Error fetching operation tracking:
+2025-11-05T03:57:40.492Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:57:40.528Z ERROR: Error fetching production machines:
+2025-11-05T03:57:40.539Z ERROR: Error fetching operation tracking:
+2025-11-05T03:57:40.567Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:58:11.301Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:58:11.314Z ERROR: Error fetching production machines:
+2025-11-05T03:58:11.325Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:58:11.331Z ERROR: Error fetching operation tracking:
+2025-11-05T03:58:41.307Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:58:41.318Z ERROR: Error fetching production machines:
+2025-11-05T03:58:41.333Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:58:41.342Z ERROR: Error fetching operation tracking:
+2025-11-05T03:59:11.340Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:59:11.351Z ERROR: Error fetching production machines:
+2025-11-05T03:59:11.367Z ERROR: Error fetching machine utilization log:
+2025-11-05T03:59:11.375Z ERROR: Error fetching operation tracking:
+2025-11-05T03:59:41.384Z ERROR: Error fetching production machines:
+2025-11-05T03:59:41.475Z ERROR: Error fetching operation tracking:
+2025-11-05T03:59:41.487Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T03:59:41.519Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:00:11.427Z ERROR: Error fetching production machines:
+2025-11-05T04:00:11.450Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:00:11.464Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:00:11.473Z ERROR: Error fetching operation tracking:
+2025-11-05T04:00:20.184Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:00:20.204Z ERROR: Error fetching production machines:
+2025-11-05T04:00:20.237Z ERROR: Error fetching operation tracking:
+2025-11-05T04:00:20.261Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:00:50.187Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:00:50.191Z ERROR: Error fetching production machines:
+2025-11-05T04:00:50.205Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:00:50.213Z ERROR: Error fetching operation tracking:
+2025-11-05T04:01:20.198Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:01:20.204Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:01:20.208Z ERROR: Error fetching production machines:
+2025-11-05T04:01:20.221Z ERROR: Error fetching operation tracking:
+2025-11-05T04:01:54.010Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:01:54.016Z ERROR: Error fetching production machines:
+2025-11-05T04:01:54.030Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:01:54.040Z ERROR: Error fetching operation tracking:
+2025-11-05T04:02:17.713Z ERROR: Error fetching production machines:
+2025-11-05T04:02:26.946Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:02:27.111Z ERROR: Error fetching production machines:
+2025-11-05T04:02:27.132Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:02:27.143Z ERROR: Error fetching operation tracking:
+2025-11-05T04:02:57.813Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:02:57.819Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:02:57.830Z ERROR: Error fetching operation tracking:
+2025-11-05T04:02:57.835Z ERROR: Error fetching production machines:
+2025-11-05T04:03:27.816Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:03:27.821Z ERROR: Error fetching production machines:
+2025-11-05T04:03:27.836Z ERROR: Error fetching operation tracking:
+2025-11-05T04:03:27.842Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:03:57.843Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:03:57.848Z ERROR: Error fetching production machines:
+2025-11-05T04:03:57.860Z ERROR: Error fetching operation tracking:
+2025-11-05T04:03:57.866Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:04:40.976Z ERROR: Error fetching shop floor dashboard:
+2025-11-05T04:04:40.984Z ERROR: Error fetching production machines:
+2025-11-05T04:04:41.006Z ERROR: Error fetching operation tracking:
+2025-11-05T04:04:41.031Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:05:24.708Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:05:24.730Z ERROR: Error fetching operation tracking:
+2025-11-05T04:06:17.298Z ERROR: Error fetching operation tracking:
+2025-11-05T04:06:48.013Z ERROR: Error fetching machine utilization log:
+2025-11-05T04:06:48.046Z ERROR: Error fetching operation tracking:
+2025-11-05T04:06:50.595Z ERROR: Error fetching operation tracking:
+2025-11-05T04:07:35.479Z ERROR: Error fetching operation tracking:
+2025-11-05T04:08:38.461Z ERROR: Error fetching operation tracking:
+2025-11-05T04:25:33.423Z ERROR: Error fetching production schedules:
+2025-11-05T04:25:33.433Z ERROR: Error fetching waste records:
+2025-11-05T04:25:33.461Z ERROR: Error fetching OEE records:
+2025-11-05T04:28:39.234Z ERROR: Error fetching waste records:
+2025-11-05T04:28:39.279Z ERROR: Error fetching production schedules:
+2025-11-05T04:28:39.307Z ERROR: Error fetching OEE records:
+2025-11-05T04:44:04.493Z ERROR: Error fetching waste records:
+2025-11-05T04:44:04.507Z ERROR: Error fetching production schedules:
+2025-11-05T04:44:04.531Z ERROR: Error fetching OEE records:
+2025-11-05T04:44:14.498Z ERROR: Error fetching production schedules:
+2025-11-05T04:44:14.505Z ERROR: Error fetching waste records:
+2025-11-05T04:44:14.551Z ERROR: Error fetching OEE records:
+2025-11-05T04:59:48.576Z ERROR: Error fetching production schedules:
+2025-11-05T04:59:48.590Z ERROR: Error fetching waste records:
+2025-11-05T04:59:48.606Z ERROR: Error fetching OEE records:
+2025-11-05T05:00:04.836Z ERROR: Error fetching production schedules:
+2025-11-05T05:00:04.854Z ERROR: Error fetching waste records:
+2025-11-05T05:00:04.881Z ERROR: Error fetching OEE records:
+2025-11-05T05:09:56.513Z ERROR: Error fetching production schedules: Unknown column 'creator.first_name' in 'field list' | stack: Error: Unknown column 'creator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getProductionSchedules (/usr/src/app/src/controllers/planning.controller.js:85:32)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:09:56.558Z ERROR: Error fetching waste records: Unknown column 'operator.first_name' in 'field list' | stack: Error: Unknown column 'operator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getWasteRecords (/usr/src/app/src/controllers/planning.controller.js:535:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:13:03.811Z ERROR: Error fetching production schedules: Unknown column 'creator.first_name' in 'field list' | stack: Error: Unknown column 'creator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getProductionSchedules (/usr/src/app/src/controllers/planning.controller.js:89:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:13:03.858Z ERROR: Error fetching waste records: Unknown column 'operator.first_name' in 'field list' | stack: Error: Unknown column 'operator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getWasteRecords (/usr/src/app/src/controllers/planning.controller.js:543:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:13:27.786Z ERROR: Error fetching production schedules: Unknown column 'creator.first_name' in 'field list' | stack: Error: Unknown column 'creator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getProductionSchedules (/usr/src/app/src/controllers/planning.controller.js:89:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:13:27.820Z ERROR: Error fetching waste records: Unknown column 'operator.first_name' in 'field list' | stack: Error: Unknown column 'operator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getWasteRecords (/usr/src/app/src/controllers/planning.controller.js:543:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:20:25.203Z ERROR: Error fetching waste records: Unknown column 'operator.first_name' in 'field list' | stack: Error: Unknown column 'operator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getWasteRecords (/usr/src/app/src/controllers/planning.controller.js:543:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:20:25.232Z ERROR: Error fetching production schedules: Unknown column 'creator.first_name' in 'field list' | stack: Error: Unknown column 'creator.first_name' in 'field list'
+    at PromisePool.execute (/usr/src/app/node_modules/mysql2/lib/promise/pool.js:54:22)
+    at getProductionSchedules (/usr/src/app/src/controllers/planning.controller.js:89:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05T05:38:06.850Z ERROR: Authentication error:
+2025-11-05T05:38:06.890Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-11-05T05:38:06.901Z ERROR: Authentication error:
+2025-11-05T05:38:06.909Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-11-05T05:38:06.938Z ERROR: Authentication error:
+2025-11-05T05:38:06.947Z ERROR: Error on GET /api/financial/invoices:
+2025-11-05T05:38:06.961Z ERROR: Authentication error:
+2025-11-05T05:38:06.973Z ERROR: Error on GET /api/financial/invoices:
+2025-11-05T05:38:27.810Z ERROR: Authentication error:
+2025-11-05T05:38:27.817Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-11-05T05:38:27.826Z ERROR: Authentication error:
+2025-11-05T05:38:27.832Z ERROR: Error on GET /api/financial/customer-outstanding:
+2025-11-05T05:38:27.840Z ERROR: Authentication error:
+2025-11-05T05:38:27.843Z ERROR: Error on GET /api/financial/invoices:
+2025-11-05T05:38:27.855Z ERROR: Authentication error:
+2025-11-05T05:38:27.859Z ERROR: Error on GET /api/financial/invoices:
+2025-11-05T05:57:01.523Z ERROR: Authentication error:
+2025-11-05T05:57:01.530Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-11-05T05:57:21.317Z ERROR: Authentication error:
+2025-11-05T05:57:21.325Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-11-05T05:57:46.624Z ERROR: Authentication error:
+2025-11-05T05:57:46.662Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-11-05T06:01:26.550Z ERROR: Authentication error:
+2025-11-05T06:01:26.556Z ERROR: Error on GET /api/financial/dashboard/kpis:
+2025-11-05T06:06:45.939Z ERROR: Error fetching departments:
+2025-11-05T06:06:50.835Z ERROR: Error fetching dashboard data:
+2025-11-05T06:06:56.236Z ERROR: Error fetching dashboard data:
+2025-11-05T06:07:14.743Z ERROR: Error fetching departments:
+2025-11-05T06:07:17.897Z ERROR: Error fetching departments:
+2025-11-05T06:07:35.638Z ERROR: Error fetching departments:
+2025-11-05T06:41:04.159Z ERROR: Error fetching employees:
+2025-11-05T06:44:24.820Z ERROR: Error fetching employees:
+2025-11-05T06:48:43.897Z ERROR: Error fetching employees:
+2025-11-05T06:48:47.179Z ERROR: Error fetching employees:
+2025-11-05T06:49:32.323Z ERROR: Error fetching employees:
+2025-11-05T06:49:36.833Z ERROR: Error fetching employees:
+2025-11-05T06:50:49.358Z ERROR: Error fetching employees:
+2025-11-05T06:54:34.669Z ERROR: Error fetching employees:
+2025-11-05T06:55:06.137Z ERROR: Error fetching employees:
+2025-11-05T07:26:18.823Z ERROR: Error fetching current employee:
+2025-11-05T07:26:18.894Z ERROR: Error fetching current employee:
+2025-11-05T08:49:45.614Z ERROR: Error fetching current employee:
+2025-11-05T08:49:45.698Z ERROR: Error fetching current employee:
+2025-11-05T08:50:08.434Z ERROR: Error fetching current employee:
+2025-11-05T08:50:08.516Z ERROR: Error fetching current employee:
+2025-11-05T08:57:58.051Z ERROR: Error fetching current employee:
+2025-11-05T08:57:58.212Z ERROR: Error fetching current employee:
+2025-11-05T09:00:33.168Z ERROR: Error in getCurrentEmployee:
+2025-11-05T09:33:55.187Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:34:09.333Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:34:25.660Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:34:25.664Z ERROR: Error fetching current employee:
+2025-11-05T09:35:13.503Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:35:38.722Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:36:15.506Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:36:29.146Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:36:46.494Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:37:01.717Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:37:20.555Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:37:37.931Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:38:09.137Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:38:57.700Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:39:21.430Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:39:21.551Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:47:58.780Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:49:10.078Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:49:45.165Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T09:51:44.862Z ERROR: 🚨🚨🚨 CRITICAL ERROR LOG: getCurrentEmployee function called 🚨🚨🚨
+2025-11-05T10:27:45.518Z ERROR: Error fetching current employee:
+2025-11-05T10:28:38.906Z ERROR: Error fetching current employee:
+2025-11-05T10:28:38.914Z ERROR: Error stack:
+2025-11-05T10:28:38.921Z ERROR: Error message:
+2025-11-05T10:28:38.924Z ERROR: Error code:
+2025-11-05T10:28:59.673Z ERROR: Error fetching current employee:
+2025-11-05T10:28:59.676Z ERROR: Error stack:
+2025-11-05T10:28:59.678Z ERROR: Error message:
+2025-11-05T10:28:59.681Z ERROR: Error code:
+2025-11-05T10:34:10.564Z ERROR: USE database error:
+2025-11-05T10:34:10.568Z ERROR: Error fetching current employee:
+2025-11-05T10:34:33.465Z ERROR: USE database error:
+2025-11-05T10:34:33.468Z ERROR: Error fetching current employee:
+2025-11-05T12:00:33.156Z ERROR: Error on GET /favicon.ico:
+2025-11-05T12:36:40.264Z ERROR: Error fetching employees:
+2025-11-05T12:36:54.288Z ERROR: Error fetching employees:
+2025-11-05T12:36:54.296Z ERROR: Error fetching employees:
+2025-11-05T12:36:59.548Z ERROR: Error fetching employees:
+2025-11-05T12:36:59.619Z ERROR: Error fetching employees:
+2025-11-05T12:37:37.518Z ERROR: Error fetching employees:
+2025-11-05T12:40:10.252Z ERROR: Error fetching production dashboard:
+2025-11-05T12:40:10.254Z ERROR: Stack trace:
+2025-11-05T12:40:29.187Z ERROR: Error fetching production dashboard:
+2025-11-05T12:40:29.188Z ERROR: Stack trace:
+2025-11-05T12:40:29.280Z ERROR: Error fetching production dashboard:
+2025-11-05T12:40:29.281Z ERROR: Stack trace:
+2025-11-05T12:40:52.182Z ERROR: Error fetching production dashboard:
+2025-11-05T12:40:52.183Z ERROR: Stack trace:
+2025-11-05T12:40:58.003Z ERROR: Error fetching production dashboard:
+2025-11-05T12:40:58.004Z ERROR: Stack trace:
+2025-11-05T12:46:24.204Z ERROR: Error fetching departments:
+2025-11-05T12:46:24.206Z ERROR: Error fetching departments:
+2025-11-05T12:48:09.710Z ERROR: Error fetching departments:

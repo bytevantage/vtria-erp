@@ -258,7 +258,7 @@ const SalesEnquiry = () => {
           return {
             ...employee,
             employee_id: employee.employee_id || `EMP-${employee.id}`,
-            department_name: user.department_name || 'Unknown'
+            department_name: employee.department_name || 'Unknown'
           };
         });
 

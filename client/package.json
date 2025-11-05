@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "VTRIA ERP Frontend - React.js Dashboard for WAMP Server Environment",
   "private": true,
-  "homepage": "/vtria-erp",
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",

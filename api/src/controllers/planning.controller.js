@@ -10,97 +10,98 @@ class ProductionPlanningController {
   async getProductionSchedules(req, res) {
     try {
       const {
-        manufacturing_unit_id,
-        schedule_date,
+        manufacturing_unit_id: manufacturingUnitId,
+        schedule_date: scheduleDate,
         status,
-        from_date,
-        to_date,
+        from_date: fromDate,
+        to_date: toDate,
         page = 1,
         limit = 20
       } = req.query;
 
-      const offset = (page - 1) * limit;
+      const parsedPage = Number.parseInt(page, 10);
+      const pageNumber = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+      const parsedLimit = Number.parseInt(limit, 10);
+      const limitNumber = Number.isNaN(parsedLimit) || parsedLimit < 1
+        ? 20
+        : Math.min(parsedLimit, 100);
+      const offset = (pageNumber - 1) * limitNumber;
+      const limitClause = `LIMIT ${limitNumber} OFFSET ${offset}`;
 
-      let query = `
+      const filters = [];
+      const filterParams = [];
+
+      if (manufacturingUnitId) {
+        filters.push('ps.manufacturing_unit_id = ?');
+        filterParams.push(manufacturingUnitId);
+      }
+
+      if (scheduleDate) {
+        filters.push('ps.schedule_date = ?');
+        filterParams.push(scheduleDate);
+      }
+
+      if (status) {
+        filters.push('ps.status = ?');
+        filterParams.push(status);
+      }
+
+      if (fromDate) {
+        filters.push('ps.schedule_date >= ?');
+        filterParams.push(fromDate);
+      }
+
+      if (toDate) {
+        filters.push('ps.schedule_date <= ?');
+        filterParams.push(toDate);
+      }
+
+      const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+
+      const dataQuery = `
         SELECT 
           ps.*,
-          mu.unit_name as manufacturing_unit_name,
-          CONCAT(creator.first_name, ' ', creator.last_name) as created_by_name,
-          CONCAT(approver.first_name, ' ', approver.last_name) as approved_by_name,
-          COUNT(psi.id) as total_items,
-          COUNT(CASE WHEN psi.status = 'completed' THEN 1 END) as completed_items
+          mu.unit_name AS manufacturing_unit_name,
+          creator.full_name AS created_by_name,
+          approver.full_name AS approved_by_name,
+          COALESCE(MIN(psi.planned_start_time), ps.schedule_date) AS start_date,
+          COALESCE(MAX(psi.planned_end_time), ps.schedule_date) AS end_date,
+          COUNT(psi.id) AS total_work_orders,
+          COUNT(CASE WHEN psi.status = 'completed' THEN 1 END) AS completed_work_orders
         FROM production_schedule ps
         LEFT JOIN manufacturing_units mu ON ps.manufacturing_unit_id = mu.id
         LEFT JOIN users creator ON ps.created_by = creator.id
         LEFT JOIN users approver ON ps.approved_by = approver.id
         LEFT JOIN production_schedule_items psi ON ps.id = psi.schedule_id
-        WHERE 1=1
+        ${whereClause}
+        GROUP BY ps.id, mu.unit_name, creator.full_name, approver.full_name
+        ORDER BY ps.schedule_date DESC
+        ${limitClause}
       `;
-      const params = [];
 
-      if (manufacturing_unit_id) {
-        query += ' AND ps.manufacturing_unit_id = ?';
-        params.push(manufacturing_unit_id);
-      }
-
-      if (schedule_date) {
-        query += ' AND ps.schedule_date = ?';
-        params.push(schedule_date);
-      }
-
-      if (status) {
-        query += ' AND ps.status = ?';
-        params.push(status);
-      }
-
-      if (from_date) {
-        query += ' AND ps.schedule_date >= ?';
-        params.push(from_date);
-      }
-
-      if (to_date) {
-        query += ' AND ps.schedule_date <= ?';
-        params.push(to_date);
-      }
-
-      query += ' GROUP BY ps.id';
-
-      // Get total count
       const countQuery = `
-        SELECT COUNT(DISTINCT ps.id) as total 
-        FROM production_schedule ps 
-        WHERE 1=1 ${manufacturing_unit_id ? 'AND ps.manufacturing_unit_id = ?' : ''}
-        ${status ? 'AND ps.status = ?' : ''}
-        ${from_date ? 'AND ps.schedule_date >= ?' : ''}
-        ${to_date ? 'AND ps.schedule_date <= ?' : ''}
+        SELECT COUNT(DISTINCT ps.id) as total
+        FROM production_schedule ps
+        ${whereClause}
       `;
-      const countParams = [];
-      if (manufacturing_unit_id) countParams.push(manufacturing_unit_id);
-      if (status) countParams.push(status);
-      if (from_date) countParams.push(from_date);
-      if (to_date) countParams.push(to_date);
 
-      const [countResult] = await db.execute(countQuery, countParams);
-      const total = countResult[0].total;
+      const [countResult] = await db.execute(countQuery, filterParams);
+      const total = countResult[0]?.total || 0;
 
-      // Get paginated results
-      query += ' ORDER BY ps.schedule_date DESC LIMIT ? OFFSET ?';
-      params.push(parseInt(limit), parseInt(offset));
-
-      const [schedules] = await db.execute(query, params);
+      const [schedules] = await db.execute(dataQuery, filterParams);
 
       res.json({
         success: true,
         data: schedules,
         pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
+          page: pageNumber,
+          limit: limitNumber,
           total,
-          totalPages: Math.ceil(total / limit)
+          totalPages: total > 0 ? Math.ceil(total / limitNumber) : 0
         }
       });
     } catch (error) {
-      logger.error('Error fetching production schedules:', error);
+      logger.error(`Error fetching production schedules: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch production schedules',
@@ -119,8 +120,8 @@ class ProductionPlanningController {
         SELECT 
           ps.*,
           mu.unit_name as manufacturing_unit_name,
-          CONCAT(creator.first_name, ' ', creator.last_name) as created_by_name,
-          CONCAT(approver.first_name, ' ', approver.last_name) as approved_by_name
+          creator.full_name as created_by_name,
+          approver.full_name as approved_by_name
         FROM production_schedule ps
         LEFT JOIN manufacturing_units mu ON ps.manufacturing_unit_id = mu.id
         LEFT JOIN users creator ON ps.created_by = creator.id
@@ -146,7 +147,7 @@ class ProductionPlanningController {
           wo.work_order_number,
           wo.quantity as work_order_quantity,
           pm.machine_name,
-          CONCAT(u.first_name, ' ', u.last_name) as operator_name
+          u.full_name as operator_name
         FROM production_schedule_items psi
         INNER JOIN manufacturing_work_orders wo ON psi.work_order_id = wo.id
         LEFT JOIN production_machines pm ON psi.assigned_machine_id = pm.id
@@ -163,7 +164,7 @@ class ProductionPlanningController {
         data: schedule
       });
     } catch (error) {
-      logger.error('Error fetching production schedule:', error);
+      logger.error(`Error fetching production schedule: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch production schedule',
@@ -180,18 +181,18 @@ class ProductionPlanningController {
       await connection.beginTransaction();
 
       const {
-        schedule_code,
-        schedule_name,
-        schedule_type,
-        schedule_date,
-        manufacturing_unit_id,
-        planned_capacity,
-        work_order_ids, // Array of work order IDs to schedule
+        schedule_code: scheduleCode,
+        schedule_name: scheduleName,
+        schedule_type: scheduleType,
+        schedule_date: scheduleDate,
+        manufacturing_unit_id: manufacturingUnitId,
+        planned_capacity: plannedCapacity,
+        work_order_ids: workOrderIds, // Array of work order IDs to schedule
         notes
       } = req.body;
 
       // Validate required fields
-      if (!schedule_code || !schedule_name || !schedule_date) {
+      if (!scheduleCode || !scheduleName || !scheduleDate) {
         await connection.rollback();
         return res.status(400).json({
           success: false,
@@ -208,29 +209,29 @@ class ProductionPlanningController {
       `;
 
       const [scheduleResult] = await connection.execute(scheduleQuery, [
-        schedule_code,
-        schedule_name,
-        schedule_type || 'daily',
-        schedule_date,
-        manufacturing_unit_id || null,
-        planned_capacity || 0,
-        planned_capacity || 0,
+        scheduleCode,
+        scheduleName,
+        scheduleType || 'daily',
+        scheduleDate,
+        manufacturingUnitId || null,
+        plannedCapacity || 0,
+        plannedCapacity || 0,
         notes,
         req.user.id
       ]);
 
-      const schedule_id = scheduleResult.insertId;
+      const scheduleId = scheduleResult.insertId;
 
       // Add work orders if provided
-      if (work_order_ids && work_order_ids.length > 0) {
+      if (workOrderIds && workOrderIds.length > 0) {
         const itemQuery = `
           INSERT INTO production_schedule_items 
           (schedule_id, work_order_id, sequence_order, priority, status)
           VALUES (?, ?, ?, 'medium', 'scheduled')
         `;
 
-        for (let i = 0; i < work_order_ids.length; i++) {
-          await connection.execute(itemQuery, [schedule_id, work_order_ids[i], i + 1]);
+        for (let i = 0; i < workOrderIds.length; i++) {
+          await connection.execute(itemQuery, [scheduleId, workOrderIds[i], i + 1]);
         }
       }
 
@@ -239,11 +240,11 @@ class ProductionPlanningController {
       res.status(201).json({
         success: true,
         message: 'Production schedule created successfully',
-        data: { id: schedule_id }
+        data: { id: scheduleId }
       });
     } catch (error) {
       await connection.rollback();
-      logger.error('Error creating production schedule:', error);
+      logger.error(`Error creating production schedule: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to create production schedule',
@@ -257,18 +258,18 @@ class ProductionPlanningController {
   // Add work order to schedule
   async addWorkOrderToSchedule(req, res) {
     try {
-      const { schedule_id } = req.params;
+      const { schedule_id: scheduleId } = req.params;
       const {
-        work_order_id,
-        planned_start_time,
-        planned_end_time,
-        estimated_duration_minutes,
-        assigned_machine_id,
-        assigned_operator_id,
+        work_order_id: workOrderId,
+        planned_start_time: plannedStartTime,
+        planned_end_time: plannedEndTime,
+        estimated_duration_minutes: estimatedDurationMinutes,
+        assigned_machine_id: assignedMachineId,
+        assigned_operator_id: assignedOperatorId,
         priority = 'medium'
       } = req.body;
 
-      if (!work_order_id) {
+      if (!workOrderId) {
         return res.status(400).json({
           success: false,
           message: 'Missing required field: work_order_id'
@@ -278,10 +279,10 @@ class ProductionPlanningController {
       // Get current max sequence order
       const [maxSeq] = await db.execute(
         'SELECT COALESCE(MAX(sequence_order), 0) as max_seq FROM production_schedule_items WHERE schedule_id = ?',
-        [schedule_id]
+        [scheduleId]
       );
 
-      const sequence_order = maxSeq[0].max_seq + 1;
+      const sequenceOrder = maxSeq[0].max_seq + 1;
 
       const query = `
         INSERT INTO production_schedule_items 
@@ -291,14 +292,14 @@ class ProductionPlanningController {
       `;
 
       const [result] = await db.execute(query, [
-        schedule_id,
-        work_order_id,
-        sequence_order,
-        planned_start_time,
-        planned_end_time,
-        estimated_duration_minutes,
-        assigned_machine_id || null,
-        assigned_operator_id || null,
+        scheduleId,
+        workOrderId,
+        sequenceOrder,
+        plannedStartTime,
+        plannedEndTime,
+        estimatedDurationMinutes,
+        assignedMachineId || null,
+        assignedOperatorId || null,
         priority
       ]);
 
@@ -308,7 +309,7 @@ class ProductionPlanningController {
         data: { id: result.insertId }
       });
     } catch (error) {
-      logger.error('Error adding work order to schedule:', error);
+      logger.error(`Error adding work order to schedule: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to add work order to schedule',
@@ -321,13 +322,18 @@ class ProductionPlanningController {
   async updateScheduleItemStatus(req, res) {
     try {
       const { id } = req.params;
-      const { status, delay_reason, actual_start_time, actual_end_time } = req.body;
+      const {
+        status,
+        delay_reason: delayReason,
+        actual_start_time: actualStartTime,
+        actual_end_time: actualEndTime
+      } = req.body;
 
       const validStatuses = ['scheduled', 'in_progress', 'completed', 'delayed', 'cancelled'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid status. Must be one of: ' + validStatuses.join(', ')
+          message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
         });
       }
 
@@ -337,19 +343,19 @@ class ProductionPlanningController {
       `;
       const params = [status];
 
-      if (delay_reason) {
+      if (delayReason) {
         query += ', delay_reason = ?';
-        params.push(delay_reason);
+        params.push(delayReason);
       }
 
-      if (actual_start_time) {
+      if (actualStartTime) {
         query += ', actual_start_time = ?';
-        params.push(actual_start_time);
+        params.push(actualStartTime);
       }
 
-      if (actual_end_time) {
+      if (actualEndTime) {
         query += ', actual_end_time = ?, actual_duration_minutes = TIMESTAMPDIFF(MINUTE, actual_start_time, ?)';
-        params.push(actual_end_time, actual_end_time);
+        params.push(actualEndTime, actualEndTime);
       }
 
       query += ' WHERE id = ?';
@@ -369,7 +375,7 @@ class ProductionPlanningController {
         message: 'Schedule item status updated successfully'
       });
     } catch (error) {
-      logger.error('Error updating schedule item status:', error);
+      logger.error(`Error updating schedule item status: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to update schedule item status',
@@ -407,7 +413,7 @@ class ProductionPlanningController {
         message: 'Production schedule approved successfully'
       });
     } catch (error) {
-      logger.error('Error approving production schedule:', error);
+      logger.error(`Error approving production schedule: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to approve production schedule',
@@ -423,19 +429,22 @@ class ProductionPlanningController {
   // Get waste categories
   async getWasteCategories(req, res) {
     try {
-      const { waste_type, is_active } = req.query;
+      const {
+        waste_type: wasteType,
+        is_active: isActive
+      } = req.query;
 
       let query = 'SELECT * FROM waste_categories WHERE 1=1';
       const params = [];
 
-      if (waste_type) {
+      if (wasteType) {
         query += ' AND waste_type = ?';
-        params.push(waste_type);
+        params.push(wasteType);
       }
 
-      if (is_active !== undefined) {
+      if (isActive !== undefined) {
         query += ' AND is_active = ?';
-        params.push(is_active === 'true' ? 1 : 0);
+        params.push(isActive === 'true' ? 1 : 0);
       }
 
       query += ' ORDER BY waste_type, category_name ASC';
@@ -447,7 +456,7 @@ class ProductionPlanningController {
         data: categories
       });
     } catch (error) {
-      logger.error('Error fetching waste categories:', error);
+      logger.error(`Error fetching waste categories: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch waste categories',
@@ -460,76 +469,96 @@ class ProductionPlanningController {
   async getWasteRecords(req, res) {
     try {
       const {
-        work_order_id,
-        waste_category_id,
-        from_date,
-        to_date,
+        work_order_id: workOrderId,
+        waste_category_id: wasteCategoryId,
+        from_date: fromDate,
+        to_date: toDate,
         page = 1,
         limit = 20
       } = req.query;
 
-      const offset = (page - 1) * limit;
+      const parsedPage = Number.parseInt(page, 10);
+      const pageNumber = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+      const parsedLimit = Number.parseInt(limit, 10);
+      const limitNumber = Number.isNaN(parsedLimit) || parsedLimit < 1
+        ? 20
+        : Math.min(parsedLimit, 100);
+      const offset = (pageNumber - 1) * limitNumber;
+      const limitClause = `LIMIT ${limitNumber} OFFSET ${offset}`;
 
-      let query = `
+      const filters = [];
+      const filterParams = [];
+
+      if (workOrderId) {
+        filters.push('pwr.work_order_id = ?');
+        filterParams.push(workOrderId);
+      }
+
+      if (wasteCategoryId) {
+        filters.push('pwr.waste_category_id = ?');
+        filterParams.push(wasteCategoryId);
+      }
+
+      if (fromDate) {
+        filters.push('pwr.waste_date >= ?');
+        filterParams.push(fromDate);
+      }
+
+      if (toDate) {
+        filters.push('pwr.waste_date <= ?');
+        filterParams.push(toDate);
+      }
+
+      const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+
+      const dataQuery = `
         SELECT 
           pwr.*,
           wo.work_order_number,
           wc.category_name as waste_category_name,
           wc.waste_type,
-          CONCAT(operator.first_name, ' ', operator.last_name) as responsible_operator_name,
-          CONCAT(reporter.first_name, ' ', reporter.last_name) as reported_by_name
+          operator.full_name as responsible_operator_name,
+          reporter.full_name as reported_by_name,
+          pwr.waste_quantity as quantity_wasted,
+          COALESCE(pwr.total_cost / NULLIF(pwr.waste_quantity, 0), 0) as unit_cost,
+          COALESCE(pwr.total_cost, 0) as total_waste_cost
         FROM production_waste_records pwr
         INNER JOIN manufacturing_work_orders wo ON pwr.work_order_id = wo.id
         INNER JOIN waste_categories wc ON pwr.waste_category_id = wc.id
         LEFT JOIN users operator ON pwr.responsible_operator_id = operator.id
         LEFT JOIN users reporter ON pwr.reported_by = reporter.id
-        WHERE 1=1
+        ${whereClause}
+        ORDER BY pwr.waste_date DESC
+        ${limitClause}
       `;
-      const params = [];
 
-      if (work_order_id) {
-        query += ' AND pwr.work_order_id = ?';
-        params.push(work_order_id);
-      }
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM production_waste_records pwr
+        INNER JOIN manufacturing_work_orders wo ON pwr.work_order_id = wo.id
+        INNER JOIN waste_categories wc ON pwr.waste_category_id = wc.id
+        LEFT JOIN users operator ON pwr.responsible_operator_id = operator.id
+        LEFT JOIN users reporter ON pwr.reported_by = reporter.id
+        ${whereClause}
+      `;
 
-      if (waste_category_id) {
-        query += ' AND pwr.waste_category_id = ?';
-        params.push(waste_category_id);
-      }
+      const [countResult] = await db.execute(countQuery, filterParams);
+      const total = countResult[0]?.total || 0;
 
-      if (from_date) {
-        query += ' AND pwr.waste_date >= ?';
-        params.push(from_date);
-      }
-
-      if (to_date) {
-        query += ' AND pwr.waste_date <= ?';
-        params.push(to_date);
-      }
-
-      // Get total count
-      const countQuery = query.replace(/SELECT.*?FROM/, 'SELECT COUNT(*) as total FROM');
-      const [countResult] = await db.execute(countQuery, params);
-      const total = countResult[0].total;
-
-      // Get paginated results
-      query += ' ORDER BY pwr.waste_date DESC LIMIT ? OFFSET ?';
-      params.push(parseInt(limit), parseInt(offset));
-
-      const [records] = await db.execute(query, params);
+      const [records] = await db.execute(dataQuery, filterParams);
 
       res.json({
         success: true,
         data: records,
         pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
+          page: pageNumber,
+          limit: limitNumber,
           total,
-          totalPages: Math.ceil(total / limit)
+          totalPages: total > 0 ? Math.ceil(total / limitNumber) : 0
         }
       });
     } catch (error) {
-      logger.error('Error fetching waste records:', error);
+      logger.error(`Error fetching waste records: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch waste records',
@@ -542,22 +571,22 @@ class ProductionPlanningController {
   async recordWaste(req, res) {
     try {
       const {
-        work_order_id,
-        waste_category_id,
-        waste_quantity,
-        waste_unit,
-        material_cost,
-        labor_cost,
-        overhead_cost,
-        waste_reason,
-        root_cause,
-        corrective_action,
-        responsible_operator_id,
-        waste_date
+        work_order_id: workOrderId,
+        waste_category_id: wasteCategoryId,
+        waste_quantity: wasteQuantity,
+        waste_unit: wasteUnit,
+        material_cost: materialCost,
+        labor_cost: laborCost,
+        overhead_cost: overheadCost,
+        waste_reason: wasteReason,
+        root_cause: rootCause,
+        corrective_action: correctiveAction,
+        responsible_operator_id: responsibleOperatorId,
+        waste_date: wasteDate
       } = req.body;
 
       // Validate required fields
-      if (!work_order_id || !waste_category_id || !waste_quantity || !waste_unit) {
+      if (!workOrderId || !wasteCategoryId || !wasteQuantity || !wasteUnit) {
         return res.status(400).json({
           success: false,
           message: 'Missing required fields: work_order_id, waste_category_id, waste_quantity, waste_unit'
@@ -565,7 +594,7 @@ class ProductionPlanningController {
       }
 
       // Calculate total cost
-      const total_cost = (material_cost || 0) + (labor_cost || 0) + (overhead_cost || 0);
+      const totalCost = (materialCost || 0) + (laborCost || 0) + (overheadCost || 0);
 
       const query = `
         INSERT INTO production_waste_records 
@@ -576,20 +605,20 @@ class ProductionPlanningController {
       `;
 
       const [result] = await db.execute(query, [
-        work_order_id,
-        waste_category_id,
-        waste_quantity,
-        waste_unit,
-        material_cost || 0,
-        labor_cost || 0,
-        overhead_cost || 0,
-        total_cost,
-        waste_reason,
-        root_cause,
-        corrective_action,
-        responsible_operator_id || null,
+        workOrderId,
+        wasteCategoryId,
+        wasteQuantity,
+        wasteUnit,
+        materialCost || 0,
+        laborCost || 0,
+        overheadCost || 0,
+        totalCost,
+        wasteReason,
+        rootCause,
+        correctiveAction,
+        responsibleOperatorId || null,
         req.user.id,
-        waste_date || new Date().toISOString().split('T')[0]
+        wasteDate || new Date().toISOString().split('T')[0]
       ]);
 
       res.status(201).json({
@@ -598,7 +627,7 @@ class ProductionPlanningController {
         data: { id: result.insertId }
       });
     } catch (error) {
-      logger.error('Error recording waste:', error);
+      logger.error(`Error recording waste: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to record waste',
@@ -610,7 +639,11 @@ class ProductionPlanningController {
   // Get waste analytics
   async getWasteAnalytics(req, res) {
     try {
-      const { from_date, to_date, waste_type } = req.query;
+      const {
+        from_date: fromDate,
+        to_date: toDate,
+        waste_type: wasteType
+      } = req.query;
 
       let query = `
         SELECT 
@@ -630,19 +663,19 @@ class ProductionPlanningController {
       `;
       const params = [];
 
-      if (from_date) {
+      if (fromDate) {
         query += ' AND pwr.waste_date >= ?';
-        params.push(from_date);
+        params.push(fromDate);
       }
 
-      if (to_date) {
+      if (toDate) {
         query += ' AND pwr.waste_date <= ?';
-        params.push(to_date);
+        params.push(toDate);
       }
 
-      if (waste_type) {
+      if (wasteType) {
         query += ' AND wc.waste_type = ?';
-        params.push(waste_type);
+        params.push(wasteType);
       }
 
       query += ' GROUP BY wc.id, wc.category_name, wc.waste_type, pwr.waste_unit';
@@ -655,7 +688,7 @@ class ProductionPlanningController {
         data: analytics
       });
     } catch (error) {
-      logger.error('Error fetching waste analytics:', error);
+      logger.error(`Error fetching waste analytics: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch waste analytics',
@@ -672,18 +705,55 @@ class ProductionPlanningController {
   async getOEERecords(req, res) {
     try {
       const {
-        machine_id,
-        manufacturing_unit_id,
-        from_date,
-        to_date,
-        oee_rating,
+        machine_id: machineId,
+        manufacturing_unit_id: manufacturingUnitId,
+        from_date: fromDate,
+        to_date: toDate,
+        oee_rating: oeeRating,
         page = 1,
         limit = 20
       } = req.query;
 
-      const offset = (page - 1) * limit;
+      const parsedPage = Number.parseInt(page, 10);
+      const pageNumber = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+      const parsedLimit = Number.parseInt(limit, 10);
+      const limitNumber = Number.isNaN(parsedLimit) || parsedLimit < 1
+        ? 20
+        : Math.min(parsedLimit, 100);
+      const offset = (pageNumber - 1) * limitNumber;
+      const limitClause = `LIMIT ${limitNumber} OFFSET ${offset}`;
 
-      let query = `
+      const filters = [];
+      const filterParams = [];
+
+      if (machineId) {
+        filters.push('oee.machine_id = ?');
+        filterParams.push(machineId);
+      }
+
+      if (manufacturingUnitId) {
+        filters.push('oee.manufacturing_unit_id = ?');
+        filterParams.push(manufacturingUnitId);
+      }
+
+      if (fromDate) {
+        filters.push('oee.record_date >= ?');
+        filterParams.push(fromDate);
+      }
+
+      if (toDate) {
+        filters.push('oee.record_date <= ?');
+        filterParams.push(toDate);
+      }
+
+      if (oeeRating) {
+        filters.push('oee.oee_rating = ?');
+        filterParams.push(oeeRating);
+      }
+
+      const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+
+      const dataQuery = `
         SELECT 
           oee.*,
           pm.machine_name,
@@ -694,58 +764,37 @@ class ProductionPlanningController {
         LEFT JOIN production_machines pm ON oee.machine_id = pm.id
         LEFT JOIN manufacturing_units mu ON oee.manufacturing_unit_id = mu.id
         LEFT JOIN manufacturing_work_orders wo ON oee.work_order_id = wo.id
-        WHERE 1=1
+        ${whereClause}
+        ORDER BY oee.record_date DESC, oee.oee_percentage DESC
+        ${limitClause}
       `;
-      const params = [];
 
-      if (machine_id) {
-        query += ' AND oee.machine_id = ?';
-        params.push(machine_id);
-      }
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM production_oee_records oee
+        LEFT JOIN production_machines pm ON oee.machine_id = pm.id
+        LEFT JOIN manufacturing_units mu ON oee.manufacturing_unit_id = mu.id
+        LEFT JOIN manufacturing_work_orders wo ON oee.work_order_id = wo.id
+        ${whereClause}
+      `;
 
-      if (manufacturing_unit_id) {
-        query += ' AND oee.manufacturing_unit_id = ?';
-        params.push(manufacturing_unit_id);
-      }
+      const [countResult] = await db.execute(countQuery, filterParams);
+      const total = countResult[0]?.total || 0;
 
-      if (from_date) {
-        query += ' AND oee.record_date >= ?';
-        params.push(from_date);
-      }
-
-      if (to_date) {
-        query += ' AND oee.record_date <= ?';
-        params.push(to_date);
-      }
-
-      if (oee_rating) {
-        query += ' AND oee.oee_rating = ?';
-        params.push(oee_rating);
-      }
-
-      // Get total count
-      const countQuery = query.replace(/SELECT.*?FROM/, 'SELECT COUNT(*) as total FROM');
-      const [countResult] = await db.execute(countQuery, params);
-      const total = countResult[0].total;
-
-      // Get paginated results
-      query += ' ORDER BY oee.record_date DESC, oee.oee_percentage DESC LIMIT ? OFFSET ?';
-      params.push(parseInt(limit), parseInt(offset));
-
-      const [records] = await db.execute(query, params);
+      const [records] = await db.execute(dataQuery, filterParams);
 
       res.json({
         success: true,
         data: records,
         pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
+          page: pageNumber,
+          limit: limitNumber,
           total,
-          totalPages: Math.ceil(total / limit)
+          totalPages: total > 0 ? Math.ceil(total / limitNumber) : 0
         }
       });
     } catch (error) {
-      logger.error('Error fetching OEE records:', error);
+      logger.error(`Error fetching OEE records: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch OEE records',
@@ -758,23 +807,29 @@ class ProductionPlanningController {
   async calculateOEE(req, res) {
     try {
       const {
-        machine_id,
-        manufacturing_unit_id,
-        work_order_id,
-        record_date,
+        machine_id: machineId,
+        manufacturing_unit_id: manufacturingUnitId,
+        work_order_id: workOrderId,
+        record_date: recordDate,
         shift,
-        planned_production_time_minutes,
-        actual_runtime_minutes,
-        downtime_minutes = 0,
-        target_quantity,
-        actual_quantity,
-        good_quantity,
-        rejected_quantity = 0,
+        planned_production_time_minutes: plannedProductionTimeMinutes,
+        actual_runtime_minutes: actualRuntimeMinutes,
+        downtime_minutes: downtimeMinutes = 0,
+        target_quantity: targetQuantity,
+        actual_quantity: actualQuantity,
+        good_quantity: goodQuantity,
+        rejected_quantity: rejectedQuantity = 0,
         notes
       } = req.body;
 
       // Validate required fields
-      if (!planned_production_time_minutes || !actual_runtime_minutes || !target_quantity || !actual_quantity || !good_quantity) {
+      if (
+        !plannedProductionTimeMinutes ||
+        !actualRuntimeMinutes ||
+        !targetQuantity ||
+        !actualQuantity ||
+        !goodQuantity
+      ) {
         return res.status(400).json({
           success: false,
           message: 'Missing required fields for OEE calculation'
@@ -783,13 +838,13 @@ class ProductionPlanningController {
 
       // Calculate OEE components
       // Availability = (Actual Runtime / Planned Production Time) × 100
-      const availability = (actual_runtime_minutes / planned_production_time_minutes) * 100;
+      const availability = (actualRuntimeMinutes / plannedProductionTimeMinutes) * 100;
 
       // Performance = (Actual Quantity / Target Quantity) × 100
-      const performance = (actual_quantity / target_quantity) * 100;
+      const performance = (actualQuantity / targetQuantity) * 100;
 
       // Quality = (Good Quantity / Actual Quantity) × 100
-      const quality = (good_quantity / actual_quantity) * 100;
+      const quality = (goodQuantity / actualQuantity) * 100;
 
       // OEE = Availability × Performance × Quality / 10000
       const oee = (availability * performance * quality) / 10000;
@@ -805,18 +860,18 @@ class ProductionPlanningController {
       `;
 
       const [result] = await db.execute(query, [
-        machine_id || null,
-        manufacturing_unit_id || null,
-        work_order_id || null,
-        record_date || new Date().toISOString().split('T')[0],
+        machineId || null,
+        manufacturingUnitId || null,
+        workOrderId || null,
+        recordDate || new Date().toISOString().split('T')[0],
         shift,
-        planned_production_time_minutes,
-        actual_runtime_minutes,
-        downtime_minutes,
-        target_quantity,
-        actual_quantity,
-        good_quantity,
-        rejected_quantity,
+        plannedProductionTimeMinutes,
+        actualRuntimeMinutes,
+        downtimeMinutes,
+        targetQuantity,
+        actualQuantity,
+        goodQuantity,
+        rejectedQuantity,
         availability.toFixed(2),
         performance.toFixed(2),
         quality.toFixed(2),
@@ -837,7 +892,7 @@ class ProductionPlanningController {
         }
       });
     } catch (error) {
-      logger.error('Error calculating OEE:', error);
+      logger.error(`Error calculating OEE: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to calculate OEE',
@@ -849,7 +904,12 @@ class ProductionPlanningController {
   // Get OEE summary/dashboard
   async getOEESummary(req, res) {
     try {
-      const { machine_id, manufacturing_unit_id, from_date, to_date } = req.query;
+      const {
+        machine_id: machineId,
+        manufacturing_unit_id: manufacturingUnitId,
+        from_date: fromDate,
+        to_date: toDate
+      } = req.query;
 
       let query = `
         SELECT 
@@ -874,24 +934,24 @@ class ProductionPlanningController {
       `;
       const params = [];
 
-      if (machine_id) {
+      if (machineId) {
         query += ' AND oee.machine_id = ?';
-        params.push(machine_id);
+        params.push(machineId);
       }
 
-      if (manufacturing_unit_id) {
+      if (manufacturingUnitId) {
         query += ' AND oee.manufacturing_unit_id = ?';
-        params.push(manufacturing_unit_id);
+        params.push(manufacturingUnitId);
       }
 
-      if (from_date) {
+      if (fromDate) {
         query += ' AND oee.record_date >= ?';
-        params.push(from_date);
+        params.push(fromDate);
       }
 
-      if (to_date) {
+      if (toDate) {
         query += ' AND oee.record_date <= ?';
-        params.push(to_date);
+        params.push(toDate);
       }
 
       query += ' GROUP BY pm.id, pm.machine_name, mu.unit_name';
@@ -903,7 +963,7 @@ class ProductionPlanningController {
         data: summary
       });
     } catch (error) {
-      logger.error('Error fetching OEE summary:', error);
+      logger.error(`Error fetching OEE summary: ${error.message} | stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch OEE summary',

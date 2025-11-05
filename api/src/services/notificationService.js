@@ -9,38 +9,25 @@ class NotificationService {
     }
 
     async initializeEmailTransporter() {
+        if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER) {
+            logger.warn('Email configuration not set, skipping email transporter initialization');
+            return;
+        }
         try {
-            // Configure email transporter based on environment
-            if (process.env.EMAIL_HOST && process.env.EMAIL_USER) {
-                this.emailTransporter = nodemailer.createTransporter({
-                    host: process.env.EMAIL_HOST,
-                    port: process.env.EMAIL_PORT || 587,
-                    secure: process.env.EMAIL_SECURE === 'true',
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASSWORD
-                    }
-                });
-                
-                // Verify connection
-                await this.emailTransporter.verify();
-                logger.info('Email transporter initialized successfully');
-            } else {
-                // For development/testing - use ethereal
-                const testAccount = await nodemailer.createTestAccount();
-                this.emailTransporter = nodemailer.createTransporter({
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    secure: false,
-                    auth: {
-                        user: testAccount.user,
-                        pass: testAccount.pass
-                    }
-                });
-                logger.info('Using Ethereal test email service');
-            }
+            this.emailTransporter = nodemailer.createTransport({
+                host: process.env.EMAIL_HOST,
+                port: process.env.EMAIL_PORT || 587,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+            await this.emailTransporter.verify();
+            logger.info('Email transporter initialized successfully');
         } catch (error) {
-            logger.error('Failed to initialize email transporter:', error);
+            logger.warn('Failed to initialize email transporter, email notifications may not work:', error);
+            this.emailTransporter = null; // Explicitly set to null on failure
         }
     }
 
@@ -304,7 +291,7 @@ class NotificationService {
             
             <div class="footer">
                 <p>This is an automated notification from VTRIA ERP System.</p>
-                <p>© ${new Date().getFullYear()} VTRIA Engineering Solutions Pvt Ltd</p>
+                <p>  ${new Date().getFullYear()} VTRIA Engineering Solutions Pvt Ltd</p>
             </div>
         </body>
         </html>

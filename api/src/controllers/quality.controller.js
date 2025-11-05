@@ -193,6 +193,10 @@ class QualityController {
 
   // Get all quality inspections
   async getQualityInspections(req, res) {
+    logger.debug(`GET /api/production/quality/inspections started with query params: ${JSON.stringify(req.query)}`);
+    let query = '';
+    let filterParams = [];
+    let pagination = { limit: 20, offset: 0, page: 1 };
     try {
       const {
         inspection_type,
@@ -204,17 +208,34 @@ class QualityController {
         page = 1,
         limit = 20
       } = req.query;
+      // Validate parameters
+      if (from_date && isNaN(Date.parse(from_date))) {
+        logger.warn('Invalid from_date format');
+        return res.status(400).json({ success: false, message: 'Invalid from_date format' });
+      }
+      if (to_date && isNaN(Date.parse(to_date))) {
+        logger.warn('Invalid to_date format');
+        return res.status(400).json({ success: false, message: 'Invalid to_date format' });
+      }
+      if (work_order_id && isNaN(work_order_id)) {
+        logger.warn('Invalid work_order_id, must be a number');
+        return res.status(400).json({ success: false, message: 'Invalid work_order_id' });
+      }
+      const parsedLimit = parseInt(limit, 10);
+      const parsedPage = parseInt(page, 10);
+      const safeLimit = Number.isNaN(parsedLimit) ? 20 : Math.max(1, parsedLimit);
+      const safePage = Number.isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
+      const offset = (safePage - 1) * safeLimit;
+      pagination = { limit: safeLimit, offset, page: safePage };
 
-      const offset = (page - 1) * limit;
-
-      let query = `
+      query = `
         SELECT 
           qi.*,
-          wo.work_order_number,
-          mc.manufacturing_case_number,
-          p.name as product_name,
-          qc.checkpoint_name,
-          CONCAT(u.first_name, ' ', u.last_name) as inspector_name
+          COALESCE(wo.work_order_number, 'N/A') as work_order_number,
+          COALESCE(mc.manufacturing_case_number, 'N/A') as manufacturing_case_number,
+          COALESCE(p.name, 'N/A') as product_name,
+          COALESCE(qc.checkpoint_name, 'N/A') as checkpoint_name,
+          COALESCE(u.full_name, 'N/A') as inspector_name
         FROM quality_inspections_enhanced qi
         LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id
         LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id
@@ -223,62 +244,118 @@ class QualityController {
         LEFT JOIN users u ON qi.inspector_id = u.id
         WHERE 1=1
       `;
-      const params = [];
+      filterParams = [];
 
       if (inspection_type) {
         query += ' AND qi.inspection_type = ?';
-        params.push(inspection_type);
+        filterParams.push(inspection_type);
       }
 
       if (overall_result) {
         query += ' AND qi.overall_result = ?';
-        params.push(overall_result);
+        filterParams.push(overall_result);
       }
 
       if (status) {
         query += ' AND qi.status = ?';
-        params.push(status);
+        filterParams.push(status);
       }
 
       if (work_order_id) {
         query += ' AND qi.work_order_id = ?';
-        params.push(work_order_id);
+        filterParams.push(work_order_id);
       }
 
       if (from_date) {
         query += ' AND qi.inspection_date >= ?';
-        params.push(from_date);
+        filterParams.push(from_date);
       }
 
       if (to_date) {
         query += ' AND qi.inspection_date <= ?';
-        params.push(to_date);
+        filterParams.push(to_date);
+      }
+
+      query += ` ORDER BY qi.inspection_date DESC LIMIT ${safeLimit} OFFSET ${offset}`;
+
+      logger.debug(`Executing main query: ${query}`);
+      logger.debug(`Main query params: ${JSON.stringify(filterParams)}`);
+      logger.debug('Executing query...');
+      const [inspections] = await db.execute(query, filterParams);
+      logger.debug(`Query executed successfully, rows returned: ${inspections.length}`);
+
+      if (inspections.length === 0) {
+        logger.info('No quality inspections found, returning empty array');
+        return res.json({
+          success: true,
+          data: [],
+          pagination: {
+            page: safePage,
+            limit: safeLimit,
+            total: 0
+          }
+        });
       }
 
       // Get total count
-      const countQuery = query.replace(/SELECT.*?FROM/, 'SELECT COUNT(*) as total FROM');
-      const [countResult] = await db.execute(countQuery, params);
-      const total = countResult && countResult.length > 0 ? countResult[0].total : 0;
+      let countQuery = `
+        SELECT COUNT(*) as total 
+        FROM quality_inspections_enhanced qi
+        WHERE 1=1`;
+      if (inspection_type) {
+        countQuery += ' AND inspection_type = ?';
+      }
+      if (overall_result) {
+        countQuery += ' AND overall_result = ?';
+      }
+      if (status) {
+        countQuery += ' AND status = ?';
+      }
+      if (work_order_id) {
+        countQuery += ' AND work_order_id = ?';
+      }
+      if (from_date) {
+        countQuery += ' AND inspection_date >= ?';
+      }
+      if (to_date) {
+        countQuery += ' AND inspection_date <= ?';
+      }
+      logger.debug(`Executing count query: ${countQuery}`);
+      logger.debug(`Count query params: ${JSON.stringify(filterParams)}`);
+      const [countResult] = await db.execute(countQuery, filterParams);
 
-      // Get paginated results
-      query += ' ORDER BY qi.inspection_date DESC LIMIT ? OFFSET ?';
-      params.push(parseInt(limit), parseInt(offset));
-
-      const [inspections] = await db.execute(query, params);
-
-      // Parse JSON fields
       inspections.forEach(inspection => {
         if (inspection.inspection_criteria && typeof inspection.inspection_criteria === 'string') {
-          inspection.inspection_criteria = JSON.parse(inspection.inspection_criteria);
+          try {
+            inspection.inspection_criteria = JSON.parse(inspection.inspection_criteria);
+          } catch (parseError) {
+            logger.warn(`Failed to parse inspection_criteria for ID ${inspection.id}: ${parseError.message}`);
+            inspection.inspection_criteria = null;
+          }
         }
         if (inspection.defects_found && typeof inspection.defects_found === 'string') {
-          inspection.defects_found = JSON.parse(inspection.defects_found);
+          try {
+            inspection.defects_found = JSON.parse(inspection.defects_found);
+          } catch (parseError) {
+            logger.warn(`Failed to parse defects_found for ID ${inspection.id}: ${parseError.message}`);
+            inspection.defects_found = null;
+          }
         }
         if (inspection.measurements && typeof inspection.measurements === 'string') {
-          inspection.measurements = JSON.parse(inspection.measurements);
+          try {
+            inspection.measurements = JSON.parse(inspection.measurements);
+          } catch (parseError) {
+            logger.warn(`Failed to parse measurements for ID ${inspection.id}: ${parseError.message}`);
+            inspection.measurements = null;
+          }
         }
         if (inspection.attachments && typeof inspection.attachments === 'string') {
-          inspection.attachments = JSON.parse(inspection.attachments);
+          try {
+            inspection.attachments = JSON.parse(inspection.attachments);
+          } catch (parseError) {
+            logger.warn(`Failed to parse attachments for ID ${inspection.id}: ${parseError.message}`);
+            inspection.attachments = null;
+          }
         }
       });
 
@@ -286,14 +363,14 @@ class QualityController {
         success: true,
         data: inspections,
         pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          totalPages: Math.ceil(total / limit)
+          page: safePage,
+          limit: safeLimit,
+          total: countResult[0].total  // Note: Total count logic was missing; add it if needed
         }
       });
     } catch (error) {
-      logger.error('Error fetching quality inspections:', error);
+      const errorContext = JSON.stringify({ query, filterParams, pagination });
+      logger.error(`Error in getQualityInspections: ${error.message}; context=${errorContext}`);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch quality inspections',
@@ -314,8 +391,8 @@ class QualityController {
           mc.manufacturing_case_number,
           p.name as product_name,
           qc.checkpoint_name,
-          CONCAT(inspector.first_name, ' ', inspector.last_name) as inspector_name,
-          CONCAT(approver.first_name, ' ', approver.last_name) as approved_by_name
+          inspector.full_name as inspector_name,
+          approver.full_name as approved_by_name
         FROM quality_inspections_enhanced qi
         LEFT JOIN manufacturing_work_orders wo ON qi.work_order_id = wo.id
         LEFT JOIN manufacturing_cases mc ON qi.manufacturing_case_id = mc.id
@@ -337,18 +414,44 @@ class QualityController {
 
       const inspection = inspections[0];
 
+      if (!inspection.work_order_number) inspection.work_order_number = 'N/A';
+      if (!inspection.manufacturing_case_number) inspection.manufacturing_case_number = 'N/A';
+      if (!inspection.product_name) inspection.product_name = 'N/A';
+      if (!inspection.checkpoint_name) inspection.checkpoint_name = 'N/A';
+      if (!inspection.inspector_name) inspection.inspector_name = 'N/A';
+
       // Parse JSON fields
       if (inspection.inspection_criteria && typeof inspection.inspection_criteria === 'string') {
-        inspection.inspection_criteria = JSON.parse(inspection.inspection_criteria);
+        try {
+          inspection.inspection_criteria = JSON.parse(inspection.inspection_criteria);
+        } catch (parseError) {
+          logger.warn(`Failed to parse inspection_criteria for ID ${inspection.id}: ${parseError.message}`);
+          inspection.inspection_criteria = null;
+        }
       }
       if (inspection.defects_found && typeof inspection.defects_found === 'string') {
-        inspection.defects_found = JSON.parse(inspection.defects_found);
+        try {
+          inspection.defects_found = JSON.parse(inspection.defects_found);
+        } catch (parseError) {
+          logger.warn(`Failed to parse defects_found for ID ${inspection.id}: ${parseError.message}`);
+          inspection.defects_found = null;
+        }
       }
       if (inspection.measurements && typeof inspection.measurements === 'string') {
-        inspection.measurements = JSON.parse(inspection.measurements);
+        try {
+          inspection.measurements = JSON.parse(inspection.measurements);
+        } catch (parseError) {
+          logger.warn(`Failed to parse measurements for ID ${inspection.id}: ${parseError.message}`);
+          inspection.measurements = null;
+        }
       }
       if (inspection.attachments && typeof inspection.attachments === 'string') {
-        inspection.attachments = JSON.parse(inspection.attachments);
+        try {
+          inspection.attachments = JSON.parse(inspection.attachments);
+        } catch (parseError) {
+          logger.warn(`Failed to parse attachments for ID ${inspection.id}: ${parseError.message}`);
+          inspection.attachments = null;
+        }
       }
 
       // Get defect records
@@ -357,7 +460,7 @@ class QualityController {
           qdr.*,
           qdt.defect_name,
           qdt.category as defect_category,
-          CONCAT(u.first_name, ' ', u.last_name) as responsible_person_name
+          u.full_name as responsible_person_name
         FROM quality_defect_records qdr
         LEFT JOIN quality_defect_types qdt ON qdr.defect_type_id = qdt.id
         LEFT JOIN users u ON qdr.responsible_person_id = u.id
@@ -704,7 +807,7 @@ class QualityController {
           qdt.defect_name,
           qdt.defect_code,
           qdt.category as defect_category,
-          CONCAT(u.first_name, ' ', u.last_name) as responsible_person_name
+          u.full_name as responsible_person_name
         FROM quality_defect_records qdr
         INNER JOIN quality_defect_types qdt ON qdr.defect_type_id = qdt.id
         LEFT JOIN users u ON qdr.responsible_person_id = u.id
@@ -833,7 +936,7 @@ class QualityController {
           qdt.defect_code,
           qdt.category,
           qdr.severity,
-          COUNT(qdr.id) as defect_count,
+          COUNT(qdr.id) as defect_occurrence_count,
           SUM(qdr.defect_count) as total_defects,
           SUM(qdr.cost_impact) as total_cost_impact,
           AVG(qdr.cost_impact) as avg_cost_per_defect,

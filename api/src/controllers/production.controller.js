@@ -414,7 +414,7 @@ class ProductionController {
 
       // Get manufacturing cases count
       const [caseStats] = await db.execute(`
-        SELECT COUNT(*) as total_cases FROM manufacturing_cases WHERE deleted_at IS NULL
+        SELECT COUNT(*) as total_cases FROM manufacturing_cases
       `);
 
       // Get BOM count

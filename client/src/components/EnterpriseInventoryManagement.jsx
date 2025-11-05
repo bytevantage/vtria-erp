@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -177,7 +177,7 @@ const EnterpriseInventoryManagement = () => {
         setSerialNumberText(next);
         setPurchaseForm(prev => ({ ...prev, serial_numbers: next }));
         setTimeout(() => {
-          try { ta.selectionStart = ta.selectionEnd = start + 1; } catch {}
+          try { ta.selectionStart = ta.selectionEnd = start + 1; } catch { }
         }, 0);
       }
     };
@@ -2639,7 +2639,7 @@ const EnterpriseInventoryManagement = () => {
                       setSerialNumberText(next);
                       setPurchaseForm(prev => ({ ...prev, serial_numbers: next }));
                       setTimeout(() => {
-                        try { ta.selectionStart = ta.selectionEnd = start + 1; } catch {}
+                        try { ta.selectionStart = ta.selectionEnd = start + 1; } catch { }
                       }, 0);
                       return;
                     }

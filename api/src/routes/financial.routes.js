@@ -35,7 +35,7 @@ router.get('/dashboard/kpis', (req, res) => financialController.getDashboardKPIs
 router.get('/cash-flow', (req, res) => financialController.getCashFlowData(req, res));
 router.get('/profit-loss', (req, res) => financialController.getProfitLossData(req, res));
 router.get('/customer-outstanding', (req, res) => financialController.getCustomerOutstanding(req, res));
-router.get('/alerts', financialController.getFinancialAlerts);
+router.get('/alerts', (req, res) => financialController.getFinancialAlerts(req, res));
 
 // Invoice Management Routes
 router.get('/invoices', async (req, res) => {
@@ -183,7 +183,7 @@ router.post('/invoices', async (req, res) => {
 
         // Generate invoice number
         const [lastInvoice] = await db.execute(
-            "SELECT invoice_number FROM invoices ORDER BY created_at DESC LIMIT 1"
+            'SELECT invoice_number FROM invoices ORDER BY created_at DESC LIMIT 1'
         );
 
         let invoiceNumber;
@@ -254,41 +254,41 @@ router.get('/payments', async (req, res) => {
         } = req.query;
 
         const offset = (page - 1) * limit;
-        let whereClause = "WHERE 1=1";
+        let whereClause = 'WHERE 1=1';
         const params = [];
 
         if (payment_type) {
-            whereClause += " AND payment_type = ?";
+            whereClause += ' AND payment_type = ?';
             params.push(payment_type);
         }
 
         if (party_type) {
-            whereClause += " AND party_type = ?";
+            whereClause += ' AND party_type = ?';
             params.push(party_type);
         }
 
         if (payment_method) {
-            whereClause += " AND payment_method = ?";
+            whereClause += ' AND payment_method = ?';
             params.push(payment_method);
         }
 
         if (payment_status) {
-            whereClause += " AND payment_status = ?";
+            whereClause += ' AND payment_status = ?';
             params.push(payment_status);
         }
 
         if (from_date) {
-            whereClause += " AND payment_date >= ?";
+            whereClause += ' AND payment_date >= ?';
             params.push(from_date);
         }
 
         if (to_date) {
-            whereClause += " AND payment_date <= ?";
+            whereClause += ' AND payment_date <= ?';
             params.push(to_date);
         }
 
         if (search) {
-            whereClause += " AND (payment_number LIKE ? OR party_name LIKE ?)";
+            whereClause += ' AND (payment_number LIKE ? OR party_name LIKE ?)';
             params.push(`%${search}%`, `%${search}%`);
         }
 
@@ -321,7 +321,7 @@ router.get('/payments', async (req, res) => {
         const [payments] = await db.execute(query);
 
         // Get total count for pagination
-        const [countResult] = await db.execute(`SELECT COUNT(*) as total FROM payments`);
+        const [countResult] = await db.execute('SELECT COUNT(*) as total FROM payments');
         const total = countResult[0].total;
 
         res.json({
@@ -368,7 +368,7 @@ router.post('/payments', async (req, res) => {
 
         // Generate payment number
         const [lastPayment] = await db.execute(
-            "SELECT payment_number FROM payments ORDER BY created_at DESC LIMIT 1"
+            'SELECT payment_number FROM payments ORDER BY created_at DESC LIMIT 1'
         );
 
         let paymentNumber;

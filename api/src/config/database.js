@@ -14,8 +14,6 @@ const pool = mysql.createPool({
     keepAliveInitialDelay: 0,
     // Connection timeouts
     connectTimeout: 10000,
-    acquireTimeout: 10000,
-    timeout: 60000
 });
 
 const promisePool = pool.promise();
@@ -51,13 +49,14 @@ pool.on('error', (err) => {
 });
 
 // Test database connection on startup
-promisePool.execute('SELECT 1')
-    .then(() => {
-        console.log('✅ Database connection successful');
+promisePool.execute('SELECT 1 as test')
+    .then((result) => {
+        console.log('✅ Database connection successful, result:', result);
         console.log(`📊 Connection pool configured: ${pool.config.connectionLimit} max connections`);
     })
     .catch((err) => {
         console.error('❌ Database connection failed:', err.message);
+        console.error('Full error:', err);
         console.error('Server will continue running with limited functionality');
     });
 
@@ -72,3 +71,29 @@ promisePool.getPoolStats = () => {
 };
 
 module.exports = promisePool;
+
+// Also export the raw pool for direct connection access
+module.exports.pool = pool;
+
+// Export a direct query function
+module.exports.queryDirect = async (sql, params = []) => {
+  const mysql = require('mysql2');
+  const connection = mysql.createConnection({
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER || 'vtria_user',
+    password: process.env.DB_PASS || 'dev_password',
+    database: process.env.DB_NAME || 'vtria_erp'
+  });
+
+  return new Promise((resolve, reject) => {
+    connection.execute(sql, params, (error, results) => {
+      connection.end();
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(results);
+    });
+  });
+};

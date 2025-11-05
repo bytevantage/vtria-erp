@@ -1,0 +1,75 @@
+{
+  "version": "demo",
+  "environment": "demo",
+  "app": {
+    "name": "VTRIA ERP - Demo Version",
+    "description": "Demonstration version for client presentations",
+    "logo": "/assets/logo-demo.png",
+    "theme": "demo",
+    "footer": "© 2024 Bytevantage Enterprise Solutions - Demo Version"
+  },
+  "features": {
+    "demo_mode": true,
+    "sample_data": true,
+    "reset_data": true,
+    "time_limit": "2h",
+    "max_users": 5,
+    "modules": {
+      "employee_management": true,
+      "production_planning": true,
+      "quality_control": true,
+      "financial_dashboard": true,
+      "sales_orders": true,
+      "shop_floor": true,
+      "inventory": true,
+      "attendance": true,
+      "reports": true
+    },
+    "restricted_features": [
+      "user_management",
+      "system_settings",
+      "database_backup",
+      "api_access",
+      "export_data"
+    ]
+  },
+  "security": {
+    "session_timeout": 7200,
+    "password_complexity": "low",
+    "two_factor_auth": false,
+    "ip_whitelist": false,
+    "audit_logging": false
+  },
+  "database": {
+    "auto_seed": true,
+    "sample_data_path": "./sql/demo-data",
+    "reset_on_restart": false,
+    "backup_enabled": false
+  },
+  "ui": {
+    "demo_banner": true,
+    "help_text": true,
+    "tooltips": true,
+    "tutorial_mode": true,
+    "reset_button": true
+  },
+  "api": {
+    "rate_limiting": false,
+    "api_keys": false,
+    "webhooks": false,
+    "integrations": false
+  },
+  "notifications": {
+    "email": false,
+    "sms": false,
+    "push": false,
+    "in_app": true
+  },
+  "deployment": {
+    "type": "docker",
+    "single_container": true,
+    "external_database": false,
+    "ssl_required": false,
+    "domain": "demo.vtria-erp.com"
+  }
+}

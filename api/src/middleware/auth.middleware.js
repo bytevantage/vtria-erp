@@ -62,12 +62,14 @@ const ROLE_PERMISSIONS = {
 
 class AuthMiddleware {
     static verifyToken(req, res, next) {
+        console.log('DEBUG: verifyToken called, BYPASS_AUTH:', process.env.BYPASS_AUTH);
         // Development bypass check
-        if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
-            req.user = { 
-                id: 1, 
+        if (process.env.BYPASS_AUTH === 'true') {
+            req.user = {
+                id: 1,
+                email: 'director@vtria.com',
                 role: 'director',
-                permissions: ROLE_PERMISSIONS.director 
+                permissions: ROLE_PERMISSIONS.director
             };
             return next();
         }
@@ -94,7 +96,7 @@ class AuthMiddleware {
     static hasRole(allowedRoles) {
         return (req, res, next) => {
             // Development bypass check
-            if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+            if (process.env.BYPASS_AUTH === 'true') {
                 return next();
             }
 
@@ -113,7 +115,7 @@ class AuthMiddleware {
     static hasPermission(permission) {
         return (req, res, next) => {
             // Development bypass check
-            if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+            if (process.env.BYPASS_AUTH === 'true') {
                 return next();
             }
 
@@ -133,7 +135,7 @@ class AuthMiddleware {
     static canAccessModule(moduleName) {
         return (req, res, next) => {
             // Development bypass check
-            if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+            if (process.env.BYPASS_AUTH === 'true') {
                 return next();
             }
 
@@ -154,7 +156,7 @@ class AuthMiddleware {
     static hasLocation(allowedLocations) {
         return (req, res, next) => {
             // Development bypass check
-            if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+            if (process.env.BYPASS_AUTH === 'true') {
                 return next();
             }
 
