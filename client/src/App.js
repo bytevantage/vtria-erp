@@ -23,6 +23,7 @@ import LicenseValidation from './components/LicenseValidation';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { getBasePath } from './utils/pathUtils';
 import './App.css';
 
 // Import Auth components
@@ -540,8 +541,9 @@ function App() {
 }
 
 export default function AppWrapper() {
+  const basePath = getBasePath();
   return (
-    <Router basename="">
+    <Router basename={basePath}>
       <LicenseProvider>
         <AuthProvider>
           <App />

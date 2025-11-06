@@ -3,6 +3,8 @@
  * Handles token management and redirects for unauthorized access
  */
 
+import { redirectWithBase } from './pathUtils';
+
 // Get authentication headers for API calls
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('vtria_token');
@@ -10,7 +12,7 @@ export const getAuthHeaders = () => {
   if (!token) {
     // In production, redirect to login if no token
     if (process.env.NODE_ENV === 'production') {
-      window.location.href = '/login';
+      redirectWithBase('/login');
       return null;
     }
     throw new Error('Authentication token not found. Please login.');

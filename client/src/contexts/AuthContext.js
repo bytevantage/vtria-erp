@@ -7,6 +7,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
+import { redirectWithBase } from '../utils/pathUtils';
 
 // Initial state
 const initialState = {
@@ -106,7 +107,7 @@ export const AuthProvider = ({ children }) => {
 
           // Force redirect to login after a short delay
           setTimeout(() => {
-            window.location.href = '/login';
+            redirectWithBase('/login');
           }, 1000);
         }
         return Promise.reject(error);

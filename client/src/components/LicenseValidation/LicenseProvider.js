@@ -6,6 +6,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Alert, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 import axios from 'axios';
+import { redirectWithBase } from '../../utils/pathUtils';
 
 const LicenseContext = createContext();
 
@@ -128,7 +129,7 @@ export const LicenseProvider = ({ children }) => {
   const handleInvalidLicenseClose = () => {
     setShowInvalidDialog(false);
     // Redirect to login or contact admin
-    window.location.href = '/vtria-erp/login';
+    redirectWithBase('/login');
   };
 
   const value = {
