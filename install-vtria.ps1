@@ -93,7 +93,8 @@ JWT_SECRET=vtria_production_secret_key_$(Get-Random -Minimum 100000 -Maximum 999
 # Build and start containers
 Write-Host "Building and starting VTRIA ERP containers..." -ForegroundColor Cyan
 
-docker-compose down
+# Stop and remove any existing containers and volumes to force fresh database initialization
+docker-compose down -v
 docker-compose build --no-cache
 docker-compose up -d
 
@@ -102,7 +103,8 @@ $appUrl = "http://localhost:8000"
 
 # Wait for services to start
 Write-Host "Waiting for services to start..." -ForegroundColor Cyan
-Start-Sleep -Seconds 10
+Write-Host "Initializing database with all schema files..." -ForegroundColor Yellow
+Start-Sleep -Seconds 15
 
 # Wait for database to be ready
 Write-Host "Waiting for database to be ready..." -ForegroundColor Yellow
@@ -132,6 +134,15 @@ if (-not $dbReady) {
 # Wait for API to be ready
 Write-Host "Waiting for API to be ready..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
+
+# Verify database tables were created
+Write-Host "Verifying database initialization..." -ForegroundColor Yellow
+$tableCount = docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'vtria_erp';" 2>$null
+if ($tableCount -match '\d+' -and [int]$Matches[0] -gt 5) {
+    Write-Host "[OK] Database initialized with $($Matches[0]) tables" -ForegroundColor Green
+} else {
+    Write-Host "[WARNING] Database may not be fully initialized. Found tables: $tableCount" -ForegroundColor Yellow
+}
 
 # Create super admin account with secure password
 Write-Host "Creating secure super admin account..." -ForegroundColor Yellow

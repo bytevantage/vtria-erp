@@ -85,12 +85,14 @@ Write-Host "[OK] Environment configured" -ForegroundColor Green
 # Build and start containers
 Write-Host "Building and starting VTRIA ERP containers..." -ForegroundColor Cyan
 
-docker-compose down
+# Stop and remove any existing containers and volumes to force fresh database initialization
+docker-compose down -v
 docker-compose build --no-cache
 docker-compose up -d
 
 # Wait for services to start
 Write-Host "Waiting for services to start..." -ForegroundColor Cyan
+Write-Host "Initializing database with all schema files..." -ForegroundColor Yellow
 Start-Sleep -Seconds 45
 
 # Wait for database to be ready
@@ -117,6 +119,15 @@ if (-not $dbReady) {
     Write-Host "[ERROR] Database failed to start. Please check the logs." -ForegroundColor Red
     docker-compose logs db
     Exit 1
+}
+
+# Verify database tables were created
+Write-Host "Verifying database initialization..." -ForegroundColor Yellow
+$tableCount = docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'vtria_erp';" 2>$null
+if ($tableCount -match '\d+' -and [int]$Matches[0] -gt 5) {
+    Write-Host "[OK] Database initialized with $($Matches[0]) tables" -ForegroundColor Green
+} else {
+    Write-Host "[WARNING] Database may not be fully initialized. Found tables: $tableCount" -ForegroundColor Yellow
 }
 
 # Create super admin user
