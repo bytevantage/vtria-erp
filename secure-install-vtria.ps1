@@ -3,7 +3,7 @@
 
 param(
     [string]$AdminEmail = "admin@vtria.in",
-    [string]$AdminPassword = $null
+    [SecureString]$AdminPassword = $null
 )
 
 Write-Host "VTRIA ERP Secure Installation" -ForegroundColor Cyan
@@ -54,7 +54,11 @@ Write-Host "✅ Repository ready" -ForegroundColor Green
 
 # Generate secure default password if not provided
 if (-not $AdminPassword) {
-    $AdminPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
+    $plainPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
+    $AdminPassword = ConvertTo-SecureString -String $plainPassword -AsPlainText -Force
+} else {
+    # Convert SecureString back to plain text for database insertion
+    $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPassword))
 }
 
 # Create secure .env file
@@ -73,8 +77,7 @@ BYPASS_AUTH=false
 
 # Admin Account Configuration
 ADMIN_EMAIL=$AdminEmail
-ADMIN_PASSWORD=$AdminPassword
-"@
+"#
 
 $envContent | Out-File -FilePath ".env" -Encoding utf8
 Write-Host "✅ Environment configured" -ForegroundColor Green
@@ -120,7 +123,7 @@ if (-not $dbReady) {
 Write-Host "Creating super admin account..." -ForegroundColor Yellow
 
 # Hash the password (using PHP's password_hash equivalent)
-$hashedPassword = docker-compose exec -T api php -r "echo password_hash('$AdminPassword', PASSWORD_DEFAULT);"
+$hashedPassword = docker-compose exec -T api php -r "echo password_hash('$plainPassword', PASSWORD_DEFAULT);"
 
 # Insert super admin into database
 $createUserSql = @"
@@ -170,7 +173,7 @@ $resetScript | Out-File -FilePath "reset-admin-password.ps1" -Encoding utf8
 Write-Host "`n🎉 VTRIA ERP has been securely installed!" -ForegroundColor Green
 Write-Host "`n🔐 ADMIN CREDENTIALS:" -ForegroundColor Red
 Write-Host "📧 Email: $AdminEmail" -ForegroundColor White
-Write-Host "🔑 Password: $AdminPassword" -ForegroundColor White
+Write-Host "🔑 Password: $plainPassword" -ForegroundColor White
 Write-Host "`n⚠️  SECURITY WARNING:" -ForegroundColor Yellow
 Write-Host "1. Login immediately and change the password" -ForegroundColor Yellow
 Write-Host "2. Save these credentials securely" -ForegroundColor Yellow
