@@ -23,18 +23,27 @@ class PurchaseRequisitionController {
 
             const pr_id = result.insertId;
 
-            // Insert PR items
+            // Insert PR items (only actual parts, not headers)
             if (items && items.length > 0) {
-                const itemsQuery = 'INSERT INTO purchase_requisition_items (pr_id, product_id, quantity, estimated_price, notes) VALUES ?';
-                const itemsData = items.map(item => [
-                    pr_id,
-                    item.product_id,
-                    item.quantity,
-                    item.estimated_price,
-                    item.notes || null
-                ]);
+                // Filter out headers - only save items with product_id
+                const actualItems = items.filter(item => item.product_id !== null && item.product_id !== undefined);
+                
+                if (actualItems.length > 0) {
+                    const itemsQuery = 'INSERT INTO purchase_requisition_items (pr_id, product_id, item_name, description, hsn_code, unit, quantity, estimated_price, notes) VALUES ?';
+                    const itemsData = actualItems.map(item => [
+                        pr_id,
+                        item.product_id,
+                        item.item_name || item.product_name || '',
+                        item.description || '',
+                        item.hsn_code || '',
+                        item.unit || 'Nos',
+                        item.quantity,
+                        item.estimated_price,
+                        item.notes || null
+                    ]);
 
-                await db.query(itemsQuery, [itemsData]);
+                    await db.query(itemsQuery, [itemsData]);
+                }
             }
 
             res.json({
