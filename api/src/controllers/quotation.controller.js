@@ -17,11 +17,17 @@ exports.getAllQuotations = async (req, res) => {
                 e.estimation_id AS estimation_code,
                 e.total_mrp,
                 e.total_final_price,
-                CASE 
-                    WHEN e.total_mrp IS NOT NULL AND e.total_final_price IS NOT NULL AND e.total_mrp > 0 
-                        THEN ROUND( ( (e.total_mrp - e.total_final_price) / e.total_mrp ) * 100, 2)
-                    ELSE NULL
-                END AS profit_percentage_calculated,
+                (
+                    SELECT 
+                        CASE 
+                            WHEN SUM(qi.amount) > 0 AND SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * qi.quantity) > 0
+                                THEN ROUND( ( (SUM(qi.amount) - SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * qi.quantity)) / SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * qi.quantity) ) * 100, 2)
+                            ELSE 0
+                        END
+                    FROM quotation_items qi
+                    LEFT JOIN products p ON qi.item_name = p.name
+                    WHERE qi.quotation_id = q.id
+                ) AS profit_percentage_calculated,
                 se.enquiry_id,
                 se.project_name,
                 c.company_name as client_name,
@@ -55,11 +61,17 @@ exports.getAllQuotations = async (req, res) => {
                 e.estimation_id AS estimation_code,
                 e.total_mrp,
                 e.total_final_price,
-                CASE 
-                    WHEN e.total_mrp IS NOT NULL AND e.total_final_price IS NOT NULL AND e.total_mrp > 0 
-                        THEN ROUND( ( (e.total_mrp - e.total_final_price) / e.total_mrp ) * 100, 2)
-                    ELSE NULL
-                END AS profit_percentage_calculated,
+                (
+                    SELECT 
+                        CASE 
+                            WHEN SUM(ei.final_price * ei.quantity) > 0 AND SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * ei.quantity) > 0
+                                THEN ROUND( ( (SUM(ei.final_price * ei.quantity) - SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * ei.quantity)) / SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * ei.quantity) ) * 100, 2)
+                            ELSE 0
+                        END
+                    FROM estimation_items ei
+                    LEFT JOIN products p ON ei.product_id = p.id
+                    WHERE ei.estimation_id = e.id
+                ) AS profit_percentage_calculated,
                 se.enquiry_id,
                 se.project_name,
                 c.company_name as client_name,
