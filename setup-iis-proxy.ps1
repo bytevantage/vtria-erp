@@ -26,7 +26,6 @@ Write-Host "Installing IIS features..." -ForegroundColor Yellow
 Install-WindowsFeature -Name Web-Default-Doc, Web-Http-Redirect, Web-Static-Content, Web-Http-Logging, Web-Custom-Logging, Web-Filtering, Web-Net-Ext, Web-App-Dev, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Mgmt-Console, Web-Mgmt-Compat, Web-Metabase, Web-Lgcy-Mgmt-Console, Web-Lgcy-Scripting, Web-WMI, Web-Scripting-Tools, Web-Mgmt-Service, Web-Dyn-Compression, Web-Basic-Auth, Web-Windows-Auth, Web-Digest-Auth, Web-Client-Auth, Web-Cert-Auth, Web-Url-Auth, Web-IP-Security, Web-Url-Auth | Out-Null
 
 # Install URL Rewrite Module if not present
-$urlRewriteInstalled = Get-WebBinding -Name "Default Web Site" -Port 80 -ErrorAction SilentlyContinue
 if (-not (Test-Path "C:\Windows\System32\inetsrv\rewrite.dll")) {
     Write-Host "Installing URL Rewrite Module..." -ForegroundColor Yellow
     $urlRewriteUrl = "https://download.microsoft.com/download/C/9/E/C9E8180D-4E51-40A6-A9BF-776990D8BCA9/rewrite_2.1_rtw_x64.msi"
