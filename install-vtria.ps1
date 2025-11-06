@@ -151,24 +151,24 @@ Write-Host "Resetting super admin password..." -ForegroundColor Cyan
 `$newPasswordText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$newPassword))
 `$hashedPassword = docker-compose exec -T api php -r "echo password_hash('`$newPasswordText', PASSWORD_DEFAULT);"
 docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "UPDATE users SET password='`$hashedPassword', updated_at=NOW() WHERE is_super_admin=1;"
-Write-Host "✅ Password reset successfully" -ForegroundColor Green
+Write-Host "[SUCCESS] Password reset successfully" -ForegroundColor Green
 "@
 
 $resetScript | Out-File -FilePath "reset-admin-password.ps1" -Encoding utf8
 
 # Show completion message with security warning
-Write-Host "`n🎉 VTRIA ERP has been securely installed!" -ForegroundColor Green
-Write-Host "`n🔐 SUPER ADMIN CREDENTIALS:" -ForegroundColor Red
-Write-Host "📧 Email: admin@vtria.in" -ForegroundColor White
-Write-Host "🔑 Password: $adminPassword" -ForegroundColor White
-Write-Host "`n⚠️  SECURITY WARNING:" -ForegroundColor Yellow
+Write-Host "`n[SUCCESS] VTRIA ERP has been securely installed!" -ForegroundColor Green
+Write-Host "`n[ADMIN CREDENTIALS]:" -ForegroundColor Red
+Write-Host "Email: admin@vtria.in" -ForegroundColor White
+Write-Host "Password: $adminPassword" -ForegroundColor White
+Write-Host "`n[SECURITY WARNING]:" -ForegroundColor Yellow
 Write-Host "1. Login immediately and change the password" -ForegroundColor Yellow
 Write-Host "2. Save these credentials securely" -ForegroundColor Yellow
 Write-Host "3. Delete this installation script after setup" -ForegroundColor Yellow
 Write-Host "4. Use reset-admin-password.ps1 if you forget the password" -ForegroundColor Yellow
 
-Write-Host "`n🌐 Access VTRIA ERP at: $appUrl" -ForegroundColor Cyan
-Write-Host "`n📋 To manage VTRIA ERP:" -ForegroundColor White
+Write-Host "`nAccess VTRIA ERP at: $appUrl" -ForegroundColor Cyan
+Write-Host "`nTo manage VTRIA ERP:" -ForegroundColor White
 Write-Host "- Start: docker-compose up -d" -ForegroundColor White
 Write-Host "- Stop: docker-compose down" -ForegroundColor White
 Write-Host "- Reset password: .\reset-admin-password.ps1" -ForegroundColor White

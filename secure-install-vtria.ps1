@@ -26,7 +26,7 @@ try {
     Exit 1
 }
 
-Write-Host "✅ Docker is installed" -ForegroundColor Green
+Write-Host "[OK] Docker is installed" -ForegroundColor Green
 
 # Navigate to script directory
 Set-Location $PSScriptRoot
@@ -37,7 +37,7 @@ try {
 } catch {
     Write-Host "Installing Git..." -ForegroundColor Yellow
     winget install --id Git.Git -e --source winget
-    Write-Host "✅ Git installed" -ForegroundColor Green
+    Write-Host "[OK] Git installed" -ForegroundColor Green
 }
 
 # Clone or update repository
@@ -50,7 +50,7 @@ if (Test-Path ".git") {
     git checkout main
 }
 
-Write-Host "✅ Repository ready" -ForegroundColor Green
+Write-Host "[OK] Repository ready" -ForegroundColor Green
 
 # Generate secure default password if not provided
 if (-not $AdminPassword) {
@@ -80,7 +80,7 @@ ADMIN_EMAIL=$AdminEmail
 "#
 
 $envContent | Out-File -FilePath ".env" -Encoding utf8
-Write-Host "✅ Environment configured" -ForegroundColor Green
+Write-Host "[OK] Environment configured" -ForegroundColor Green
 
 # Build and start containers
 Write-Host "Building and starting VTRIA ERP containers..." -ForegroundColor Cyan
@@ -104,7 +104,7 @@ while (-not $dbReady -and $attempts -lt $maxAttempts) {
         $result = docker-compose exec -T db mysqladmin ping -h localhost -u vtria_user --password=dev_password 2>$null
         if ($result -match "mysqld is alive") {
             $dbReady = $true
-            Write-Host "✅ Database is ready" -ForegroundColor Green
+            Write-Host "[OK] Database is ready" -ForegroundColor Green
         }
     } catch {
         $attempts++
@@ -114,7 +114,7 @@ while (-not $dbReady -and $attempts -lt $maxAttempts) {
 }
 
 if (-not $dbReady) {
-    Write-Host "❌ Database failed to start. Please check the logs." -ForegroundColor Red
+    Write-Host "[ERROR] Database failed to start. Please check the logs." -ForegroundColor Red
     docker-compose logs db
     Exit 1
 }
@@ -134,9 +134,9 @@ ON DUPLICATE KEY UPDATE password='$hashedPassword', is_super_admin=1, updated_at
 
 try {
     docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "$createUserSql"
-    Write-Host "✅ Super admin account created" -ForegroundColor Green
+    Write-Host "[OK] Super admin account created" -ForegroundColor Green
 } catch {
-    Write-Host "❌ Failed to create super admin account" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to create super admin account" -ForegroundColor Red
     Write-Host "Please create admin account manually through the web interface." -ForegroundColor Yellow
 }
 
@@ -159,9 +159,9 @@ Write-Host "=====================================" -ForegroundColor Cyan
 
 try {
     docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "`$updateSql"
-    Write-Host "✅ Super admin password reset successfully" -ForegroundColor Green
+    Write-Host "[OK] Super admin password reset successfully" -ForegroundColor Green
 } catch {
-    Write-Host "❌ Failed to reset password" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to reset password" -ForegroundColor Red
 }
 
 Write-Host "You can now login with the new password." -ForegroundColor White
@@ -170,24 +170,24 @@ Write-Host "You can now login with the new password." -ForegroundColor White
 $resetScript | Out-File -FilePath "reset-admin-password.ps1" -Encoding utf8
 
 # Show completion message with security warning
-Write-Host "`n🎉 VTRIA ERP has been securely installed!" -ForegroundColor Green
-Write-Host "`n🔐 ADMIN CREDENTIALS:" -ForegroundColor Red
-Write-Host "📧 Email: $AdminEmail" -ForegroundColor White
-Write-Host "🔑 Password: $plainPassword" -ForegroundColor White
-Write-Host "`n⚠️  SECURITY WARNING:" -ForegroundColor Yellow
+Write-Host "`n[SUCCESS] VTRIA ERP has been securely installed!" -ForegroundColor Green
+Write-Host "`n[ADMIN CREDENTIALS]:" -ForegroundColor Red
+Write-Host "Email: $AdminEmail" -ForegroundColor White
+Write-Host "Password: $plainPassword" -ForegroundColor White
+Write-Host "`n[SECURITY WARNING]:" -ForegroundColor Yellow
 Write-Host "1. Login immediately and change the password" -ForegroundColor Yellow
 Write-Host "2. Save these credentials securely" -ForegroundColor Yellow
 Write-Host "3. Delete this installation script after setup" -ForegroundColor Yellow
 Write-Host "4. Use reset-admin-password.ps1 if you forget the password" -ForegroundColor Yellow
 
-Write-Host "`n🌐 Access VTRIA ERP at: http://localhost:8000" -ForegroundColor Cyan
-Write-Host "`n📋 To manage VTRIA ERP:" -ForegroundColor White
+Write-Host "`nAccess VTRIA ERP at: http://localhost:8000" -ForegroundColor Cyan
+Write-Host "`nTo manage VTRIA ERP:" -ForegroundColor White
 Write-Host "- Start: docker-compose up -d" -ForegroundColor White
 Write-Host "- Stop: docker-compose down" -ForegroundColor White
 Write-Host "- Status: docker-compose ps" -ForegroundColor White
 Write-Host "- Reset password: .\reset-admin-password.ps1" -ForegroundColor White
 
-Write-Host "`n🔒 For security, please:" -ForegroundColor Red
+Write-Host "`n[SECURITY] For security, please:" -ForegroundColor Red
 Write-Host "- Change the super admin password immediately" -ForegroundColor Red
 Write-Host "- Delete the installation script" -ForegroundColor Red
 Write-Host "- Configure firewall rules" -ForegroundColor Red
