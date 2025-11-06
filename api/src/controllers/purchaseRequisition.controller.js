@@ -471,55 +471,32 @@ class PurchaseRequisitionController {
 
             for (const quotation of quotations) {
                 // Get all items for this quotation with stock information
+                // Get actual parts from estimation_items (not quotation headers)
                 const itemsQuery = `
                     SELECT 
-                        combined_items.item_name,
-                        MAX(combined_items.description) as description,
-                        MAX(combined_items.hsn_code) as hsn_code,
-                        MAX(combined_items.unit) as unit,
-                        SUM(combined_items.quantity) as total_quantity,
-                        AVG(combined_items.rate) as avg_estimated_price,
-                        MIN(combined_items.rate) as min_price,
-                        MAX(combined_items.rate) as max_price,
-                        MAX(combined_items.product_id) as product_id,
-                        COALESCE(SUM(DISTINCT stock.available_stock), 0) as available_stock,
-                        COALESCE(SUM(DISTINCT stock.reserved_stock), 0) as reserved_stock,
-                        MAX(p.name) as product_name
-                    FROM (
-                        SELECT 
-                            qi.item_name,
-                            qi.description,
-                            qi.hsn_code,
-                            qi.unit,
-                            qi.quantity,
-                            qi.rate,
-                            NULL as product_id
-                        FROM quotation_items qi
-                        WHERE qi.quotation_id = ?
-                        
-                        UNION ALL
-                        
-                        SELECT 
-                            p.name as item_name,
-                            p.description,
-                            p.hsn_code,
-                            'Nos' as unit,
-                            ei.quantity,
-                            ei.final_price as rate,
-                            ei.product_id
-                        FROM estimation_items ei
-                        JOIN estimations e ON ei.estimation_id = e.id
-                        JOIN quotations q2 ON e.id = q2.estimation_id
-                        JOIN products p ON ei.product_id = p.id
-                        WHERE q2.id = ?
-                    ) as combined_items
-                    LEFT JOIN products p ON combined_items.product_id = p.id
+                        p.name as item_name,
+                        p.description,
+                        p.hsn_code,
+                        COALESCE(p.unit, 'Nos') as unit,
+                        SUM(ei.quantity) as total_quantity,
+                        AVG(ei.final_price) as avg_estimated_price,
+                        MIN(ei.final_price) as min_price,
+                        MAX(ei.final_price) as max_price,
+                        ei.product_id,
+                        p.name as product_name,
+                        COALESCE(MAX(stock.available_stock), 0) as available_stock,
+                        COALESCE(MAX(stock.reserved_stock), 0) as reserved_stock
+                    FROM estimation_items ei
+                    JOIN estimations e ON ei.estimation_id = e.id
+                    JOIN quotations q2 ON e.id = q2.estimation_id
+                    JOIN products p ON ei.product_id = p.id
                     LEFT JOIN inventory_warehouse_stock stock ON p.id = stock.item_id
-                    GROUP BY combined_items.item_name
-                    ORDER BY combined_items.item_name
+                    WHERE q2.id = ?
+                    GROUP BY ei.product_id, p.name, p.description, p.hsn_code, p.unit
+                    ORDER BY p.name
                 `;
 
-                const [items] = await db.execute(itemsQuery, [quotation.quotation_id, quotation.quotation_id]);
+                const [items] = await db.execute(itemsQuery, [quotation.quotation_id]);
 
                 if (items.length > 0) {
                     quotationData.push({
