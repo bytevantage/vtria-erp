@@ -73,18 +73,18 @@ DB_HOST=db
 DB_PORT=3306
 DB_DATABASE=vtria_erp
 DB_USERNAME=vtria_user
-DB_PASSWORD=vtria_password
+DB_PASSWORD=dev_password
 
 # Application Configuration
-APP_ENV=production
-APP_DEBUG=false
-APP_KEY=
+NODE_ENV=production
 APP_URL=http://localhost:8000
 
-# Demo Configuration (for demo installations)
-DEMO_MODE=true
-DEMO_USER=demo@vtria.com
-DEMO_PASSWORD=Demo@123456
+# Redis Configuration
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# JWT Configuration
+JWT_SECRET=vtria_production_secret_key_$(Get-Random -Minimum 100000 -Maximum 999999)
 "@ | Out-File -FilePath $envFile -Encoding utf8
     
     Write-Host "Please edit $envFile to configure your installation." -ForegroundColor Yellow
@@ -98,49 +98,99 @@ docker-compose build --no-cache
 docker-compose up -d
 
 # Set the access URL
-$appUrl = "http://localhost:8080"
+$appUrl = "http://localhost:8000"
 
 # Wait for services to start
 Write-Host "Waiting for services to start..." -ForegroundColor Cyan
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 10
 
-# Install PHP dependencies and setup database
-Write-Host "Installing dependencies and setting up database..." -ForegroundColor Cyan
-docker-compose exec app composer install --no-interaction --no-progress
-docker-compose exec app php artisan key:generate
-docker-compose exec app php artisan migrate --seed --force
+# Wait for database to be ready
+Write-Host "Waiting for database to be ready..." -ForegroundColor Yellow
+$dbReady = $false
+$attempts = 0
+$maxAttempts = 30
 
-docker-compose exec app php artisan storage:link
+while (-not $dbReady -and $attempts -lt $maxAttempts) {
+    try {
+        $result = docker-compose exec -T db mysqladmin ping -h localhost -u vtria_user --password=dev_password 2>$null
+        if ($result -match "mysqld is alive") {
+            $dbReady = $true
+            Write-Host "[OK] Database is ready" -ForegroundColor Green
+        }
+    } catch {
+        $attempts++
+        Write-Host "Waiting for database... ($attempts/$maxAttempts)" -ForegroundColor Yellow
+        Start-Sleep -Seconds 2
+    }
+}
 
-docker-compose exec app php artisan optimize:clear
+if (-not $dbReady) {
+    Write-Host "[ERROR] Database failed to start. Please check logs: docker-compose logs db" -ForegroundColor Red
+    Exit 1
+}
 
-# Set permissions
-Write-Host "Setting up permissions..." -ForegroundColor Cyan
-docker-compose exec app chown -R www-data:www-data storage bootstrap/cache
-
-docker-compose exec app chmod -R 775 storage bootstrap/cache
+# Wait for API to be ready
+Write-Host "Waiting for API to be ready..." -ForegroundColor Yellow
+Start-Sleep -Seconds 5
 
 # Create super admin account with secure password
 Write-Host "Creating secure super admin account..." -ForegroundColor Yellow
 
 # Generate secure password
 $adminPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
+Write-Host "Generated password: $adminPassword" -ForegroundColor DarkGray
 
-# Hash the password using bcrypt (Node.js)
-$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$adminPassword', 10));"
+# Hash the password using bcrypt (Node.js) with retry logic
+$hashedPassword = $null
+$hashAttempts = 0
+while (-not $hashedPassword -and $hashAttempts -lt 5) {
+    try {
+        $hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$adminPassword', 10));" 2>$null
+        $hashedPassword = $hashedPassword.Trim()
+        if ($hashedPassword -and $hashedPassword.StartsWith('`$2')) {
+            Write-Host "[OK] Password hashed successfully" -ForegroundColor Green
+            break
+        } else {
+            $hashedPassword = $null
+        }
+    } catch {
+        $hashAttempts++
+        Write-Host "Retrying password hash... ($hashAttempts/5)" -ForegroundColor Yellow
+        Start-Sleep -Seconds 2
+    }
+}
 
-# Insert super admin with correct schema
-$createUserSql = @"
-INSERT INTO users (email, password_hash, full_name, user_role, status, created_at, updated_at) 
-VALUES ('admin@vtria.in', '$hashedPassword', 'Super Administrator', 'admin', 'active', NOW(), NOW())
-ON DUPLICATE KEY UPDATE password_hash='$hashedPassword', updated_at=NOW();
-"@
-
-try {
-    docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "$createUserSql"
-    Write-Host "[OK] Super admin account created" -ForegroundColor Green
-} catch {
-    Write-Host "[WARNING] Admin account creation failed. Using default admin@vtria.com / Admin@123" -ForegroundColor Yellow
+if (-not $hashedPassword) {
+    Write-Host "[ERROR] Failed to hash password. Using default accounts instead." -ForegroundColor Red
+    Write-Host "Login with: admin@vtria.com / Admin@123" -ForegroundColor Yellow
+} else {
+    # Insert super admin with correct schema
+    $createUserSql = "INSERT INTO users (email, password_hash, full_name, user_role, status, created_at, updated_at) VALUES ('admin@vtria.in', '$hashedPassword', 'Super Administrator', 'admin', 'active', NOW(), NOW()) ON DUPLICATE KEY UPDATE password_hash='$hashedPassword', updated_at=NOW();"
+    
+    $userCreated = $false
+    $createAttempts = 0
+    while (-not $userCreated -and $createAttempts -lt 5) {
+        try {
+            $result = docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "$createUserSql" 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                $userCreated = $true
+                Write-Host "[OK] Super admin account created successfully" -ForegroundColor Green
+            } else {
+                $createAttempts++
+                Write-Host "Retrying user creation... ($createAttempts/5)" -ForegroundColor Yellow
+                Start-Sleep -Seconds 2
+            }
+        } catch {
+            $createAttempts++
+            Write-Host "Retrying user creation... ($createAttempts/5)" -ForegroundColor Yellow
+            Start-Sleep -Seconds 2
+        }
+    }
+    
+    if (-not $userCreated) {
+        Write-Host "[WARNING] Custom admin account creation failed. Using default admin@vtria.com / Admin@123" -ForegroundColor Yellow
+        $adminPassword = "Admin@123"
+    }
 }
 
 # Create password reset script

@@ -121,23 +121,59 @@ if (-not $dbReady) {
 
 # Create super admin user
 Write-Host "Creating super admin account..." -ForegroundColor Yellow
+Write-Host "Email: $AdminEmail" -ForegroundColor DarkGray
+Write-Host "Password: $plainPassword" -ForegroundColor DarkGray
 
-# Hash the password using bcrypt (Node.js)
-$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$plainPassword', 10));"
+# Hash the password using bcrypt (Node.js) with retry logic
+$hashedPassword = $null
+$hashAttempts = 0
+while (-not $hashedPassword -and $hashAttempts -lt 5) {
+    try {
+        $hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$plainPassword', 10));" 2>$null
+        $hashedPassword = $hashedPassword.Trim()
+        if ($hashedPassword -and $hashedPassword.StartsWith('`$2')) {
+            Write-Host "[OK] Password hashed successfully" -ForegroundColor Green
+            break
+        } else {
+            $hashedPassword = $null
+        }
+    } catch {
+        $hashAttempts++
+        Write-Host "Retrying password hash... ($hashAttempts/5)" -ForegroundColor Yellow
+        Start-Sleep -Seconds 2
+    }
+}
 
-# Insert super admin with correct schema
-$createUserSql = @"
-INSERT INTO users (email, password_hash, full_name, user_role, status, created_at, updated_at) 
-VALUES ('$AdminEmail', '$hashedPassword', 'Super Administrator', 'admin', 'active', NOW(), NOW())
-ON DUPLICATE KEY UPDATE password_hash='$hashedPassword', updated_at=NOW();
-"@
-
-try {
-    docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "$createUserSql"
-    Write-Host "[OK] Super admin account created" -ForegroundColor Green
-} catch {
-    Write-Host "[ERROR] Failed to create super admin account" -ForegroundColor Red
-    Write-Host "Please create admin account manually through the web interface." -ForegroundColor Yellow
+if (-not $hashedPassword) {
+    Write-Host "[ERROR] Failed to hash password. Using default accounts instead." -ForegroundColor Red
+    Write-Host "Login with: admin@vtria.com / Admin@123" -ForegroundColor Yellow
+} else {
+    # Insert super admin with correct schema
+    $createUserSql = "INSERT INTO users (email, password_hash, full_name, user_role, status, created_at, updated_at) VALUES ('$AdminEmail', '$hashedPassword', 'Super Administrator', 'admin', 'active', NOW(), NOW()) ON DUPLICATE KEY UPDATE password_hash='$hashedPassword', updated_at=NOW();"
+    
+    $userCreated = $false
+    $createAttempts = 0
+    while (-not $userCreated -and $createAttempts -lt 5) {
+        try {
+            $result = docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "$createUserSql" 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                $userCreated = $true
+                Write-Host "[OK] Super admin account created successfully" -ForegroundColor Green
+            } else {
+                $createAttempts++
+                Write-Host "Retrying user creation... ($createAttempts/5)" -ForegroundColor Yellow
+                Start-Sleep -Seconds 2
+            }
+        } catch {
+            $createAttempts++
+            Write-Host "Retrying user creation... ($createAttempts/5)" -ForegroundColor Yellow
+            Start-Sleep -Seconds 2
+        }
+    }
+    
+    if (-not $userCreated) {
+        Write-Host "[WARNING] Custom admin account creation failed. Using default admin@vtria.com / Admin@123" -ForegroundColor Yellow
+    }
 }
 
 # Create password reset script
