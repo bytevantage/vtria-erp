@@ -910,14 +910,11 @@ exports.updatePurchaseOrder = async (req, res) => {
             });
         }
 
-        // Update purchase order
+        // Update purchase order (only use existing columns)
         const updateQuery = `
             UPDATE purchase_orders 
             SET 
-                delivery_date = ?,
-                payment_terms = ?,
-                delivery_terms = ?,
-                notes = ?,
+                expected_delivery_date = ?,
                 status = ?,
                 updated_at = NOW()
             WHERE id = ?
@@ -925,9 +922,6 @@ exports.updatePurchaseOrder = async (req, res) => {
 
         await db.execute(updateQuery, [
             delivery_date || null,
-            payment_terms || null,
-            delivery_terms || null,
-            notes || null,
             status || 'draft',
             id
         ]);
@@ -941,9 +935,6 @@ exports.updatePurchaseOrder = async (req, res) => {
                 po.supplier_id,
                 po.po_date,
                 po.expected_delivery_date,
-                po.payment_terms,
-                po.delivery_terms,
-                po.notes,
                 po.status,
                 po.total_amount,
                 po.tax_amount,

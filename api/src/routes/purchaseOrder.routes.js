@@ -162,7 +162,7 @@ router.put('/:id/approve',
  */
 router.get('/:id/pdf/:type',
     rateLimiter.standard(),
-    // authMiddleware.verifyToken, // Temporarily disabled for testing
+    authMiddleware.verifyToken,
     ValidationMiddleware.validatePDFGeneration,
     purchaseOrderController.generatePDF
 );
