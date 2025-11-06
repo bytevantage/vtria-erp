@@ -124,12 +124,12 @@ Write-Host "Creating super admin account..." -ForegroundColor Yellow
 Write-Host "Email: $AdminEmail" -ForegroundColor DarkGray
 Write-Host "Password: $plainPassword" -ForegroundColor DarkGray
 
-# Hash the password using bcrypt (Node.js) with retry logic
+# Hash the password using bcryptjs (matches API library) with retry logic
 $hashedPassword = $null
 $hashAttempts = 0
 while (-not $hashedPassword -and $hashAttempts -lt 5) {
     try {
-        $hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$plainPassword', 10));" 2>$null
+        $hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcryptjs'); console.log(bcrypt.hashSync('$plainPassword', 10));" 2>$null
         $hashedPassword = $hashedPassword.Trim()
         if ($hashedPassword -and $hashedPassword.StartsWith('`$2')) {
             Write-Host "[OK] Password hashed successfully" -ForegroundColor Green
@@ -187,8 +187,8 @@ Write-Host "=====================================" -ForegroundColor Cyan
 `$newPassword = Read-Host "Enter new password for super admin" -AsSecureString
 `$newPasswordText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$newPassword))
 
-# Hash the new password using bcrypt
-`$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('`$newPasswordText', 10));"
+# Hash the new password using bcryptjs
+`$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcryptjs'); console.log(bcrypt.hashSync('`$newPasswordText', 10));"
 
 # Update password in database
 `$updateSql = "UPDATE users SET password_hash='`$hashedPassword', updated_at=NOW() WHERE user_role='admin' AND email='$AdminEmail';"

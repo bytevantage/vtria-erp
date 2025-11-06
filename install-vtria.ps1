@@ -140,12 +140,12 @@ Write-Host "Creating secure super admin account..." -ForegroundColor Yellow
 $adminPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
 Write-Host "Generated password: $adminPassword" -ForegroundColor DarkGray
 
-# Hash the password using bcrypt (Node.js) with retry logic
+# Hash the password using bcryptjs (matches API library) with retry logic
 $hashedPassword = $null
 $hashAttempts = 0
 while (-not $hashedPassword -and $hashAttempts -lt 5) {
     try {
-        $hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$adminPassword', 10));" 2>$null
+        $hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcryptjs'); console.log(bcrypt.hashSync('$adminPassword', 10));" 2>$null
         $hashedPassword = $hashedPassword.Trim()
         if ($hashedPassword -and $hashedPassword.StartsWith('`$2')) {
             Write-Host "[OK] Password hashed successfully" -ForegroundColor Green
@@ -199,7 +199,7 @@ $resetScript = @"
 Write-Host "Resetting super admin password..." -ForegroundColor Cyan
 `$newPassword = Read-Host "Enter new password" -AsSecureString
 `$newPasswordText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$newPassword))
-`$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('`$newPasswordText', 10));"
+`$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcryptjs'); console.log(bcrypt.hashSync('`$newPasswordText', 10));"
 docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "UPDATE users SET password_hash='`$hashedPassword', updated_at=NOW() WHERE email='admin@vtria.in';"
 Write-Host "[SUCCESS] Password reset successfully" -ForegroundColor Green
 Write-Host "You can now login with admin@vtria.in and your new password" -ForegroundColor White
