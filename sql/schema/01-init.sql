@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Insert default admin users with proper password hashes
-INSERT IGNORE INTO users (email, password_hash, full_name, user_role, status) VALUES 
-('admin@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'System Administrator', 'admin', 'active'),
-('director@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Director', 'director', 'active'),
-('manager@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Manager', 'manager', 'active');
+-- IMPORTANT: admin@vtria.com MUST have ID=1 for foreign key references
+INSERT IGNORE INTO users (id, email, password_hash, full_name, user_role, status) VALUES 
+(1, 'admin@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'System Administrator', 'admin', 'active'),
+(2, 'director@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Director', 'director', 'active'),
+(3, 'manager@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Manager', 'manager', 'active');
 
 -- Create basic system tables
 CREATE TABLE IF NOT EXISTS system_config (
