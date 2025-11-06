@@ -120,11 +120,55 @@ docker-compose exec app chown -R www-data:www-data storage bootstrap/cache
 
 docker-compose exec app chmod -R 775 storage bootstrap/cache
 
-# Show completion message
-Write-Host "`nVTRIA ERP has been successfully installed!" -ForegroundColor Green
-Write-Host "`nAccess the application at: $appUrl" -ForegroundColor Cyan
-Write-Host "Demo credentials:" -ForegroundColor Cyan
-Write-Host "- Email: demo@vtria.com" -ForegroundColor Cyan
-Write-Host "- Password: Demo@123456" -ForegroundColor Cyan
-Write-Host "`nTo stop the application, run: docker-compose down" -ForegroundColor Yellow
-Write-Host "To start the application again, run: docker-compose up -d" -ForegroundColor Yellow
+# Create super admin account with secure password
+Write-Host "Creating secure super admin account..." -ForegroundColor Yellow
+
+# Generate secure password
+$adminPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
+
+# Hash the password
+$hashedPassword = docker-compose exec -T api php -r "echo password_hash('$adminPassword', PASSWORD_DEFAULT);"
+
+# Insert super admin
+$createUserSql = @"
+INSERT INTO users (username, email, password, role, is_super_admin, created_at, updated_at) 
+VALUES ('superadmin', 'admin@vtria.in', '$hashedPassword', 'admin', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE password='$hashedPassword', is_super_admin=1, updated_at=NOW();
+"@
+
+try {
+    docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "$createUserSql"
+    Write-Host "✅ Super admin account created" -ForegroundColor Green
+} catch {
+    Write-Host "⚠️  Admin account creation failed. Please create manually." -ForegroundColor Yellow
+}
+
+# Create password reset script
+$resetScript = @"
+# VTRIA ERP Super Admin Password Reset
+Write-Host "Resetting super admin password..." -ForegroundColor Cyan
+`$newPassword = Read-Host "Enter new password" -AsSecureString
+`$newPasswordText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$newPassword))
+`$hashedPassword = docker-compose exec -T api php -r "echo password_hash('`$newPasswordText', PASSWORD_DEFAULT);"
+docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "UPDATE users SET password='`$hashedPassword', updated_at=NOW() WHERE is_super_admin=1;"
+Write-Host "✅ Password reset successfully" -ForegroundColor Green
+"@
+
+$resetScript | Out-File -FilePath "reset-admin-password.ps1" -Encoding utf8
+
+# Show completion message with security warning
+Write-Host "`n🎉 VTRIA ERP has been securely installed!" -ForegroundColor Green
+Write-Host "`n🔐 SUPER ADMIN CREDENTIALS:" -ForegroundColor Red
+Write-Host "📧 Email: admin@vtria.in" -ForegroundColor White
+Write-Host "🔑 Password: $adminPassword" -ForegroundColor White
+Write-Host "`n⚠️  SECURITY WARNING:" -ForegroundColor Yellow
+Write-Host "1. Login immediately and change the password" -ForegroundColor Yellow
+Write-Host "2. Save these credentials securely" -ForegroundColor Yellow
+Write-Host "3. Delete this installation script after setup" -ForegroundColor Yellow
+Write-Host "4. Use reset-admin-password.ps1 if you forget the password" -ForegroundColor Yellow
+
+Write-Host "`n🌐 Access VTRIA ERP at: $appUrl" -ForegroundColor Cyan
+Write-Host "`n📋 To manage VTRIA ERP:" -ForegroundColor White
+Write-Host "- Start: docker-compose up -d" -ForegroundColor White
+Write-Host "- Stop: docker-compose down" -ForegroundColor White
+Write-Host "- Reset password: .\reset-admin-password.ps1" -ForegroundColor White
