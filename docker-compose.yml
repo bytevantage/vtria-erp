@@ -33,10 +33,10 @@ services:
       context: ./client
       target: production
     ports:
-      - "80:80"
+      - "8080:80"
     environment:
       - NODE_ENV=production
-      - REACT_APP_API_URL=
+      - REACT_APP_API_URL=http://localhost:3001
     depends_on:
       - api
     restart: unless-stopped
@@ -44,7 +44,7 @@ services:
   db:
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql/schema:/docker-entrypoint-initdb.d
@@ -62,7 +62,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes

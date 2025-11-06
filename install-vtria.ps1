@@ -95,90 +95,10 @@ Write-Host "Building and starting VTRIA ERP containers..." -ForegroundColor Cyan
 
 docker-compose down
 docker-compose build --no-cache
-
-# Try to start with default ports first
-Write-Host "Attempting to start with default ports..." -ForegroundColor Yellow
 docker-compose up -d
 
-# Wait a moment and check if port 80 failed
-Start-Sleep -Seconds 10
-$port80Check = Get-NetTCPConnection -LocalPort 80 -ErrorAction SilentlyContinue | Where-Object { $_.State -eq "Listen" }
-
-if (-not $port80Check) {
-    Write-Host "Port 80 access denied. Using alternative port 8080..." -ForegroundColor Yellow
-    
-    # Stop containers
-    docker-compose down -v
-    
-    # Use alternative ports configuration
-    if (Test-Path "docker-compose-alt-ports.yml") {
-        Write-Host "Starting with alternative ports (8080)..." -ForegroundColor Green
-        docker-compose -f docker-compose-alt-ports.yml up -d
-        
-        # Update access URL
-        $appUrl = "http://localhost:8080"
-        Write-Host "VTRIA ERP will be accessible at: $appUrl" -ForegroundColor Cyan
-    } else {
-        Write-Host "Alternative port configuration not found. Creating it..." -ForegroundColor Yellow
-        # Create alternative configuration on the fly
-        $altConfig = @"
-services:
-  api:
-    build:
-      context: ./api
-      target: production
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=vtria_user
-      - DB_PASS=dev_password
-      - DB_NAME=vtria_erp
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - JWT_SECRET=vtria_production_secret_key_2025_secure_random_string_for_jwt_signing
-      - BYPASS_AUTH=true
-    depends_on:
-      - db
-      - redis
-
-  client:
-    build:
-      context: ./client
-      target: production
-    ports:
-      - "8080:80"
-    environment:
-      - NODE_ENV=production
-      - REACT_APP_API_URL=http://localhost:3001
-    depends_on:
-      - api
-
-  db:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=vtria_erp
-      - MYSQL_USER=vtria_user
-      - MYSQL_PASSWORD=dev_password
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-"@
-        $altConfig | Out-File -FilePath "docker-compose-alt-ports.yml" -Encoding utf8
-        docker-compose -f docker-compose-alt-ports.yml up -d
-        $appUrl = "http://localhost:8080"
-    }
-} else {
-    $appUrl = "http://localhost"
-}
+# Set the access URL
+$appUrl = "http://localhost:8080"
 
 # Wait for services to start
 Write-Host "Waiting for services to start..." -ForegroundColor Cyan
@@ -206,12 +126,5 @@ Write-Host "`nAccess the application at: $appUrl" -ForegroundColor Cyan
 Write-Host "Demo credentials:" -ForegroundColor Cyan
 Write-Host "- Email: demo@vtria.com" -ForegroundColor Cyan
 Write-Host "- Password: Demo@123456" -ForegroundColor Cyan
-
-if ($appUrl -eq "http://localhost:8080") {
-    Write-Host "`nNote: Port 80 was not available, so VTRIA ERP is running on port 8080." -ForegroundColor Yellow
-    Write-Host "To use port 8080 permanently, run:" -ForegroundColor Yellow
-    Write-Host "docker-compose -f docker-compose-alt-ports.yml up -d" -ForegroundColor White
-}
-
 Write-Host "`nTo stop the application, run: docker-compose down" -ForegroundColor Yellow
 Write-Host "To start the application again, run: docker-compose up -d" -ForegroundColor Yellow
