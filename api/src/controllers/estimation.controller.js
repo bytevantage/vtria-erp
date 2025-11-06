@@ -314,6 +314,8 @@ exports.createEstimation = async (req, res) => {
 
     } catch (error) {
         await connection.rollback();
+        console.error('Error creating estimation:', error);
+        console.error('Error stack:', error.stack);
         res.status(500).json({
             success: false,
             message: 'Error creating estimation',
