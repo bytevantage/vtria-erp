@@ -458,7 +458,7 @@ class PurchaseRequisitionController {
                 LEFT JOIN cases ON se.case_id = cases.id
                 LEFT JOIN purchase_requisitions pr ON (pr.quotation_id = q.id OR pr.quotation_id = q.quotation_id)
                     AND pr.status IN ('draft', 'pending_approval', 'approved')
-                WHERE q.status IN ('approved', 'sent')
+                WHERE q.status IN ('approved', 'sent', 'accepted')
                 AND pr.id IS NULL
                 AND cases.current_state IN ('quotation', 'order', 'production')
                 AND cases.status = 'active'
