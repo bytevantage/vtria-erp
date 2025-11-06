@@ -217,8 +217,7 @@ exports.createEstimation = async (req, res) => {
                     enquiryResult[0].client_id || null,
                     enquiryResult[0].project_name || null,
                     enquiryResult[0].description || null,
-                    enquiryResult[0].enquiry_by || created_by,
-                    enquiryResult[0].enquiry_by || created_by,
+                    created_by,
                     'active'
                 ]
             );

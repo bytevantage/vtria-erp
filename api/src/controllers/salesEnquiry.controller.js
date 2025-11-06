@@ -165,12 +165,12 @@ class SalesEnquiryController {
                 // Generate case number
                 const caseNumber = await generateDocumentId(DOCUMENT_TYPES.CASE);
 
-                // Create case
+                // Create case (fixed: removed non-existent updated_by column)
                 const [caseResult] = await connection.execute(
                     `INSERT INTO cases
                     (case_number, enquiry_id, current_state, client_id, project_name, requirements,
-                     priority, estimated_value, created_by, updated_by)
-                    VALUES (?, ?, 'enquiry', ?, ?, ?, 'medium', ?, ?, ?)`,
+                     priority, estimated_value, created_by)
+                    VALUES (?, ?, 'enquiry', ?, ?, ?, 'medium', ?, ?)`,
                     [
                         caseNumber,
                         enquiry_insert_id,
@@ -178,7 +178,6 @@ class SalesEnquiryController {
                         project_name,
                         description,
                         estimated_value || null,
-                        enquiry_by,
                         enquiry_by
                     ]
                 );
