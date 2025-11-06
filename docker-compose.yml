@@ -27,6 +27,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    restart: unless-stopped
 
   client:
     build:
@@ -52,11 +53,20 @@ services:
       - MYSQL_DATABASE=vtria_erp
       - MYSQL_USER=vtria_user
       - MYSQL_PASSWORD=dev_password
+    command: >
+      --max_connections=200
+      --innodb_buffer_pool_size=512M
+      --innodb_log_file_size=128M
+      --max_allowed_packet=64M
+      --wait_timeout=600
+      --interactive_timeout=600
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=dev_password" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
@@ -65,6 +75,7 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    restart: unless-stopped
 
 volumes:
   mysql_data:
