@@ -594,7 +594,7 @@ const EnterpriseInventoryManagement = () => {
         tax_amount: taxAmount
       };
 
-      await api.post('/api/inventory-enhanced/purchase-history', purchaseData);
+      await api.post(`/api/inventory-enhanced/items/${purchaseForm.item_id}/purchase-history`, purchaseData);
       setAddPurchaseDialog(false);
       setPurchaseForm({
         item_id: '',

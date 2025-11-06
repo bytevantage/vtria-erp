@@ -20,12 +20,12 @@ exports.getAllQuotations = async (req, res) => {
                 (
                     SELECT 
                         CASE 
-                            WHEN SUM(qi.amount) > 0 AND SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * qi.quantity) > 0
-                                THEN ROUND( ( (SUM(qi.amount) - SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * qi.quantity)) / SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * qi.quantity) ) * 100, 2)
+                            WHEN SUM(qi.amount) > 0 AND SUM(COALESCE(iie.standard_cost, iie.last_purchase_cost, 0) * qi.quantity) > 0
+                                THEN ROUND( ( (SUM(qi.amount) - SUM(COALESCE(iie.standard_cost, iie.last_purchase_cost, 0) * qi.quantity)) / SUM(COALESCE(iie.standard_cost, iie.last_purchase_cost, 0) * qi.quantity) ) * 100, 2)
                             ELSE 0
                         END
                     FROM quotation_items qi
-                    LEFT JOIN products p ON qi.item_name = p.name
+                    LEFT JOIN inventory_items_enhanced iie ON qi.item_name = iie.item_name
                     WHERE qi.quotation_id = q.id
                 ) AS profit_percentage_calculated,
                 se.enquiry_id,
@@ -64,12 +64,13 @@ exports.getAllQuotations = async (req, res) => {
                 (
                     SELECT 
                         CASE 
-                            WHEN SUM(ei.final_price * ei.quantity) > 0 AND SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * ei.quantity) > 0
-                                THEN ROUND( ( (SUM(ei.final_price * ei.quantity) - SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * ei.quantity)) / SUM(COALESCE(p.cost_price, p.last_purchase_price, 0) * ei.quantity) ) * 100, 2)
+                            WHEN SUM(ei.final_price * ei.quantity) > 0 AND SUM(COALESCE(iie.standard_cost, iie.last_purchase_cost, 0) * ei.quantity) > 0
+                                THEN ROUND( ( (SUM(ei.final_price * ei.quantity) - SUM(COALESCE(iie.standard_cost, iie.last_purchase_cost, 0) * ei.quantity)) / SUM(COALESCE(iie.standard_cost, iie.last_purchase_cost, 0) * ei.quantity) ) * 100, 2)
                             ELSE 0
                         END
                     FROM estimation_items ei
                     LEFT JOIN products p ON ei.product_id = p.id
+                    LEFT JOIN inventory_items_enhanced iie ON p.name = iie.item_name
                     WHERE ei.estimation_id = e.id
                 ) AS profit_percentage_calculated,
                 se.enquiry_id,
