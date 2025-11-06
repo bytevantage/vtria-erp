@@ -94,9 +94,11 @@ CREATE TABLE IF NOT EXISTS quality_inspections_enhanced (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (work_order_id) REFERENCES manufacturing_work_orders(id),
-    FOREIGN KEY (manufacturing_case_id) REFERENCES manufacturing_cases(id),
-    FOREIGN KEY (product_id) REFERENCES products(id),
+    -- Foreign keys removed for tables that don't exist yet
+    -- TODO: Add back when manufacturing_work_orders and manufacturing_cases tables are created
+    -- FOREIGN KEY (work_order_id) REFERENCES manufacturing_work_orders(id),
+    -- FOREIGN KEY (manufacturing_case_id) REFERENCES manufacturing_cases(id),
+    -- FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (checkpoint_id) REFERENCES quality_checkpoints(id),
     FOREIGN KEY (inspector_id) REFERENCES users(id),
     FOREIGN KEY (approved_by) REFERENCES users(id),
