@@ -1,0 +1,72 @@
+services:
+  api:
+    build:
+      context: ./api
+      target: ${NODE_ENV:-development}
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./uploads:/var/www/vtria-erp/uploads
+      - ./logs:/var/log/vtria-erp
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=vtria_user
+      - DB_PASS=dev_password
+      - DB_NAME=vtria_erp
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=vtria_production_secret_key_2025_secure_random_string_for_jwt_signing
+      - BYPASS_AUTH=true
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  client:
+    build:
+      context: ./client
+      target: production
+    ports:
+      - "8080:80"  # Changed from 80:80 to 8080:80
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost:3001
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/schema:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=vtria_erp
+      - MYSQL_USER=vtria_user
+      - MYSQL_PASSWORD=dev_password
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "vtria_user", "--password=dev_password" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  mysql_data:
+  redis_data:
