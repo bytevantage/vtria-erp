@@ -3,7 +3,9 @@
  * Contains all the environment-specific configuration values
  */
 
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+// Use empty string to make API calls go through nginx proxy
+// Nginx will proxy /api/* and /health to the API container
+export const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 // Feature Flags
 export const FEATURE_FLAGS = {

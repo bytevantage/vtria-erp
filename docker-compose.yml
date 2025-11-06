@@ -33,10 +33,9 @@ services:
       context: ./client
       target: production
     ports:
-      - "8080:80"
+      - "8000:80"
     environment:
       - NODE_ENV=production
-      - REACT_APP_API_URL=http://localhost:3001
     depends_on:
       - api
     restart: unless-stopped
