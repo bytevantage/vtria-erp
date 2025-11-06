@@ -122,14 +122,14 @@ if (-not $dbReady) {
 # Create super admin user
 Write-Host "Creating super admin account..." -ForegroundColor Yellow
 
-# Hash the password (using PHP's password_hash equivalent)
-$hashedPassword = docker-compose exec -T api php -r "echo password_hash('$plainPassword', PASSWORD_DEFAULT);"
+# Hash the password using bcrypt (Node.js)
+$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('$plainPassword', 10));"
 
-# Insert super admin into database
+# Insert super admin with correct schema
 $createUserSql = @"
-INSERT INTO users (username, email, password, role, is_super_admin, created_at, updated_at) 
-VALUES ('superadmin', '$AdminEmail', '$hashedPassword', 'admin', 1, NOW(), NOW())
-ON DUPLICATE KEY UPDATE password='$hashedPassword', is_super_admin=1, updated_at=NOW();
+INSERT INTO users (email, password_hash, full_name, user_role, status, created_at, updated_at) 
+VALUES ('$AdminEmail', '$hashedPassword', 'Super Administrator', 'admin', 'active', NOW(), NOW())
+ON DUPLICATE KEY UPDATE password_hash='$hashedPassword', updated_at=NOW();
 "@
 
 try {
@@ -151,11 +151,11 @@ Write-Host "=====================================" -ForegroundColor Cyan
 `$newPassword = Read-Host "Enter new password for super admin" -AsSecureString
 `$newPasswordText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$newPassword))
 
-# Hash the new password
-`$hashedPassword = docker-compose exec -T api php -r "echo password_hash('`$newPasswordText', PASSWORD_DEFAULT);"
+# Hash the new password using bcrypt
+`$hashedPassword = docker-compose exec -T api node -e "const bcrypt = require('bcrypt'); console.log(bcrypt.hashSync('`$newPasswordText', 10));"
 
 # Update password in database
-`$updateSql = "UPDATE users SET password='`$hashedPassword', updated_at=NOW() WHERE is_super_admin=1;"
+`$updateSql = "UPDATE users SET password_hash='`$hashedPassword', updated_at=NOW() WHERE user_role='admin' AND email='$AdminEmail';"
 
 try {
     docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "`$updateSql"
@@ -174,6 +174,11 @@ Write-Host "`n[SUCCESS] VTRIA ERP has been securely installed!" -ForegroundColor
 Write-Host "`n[ADMIN CREDENTIALS]:" -ForegroundColor Red
 Write-Host "Email: $AdminEmail" -ForegroundColor White
 Write-Host "Password: $plainPassword" -ForegroundColor White
+Write-Host "`n[ALTERNATIVE DEFAULT ACCOUNTS]:" -ForegroundColor Cyan
+Write-Host "If the above doesn't work, use these pre-configured accounts:" -ForegroundColor White
+Write-Host "- admin@vtria.com / Admin@123" -ForegroundColor White
+Write-Host "- director@vtria.com / Admin@123" -ForegroundColor White
+Write-Host "- manager@vtria.com / Admin@123" -ForegroundColor White
 Write-Host "`n[SECURITY WARNING]:" -ForegroundColor Yellow
 Write-Host "1. Login immediately and change the password" -ForegroundColor Yellow
 Write-Host "2. Save these credentials securely" -ForegroundColor Yellow
