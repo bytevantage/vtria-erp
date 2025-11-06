@@ -213,7 +213,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
                 <TableCell><strong>API URL</strong></TableCell>
                 <TableCell>
                   <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                    {url || 'Not connected'}
+                    {url || (connected ? 'Using nginx proxy (relative URLs)' : 'Not connected')}
                   </Typography>
                 </TableCell>
               </TableRow>
