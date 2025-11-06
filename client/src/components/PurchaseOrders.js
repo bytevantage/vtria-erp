@@ -637,7 +637,7 @@ const PurchaseOrders = () => {
       setLoading(true);
 
       // Generate PDF using the api utility with automatic auth
-      const { data: result, error } = await api.post(`/api/pdf/purchase-order/${po.id}`, {});
+      const { data: result, error } = await api.get(`/api/purchase-orders/${po.id}/pdf/purchase-order`);
 
       if (error) {
         throw new Error(error);

@@ -866,9 +866,9 @@ exports.generatePDF = async (req, res) => {
             .text('Terms and Conditions:', 50, pdf.doc.y + 20)
             .fontSize(10)
             .text('Payment Terms:', 50, pdf.doc.y + 10)
-            .text(po[0].payment_terms, 70, pdf.doc.y)
+            .text('As per agreement', 70, pdf.doc.y)
             .text('Delivery Terms:', 50, pdf.doc.y + 10)
-            .text(po[0].delivery_terms, 70, pdf.doc.y);
+            .text('As per agreement', 70, pdf.doc.y);
 
         // Generate PDF and send as response
         const folder = type === 'po' ? 'purchase_orders' : 'proforma_invoices';
