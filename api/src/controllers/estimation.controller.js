@@ -170,7 +170,16 @@ exports.createEstimation = async (req, res) => {
         await connection.beginTransaction();
 
         const { enquiry_id } = req.body;
-        const created_by = req.user?.id || 1; // Get from authenticated user
+        
+        // Get created_by user ID - if no authenticated user, get first available user
+        let created_by = req.user?.id;
+        if (!created_by) {
+            const [users] = await connection.execute('SELECT id FROM users ORDER BY id LIMIT 1');
+            if (users.length === 0) {
+                throw new Error('No users found in database. Cannot create estimation without a valid user.');
+            }
+            created_by = users[0].id;
+        }
 
         // Get enquiry details and check if case exists
         const [enquiryResult] = await db.execute(
