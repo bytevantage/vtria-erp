@@ -4373,7 +4373,7 @@ SELECT 'VTRIA ERP Complete Schema Loaded Successfully - All 181 Tables Created' 
 -- ============================================================================
 -- Insert default admin users with bcryptjs hashed passwords (password: Admin@123)
 -- Hash: $2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce
--- IMPORTANT: admin@vtria.com MUST have ID=1 for foreign key references
+-- IMPORTANT: admin@vtria.in MUST have ID=1 for foreign key references
 
 -- Delete existing users first (in case of reinstall)
 DELETE FROM users WHERE id IN (1, 2, 3);
@@ -4383,9 +4383,9 @@ ALTER TABLE users AUTO_INCREMENT = 1;
 
 -- Insert default users with explicit IDs
 INSERT INTO users (id, email, password_hash, full_name, user_role, status) VALUES 
-(1, 'admin@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'System Administrator', 'admin', 'active'),
-(2, 'director@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Director', 'director', 'active'),
-(3, 'manager@vtria.com', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Manager', 'manager', 'active');
+(1, 'admin@vtria.in', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'System Administrator', 'admin', 'active'),
+(2, 'director@vtria.in', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Director', 'director', 'active'),
+(3, 'manager@vtria.in', '$2b$10$l..EPh9jnNKogEkGds6V5eqwWwq6ZjcDWC35yB9WBqrqzTwR2ysce', 'Manager', 'manager', 'active');
 
 -- Show completion message
-SELECT 'Default admin users created successfully (admin@vtria.com = ID 1)' as Status;
+SELECT 'Default admin users created successfully (admin@vtria.in = ID 1)' as Status;
