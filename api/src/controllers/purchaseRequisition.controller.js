@@ -477,22 +477,22 @@ class PurchaseRequisitionController {
                         p.name as item_name,
                         p.description,
                         p.hsn_code,
-                        COALESCE(p.unit, 'Nos') as unit,
+                        COALESCE(iie.primary_unit, 'Nos') as unit,
                         SUM(ei.quantity) as total_quantity,
                         AVG(ei.final_price) as avg_estimated_price,
                         MIN(ei.final_price) as min_price,
                         MAX(ei.final_price) as max_price,
                         ei.product_id,
                         p.name as product_name,
-                        COALESCE(MAX(stock.available_stock), 0) as available_stock,
-                        COALESCE(MAX(stock.reserved_stock), 0) as reserved_stock
+                        COALESCE(MAX(iie.current_stock - iie.reserved_stock), 0) as available_stock,
+                        COALESCE(MAX(iie.reserved_stock), 0) as reserved_stock
                     FROM estimation_items ei
                     JOIN estimations e ON ei.estimation_id = e.id
                     JOIN quotations q2 ON e.id = q2.estimation_id
                     JOIN products p ON ei.product_id = p.id
-                    LEFT JOIN inventory_warehouse_stock stock ON p.id = stock.item_id
+                    LEFT JOIN inventory_items_enhanced iie ON p.id = iie.id
                     WHERE q2.id = ?
-                    GROUP BY ei.product_id, p.name, p.description, p.hsn_code, p.unit
+                    GROUP BY ei.product_id, p.name, p.description, p.hsn_code, iie.primary_unit
                     ORDER BY p.name
                 `;
 
