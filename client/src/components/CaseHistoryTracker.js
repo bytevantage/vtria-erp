@@ -153,7 +153,7 @@ const CaseHistoryTracker = ({
     try {
       setLoading(true);
       
-      const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      const API_BASE_URL = process.env.REACT_APP_API_URL || '';
       
       // If no caseId provided, use the analytics endpoint for the full case history tracker
       if (!caseId) {

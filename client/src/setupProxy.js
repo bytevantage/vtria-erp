@@ -4,7 +4,7 @@ module.exports = function (app) {
   // Use Docker service name in Docker environment, localhost for local development  
   const apiTarget = process.env.DOCKER_ENV === 'true'
     ? 'http://api:3001'
-    : 'http://localhost:3001';
+    : '';
 
   console.log('API Proxy target:', apiTarget);
 

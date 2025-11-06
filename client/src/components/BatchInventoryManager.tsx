@@ -100,7 +100,7 @@ const BatchInventoryManager: React.FC<BatchInventoryManagerProps> = ({
   const [openBatchDialog, setOpenBatchDialog] = useState(false);
   const [editingBatch, setEditingBatch] = useState<InventoryBatch | null>(null);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     fetchProducts();

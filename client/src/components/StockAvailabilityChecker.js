@@ -40,7 +40,7 @@ const StockAvailabilityChecker = ({
   const [error, setError] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:3001';
+  const API_BASE_URL = '';
 
   useEffect(() => {
     if (productId && requiredQuantity > 0) {
@@ -299,7 +299,7 @@ export const BulkStockChecker = ({ items, onStockResults }) => {
   const [stockResults, setStockResults] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:3001';
+  const API_BASE_URL = '';
 
   useEffect(() => {
     if (items && items.length > 0) {

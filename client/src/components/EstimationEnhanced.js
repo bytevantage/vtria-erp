@@ -36,7 +36,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = '';
 
 const EstimationEnhanced = ({ enquiryId, onEstimationCreated }) => {
   const [sections, setSections] = useState([

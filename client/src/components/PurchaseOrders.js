@@ -645,7 +645,7 @@ const PurchaseOrders = () => {
 
       if (result.success && result.downloadUrl) {
         // Download the generated PDF
-        const downloadUrl = `http://localhost:3001${result.downloadUrl}`;
+        const downloadUrl = `${result.downloadUrl}`;
         const link = document.createElement('a');
         link.href = downloadUrl;
         // Extract filename from the response

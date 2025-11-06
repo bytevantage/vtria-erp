@@ -53,7 +53,7 @@ import EstimationDetailView from './EstimationDetailView';
 
 const API_BASE_URL = process.env.DOCKER_ENV === 'true'
   ? '' // Use proxy when in Docker (empty string means relative URLs)
-  : (process.env.REACT_APP_API_URL || 'http://localhost:3001');
+  : (process.env.REACT_APP_API_URL || '');
 
 const Estimation = () => {
   const [estimations, setEstimations] = useState([]);

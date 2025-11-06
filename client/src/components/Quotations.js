@@ -65,10 +65,10 @@ const Quotations = () => {
       // Prefer enhanced endpoint for richer data; fall back to basic if unauthorized
       let response;
       try {
-        response = await axios.get('http://localhost:3001/api/quotations/enhanced/all', { headers: authHeaders() });
+        response = await axios.get('/api/quotations/enhanced/all', { headers: authHeaders() });
       } catch (enhErr) {
         if (enhErr.response && enhErr.response.status === 401) {
-          response = await axios.get('http://localhost:3001/api/quotations', { headers: authHeaders() });
+          response = await axios.get('/api/quotations', { headers: authHeaders() });
         } else {
           throw enhErr;
         }
@@ -85,7 +85,7 @@ const Quotations = () => {
 
   const fetchAvailableEstimations = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/estimation', { headers: authHeaders() });
+      const response = await axios.get('/api/estimation', { headers: authHeaders() });
       const allEstimations = response.data.data || [];
       const estimationsWithoutQuotations = allEstimations.filter(estimation =>
         estimation.status === 'approved' &&
@@ -134,7 +134,7 @@ const Quotations = () => {
         return;
       } else {
         // Create new quotation
-        const response = await axios.post('http://localhost:3001/api/quotations', formData, { headers: authHeaders() });
+        const response = await axios.post('/api/quotations', formData, { headers: authHeaders() });
 
         // Refresh the quotations list and available estimations
         await fetchQuotations();
@@ -150,7 +150,7 @@ const Quotations = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this quotation?')) {
       try {
-        await axios.delete(`http://localhost:3001/api/quotations/${id}`, { headers: authHeaders() });
+        await axios.delete(`/api/quotations/${id}`, { headers: authHeaders() });
         setQuotations(quotations.filter(quotation => quotation.id !== id));
         // Refresh available estimations since one might now be available
         await fetchAvailableEstimations();
@@ -189,13 +189,13 @@ const Quotations = () => {
   const handleApprove = async (quotationId) => {
     try {
       // First approve the quotation
-      const approveResponse = await axios.post(`http://localhost:3001/api/quotations/enhanced/${quotationId}/approve`, {}, { headers: authHeaders() });
+      const approveResponse = await axios.post(`/api/quotations/enhanced/${quotationId}/approve`, {}, { headers: authHeaders() });
 
       if (approveResponse.data.success) {
         // Then automatically create manufacturing case
         try {
           const manufacturingResponse = await axios.post(
-            'http://localhost:3001/api/manufacturing/cases/create-from-quote',
+            '/api/manufacturing/cases/create-from-quote',
             { quotation_id: quotationId, priority: 'medium', notes: 'Manufacturing case auto-created from approved quotation' },
             { headers: authHeaders() }
           );
@@ -221,7 +221,7 @@ const Quotations = () => {
 
   const handleStatusUpdate = async (quotationId, newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:3001/api/quotations/enhanced/${quotationId}/status`, {
+      const response = await axios.put(`/api/quotations/enhanced/${quotationId}/status`, {
         status: newStatus
       }, { headers: authHeaders() });
       if (response.data.success) {

@@ -142,7 +142,7 @@ const MobileAttendanceApp: React.FC = () => {
       }
 
       // Get current user data from JWT token or API
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/employees/current`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/employees/current`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -271,7 +271,7 @@ const MobileAttendanceApp: React.FC = () => {
 
     try {
       const token = localStorage.getItem('vtria_token');
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/enhanced-attendance/record`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/enhanced-attendance/record`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

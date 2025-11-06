@@ -31,7 +31,7 @@ import {
   Business as BusinessIcon,
 } from '@mui/icons-material';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const Vendors = () => {
   const [vendors, setVendors] = useState([]);

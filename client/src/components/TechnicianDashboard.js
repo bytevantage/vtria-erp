@@ -79,7 +79,7 @@ const TechnicianDashboard = () => {
         actual_hours: ''
     });
 
-    const API_BASE_URL = 'http://localhost:3001';
+    const API_BASE_URL = '';
 
     useEffect(() => {
         fetchDashboardData();

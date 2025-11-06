@@ -144,7 +144,7 @@ const LeaveManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/employees/current`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/employees/current`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -180,7 +180,7 @@ const LeaveManagement: React.FC = () => {
         ...(employeeFilter && { employee_id: employeeFilter })
       });
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications?${params}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/leave-policy/applications?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
@@ -200,7 +200,7 @@ const LeaveManagement: React.FC = () => {
 
   const fetchLeaveTypes = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/types`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/leave-policy/types`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
@@ -227,7 +227,7 @@ const LeaveManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/employees?status=active`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/employees?status=active`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -252,7 +252,7 @@ const LeaveManagement: React.FC = () => {
   const fetchLeaveBalances = async (employeeId: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/balance/${employeeId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/leave-policy/balance/${employeeId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
         },
@@ -272,7 +272,7 @@ const LeaveManagement: React.FC = () => {
 
   const handleApplyLeave = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/leave-policy/applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ const LeaveManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leave-policy/applications/${applicationId}/process`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/leave-policy/applications/${applicationId}/process`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

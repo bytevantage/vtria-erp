@@ -63,7 +63,7 @@ import {
 const QuotationsEnhanced = () => {
   const COMPONENT_VERSION = 'Q-ENH-1.1';
   // Use relative API calls in Docker environment to leverage proxy
-  const API_BASE_URL = process.env.DOCKER_ENV === 'true' ? '' : (process.env.REACT_APP_API_URL || 'http://localhost:3001');
+  const API_BASE_URL = process.env.DOCKER_ENV === 'true' ? '' : (process.env.REACT_APP_API_URL || '');
 
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);

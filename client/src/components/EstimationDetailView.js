@@ -32,7 +32,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = '';
 
 const EstimationDetailView = ({ open, onClose, estimationId }) => {
   const [estimation, setEstimation] = useState(null);

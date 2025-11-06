@@ -28,7 +28,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = '';
 
 const ProductDashboard = () => {
   const [loading, setLoading] = useState(true);

@@ -132,7 +132,7 @@ const SerialNumberManager: React.FC<SerialNumberManagerProps> = ({
   const [editingSerial, setEditingSerial] = useState<SerialNumberItem | null>(null);
   const [openWarrantyDialog, setOpenWarrantyDialog] = useState(false);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     fetchProducts();

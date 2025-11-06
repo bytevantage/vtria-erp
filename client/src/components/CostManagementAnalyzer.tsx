@@ -155,7 +155,7 @@ const CostManagementAnalyzer: React.FC<CostManagementAnalyzerProps> = ({
   const [selectedCostMethod, setSelectedCostMethod] = useState<string>('weighted_avg');
   const [expandedProduct, setExpandedProduct] = useState<string | false>(false);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     fetchProducts();

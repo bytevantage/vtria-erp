@@ -47,7 +47,7 @@ import { api } from '../utils/api';
 
 const API_BASE_URL = process.env.DOCKER_ENV === 'true'
   ? ''
-  : (process.env.REACT_APP_API_URL || 'http://localhost:3001');
+  : (process.env.REACT_APP_API_URL || '');
 
 const VendorQuoteManager = () => {
   const [tabValue, setTabValue] = useState(0);

@@ -132,7 +132,7 @@ const EnhancedCostingManager: React.FC = () => {
     // Cost analysis state
     const [costAnalysis, setCostAnalysis] = useState<any>(null);
 
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
     const fetchBatchCostingDetails = async (batchId: number) => {
         try {

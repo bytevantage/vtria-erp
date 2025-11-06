@@ -65,7 +65,7 @@ import {
 } from 'recharts';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const CasePerformanceDashboard: React.FC = () => {
     const [loading, setLoading] = useState(false);

@@ -151,7 +151,7 @@ const IndustrialEquipmentDashboard: React.FC = () => {
         root_cause_analysis: ''
     });
 
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
     const fetchEquipmentStatus = async () => {
         try {

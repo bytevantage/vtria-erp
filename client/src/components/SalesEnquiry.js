@@ -48,7 +48,7 @@ import CaseHistoryTracker from './CaseHistoryTracker';
 import EnterpriseButton from './common/EnterpriseButton';
 import { useAuth } from '../contexts/AuthContext';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const SalesEnquiry = () => {
   const [enquiries, setEnquiries] = useState([]);

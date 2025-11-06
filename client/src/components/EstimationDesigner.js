@@ -50,7 +50,7 @@ import {
 import axios from 'axios';
 import IntelligentProductSelector from './IntelligentProductSelector';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = '';
 
 const EstimationDesigner = ({ estimation: estimationProp, onClose }) => {
   // State management
