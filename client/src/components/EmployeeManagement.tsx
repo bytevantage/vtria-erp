@@ -39,7 +39,8 @@ import {
   CircularProgress,
   SelectChangeEvent,
   Switch,
-  Tooltip
+  Tooltip,
+  Stack
 } from '@mui/material';
 import SelectOrAddField from './common/SelectOrAddField';
 import {
@@ -594,7 +595,8 @@ const handleOpenDialog = (employee?: Employee) => {
       gender: 'prefer_not_to_say',
       department_id: '',
       designation: '',
-      basic_salary: ''
+      basic_salary: '',
+      employment_status: 'permanent'
     });
   }
   setActiveStep(0);
