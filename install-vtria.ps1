@@ -137,9 +137,12 @@ Start-Sleep -Seconds 5
 
 # Verify database tables were created
 Write-Host "Verifying database initialization..." -ForegroundColor Yellow
-$tableCount = docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'vtria_erp';" 2>$null
-if ($tableCount -match '\d+' -and [int]$Matches[0] -gt 5) {
-    Write-Host "[OK] Database initialized with $($Matches[0]) tables" -ForegroundColor Green
+$tableCountOutput = docker-compose exec -T db mysql -u vtria_user --password=dev_password vtria_erp -e "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'vtria_erp';" 2>$null
+$tableCount = $tableCountOutput -replace '\D', ''
+if ([string]::IsNullOrEmpty($tableCount)) {
+    Write-Host "[WARNING] Could not determine table count. Output: $tableCountOutput" -ForegroundColor Yellow
+} elseif ([int]$tableCount -gt 5) {
+    Write-Host "[OK] Database initialized with $tableCount tables" -ForegroundColor Green
 } else {
     Write-Host "[WARNING] Database may not be fully initialized. Found tables: $tableCount" -ForegroundColor Yellow
 }
