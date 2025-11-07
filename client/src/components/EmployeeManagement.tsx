@@ -701,8 +701,41 @@ const handleSubmit = async () => {
 
     const method = editingEmployee ? 'PUT' : 'POST';
 
-    // Prepare the data to send (remove UI-only fields)
-    const { ...employeeData } = formData;
+    // Prepare the data to send (map to API contract)
+    const payload = {
+      firstName: formData.first_name?.toString().trim(),
+      lastName: formData.last_name?.toString().trim(),
+      email: formData.email?.toString().trim(),
+      phone: formData.phone ? formData.phone.toString().trim() : null,
+      employeeType: formData.employee_type || 'full_time',
+      status: formData.status || 'active',
+      dateOfBirth: formData.date_of_birth || null,
+      gender: formData.gender || null,
+      departmentId: formData.department_id ? Number(formData.department_id) : null,
+      designation: formData.designation?.toString().trim() || null,
+      reportingTo: formData.reporting_to ? Number(formData.reporting_to) : null,
+      workLocation: formData.work_location?.toString().trim() || null,
+      basicSalary: formData.basic_salary ? Number(formData.basic_salary) : null,
+      hireDate: formData.hire_date,
+      currentAddress: formData.current_address?.toString().trim() || null,
+      emergencyContactName: formData.emergency_contact_name?.toString().trim() || null,
+      emergencyContactPhone: formData.emergency_contact_phone?.toString().trim() || null,
+      hasSystemAccess: Boolean(formData.has_system_access),
+      userRole: formData.has_system_access ? formData.user_role : null,
+      password: formData.has_system_access ? formData.password : null
+    } as Record<string, string | number | boolean | null | undefined>;
+
+    if (!payload.hasSystemAccess) {
+      delete payload.userRole;
+      delete payload.password;
+    }
+
+    const sanitizedPayload = Object.fromEntries(
+      Object.entries(payload).filter(([key, value]) => {
+        if (key === 'hasSystemAccess') return true;
+        return value !== null && value !== undefined && value !== '';
+      })
+    );
 
     // Get auth token from localStorage
     const token = localStorage.getItem('vtria_token');
@@ -713,7 +746,7 @@ const handleSubmit = async () => {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       },
-      body: JSON.stringify(employeeData)
+      body: JSON.stringify(sanitizedPayload)
     });
 
     if (!response.ok) {
