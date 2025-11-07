@@ -1085,6 +1085,62 @@ const renderStepContent = (step: number) => {
         </Grid>
       );
 
+    case 5: // Review & Submit
+      return (
+        <Box>
+          <Typography variant="h6" gutterBottom>Review Employee Information</Typography>
+          <Stack spacing={2} sx={{ mt: 2 }}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle1" gutterBottom>Personal Details</Typography>
+                <Grid container spacing={1}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body2"><strong>Name:</strong> {formData.first_name} {formData.last_name}</Typography>
+                    <Typography variant="body2"><strong>Email:</strong> {formData.email}</Typography>
+                    <Typography variant="body2"><strong>Phone:</strong> {formData.phone}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body2"><strong>Employee Type:</strong> {getEmployeeTypeLabel(String(formData.employee_type))}</Typography>
+                    <Typography variant="body2"><strong>Hire Date:</strong> {formData.hire_date}</Typography>
+                    <Typography variant="body2"><strong>Status:</strong> {String(formData.employment_status).replace('_', ' ')}</Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle1" gutterBottom>Employment</Typography>
+                <Grid container spacing={1}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body2"><strong>Department:</strong> {departments.find(d => d.id === Number(formData.department_id))?.department_name || 'N/A'}</Typography>
+                    <Typography variant="body2"><strong>Designation:</strong> {formData.designation}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body2"><strong>Basic Salary:</strong> ₹{Number(formData.basic_salary || 0).toLocaleString('en-IN')}</Typography>
+                    <Typography variant="body2"><strong>Emergency Contact:</strong> {formData.emergency_contact_name} ({formData.emergency_contact_phone})</Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle1" gutterBottom>Address</Typography>
+                <Typography variant="body2">{formData.current_address}</Typography>
+                <Typography variant="body2">
+                  {formData.current_city}, {formData.current_state} - {formData.current_pincode}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Stack>
+
+          <Typography variant="body2" sx={{ mt: 3 }} color="text.secondary">
+            Please verify the information above before creating the employee record.
+          </Typography>
+        </Box>
+      );
+
     default:
       return 'Unknown step';
   }
