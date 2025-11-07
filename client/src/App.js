@@ -201,14 +201,6 @@ function App() {
                         color="inherit"
                         size="small"
                         startIcon={<ExitToAppIcon />}
-                        onClick={clearLicense}
-                      >
-                        Change License
-                      </Button>
-                      <Button
-                        color="inherit"
-                        size="small"
-                        startIcon={<ExitToAppIcon />}
                         onClick={logout}
                       >
                         Logout
