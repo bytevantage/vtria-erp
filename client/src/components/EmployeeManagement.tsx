@@ -1016,6 +1016,41 @@ const renderStepContent = (step: number) => {
               helperText={formErrors.current_pincode}
             />
           </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1" gutterBottom>Emergency Contact</Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Name *"
+              name="emergency_contact_name"
+              value={formData.emergency_contact_name || ''}
+              onChange={handleInputChange}
+              error={!!formErrors.emergency_contact_name}
+              helperText={formErrors.emergency_contact_name}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Relationship"
+              name="emergency_contact_relation"
+              value={formData.emergency_contact_relation || ''}
+              onChange={handleInputChange}
+              helperText="Optional"
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Phone *"
+              name="emergency_contact_phone"
+              value={formData.emergency_contact_phone || ''}
+              onChange={handleInputChange}
+              error={!!formErrors.emergency_contact_phone}
+              helperText={formErrors.emergency_contact_phone}
+            />
+          </Grid>
         </Grid>
       );
 
