@@ -208,7 +208,7 @@ const EmployeeManagement = () => {
     hire_date: new Date().toISOString().split('T')[0],
     date_of_birth: '',
     gender: 'male',
-    department_id: 0,
+    department_id: '',
     designation: '',
     basic_salary: 0,
     marital_status: 'single',
@@ -317,8 +317,8 @@ const handleAddNewDepartment = async (departmentName: string) => {
         'Authorization': `Bearer ${localStorage.getItem('vtria_token')}`,
       },
       body: JSON.stringify({
-        department_name: departmentName,
-        department_code: departmentName.toUpperCase().replace(/\s+/g, '_'),
+        departmentName: departmentName,
+        departmentCode: departmentName.toUpperCase().replace(/\s+/g, '_'),
         status: 'active'
       }),
     });
@@ -482,16 +482,16 @@ const validateStep = (step: number): Record<string, string> => {
 
   switch (step) {
     case 0: // Personal Information
-      if (!formData.first_name || !formData.first_name.trim()) errors.first_name = 'First name is required';
-      if (!formData.last_name || !formData.last_name.trim()) errors.last_name = 'Last name is required';
+      if (!formData.first_name || !formData.first_name.toString().trim()) errors.first_name = 'First name is required';
+      if (!formData.last_name || !formData.last_name.toString().trim()) errors.last_name = 'Last name is required';
       if (!formData.email) {
         errors.email = 'Email is required';
-      } else if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+      } else if (formData.email && !/\S+@\S+\.\S+/.test(formData.email.toString())) {
         errors.email = 'Email is invalid';
       }
       if (!formData.phone) {
         errors.phone = 'Phone number is required';
-      } else if (formData.phone && !formData.phone.trim()) {
+      } else if (formData.phone && !formData.phone.toString().trim()) {
         errors.phone = 'Phone number is required';
       }
       if (!formData.date_of_birth) errors.date_of_birth = 'Date of birth is required';
@@ -501,8 +501,8 @@ const validateStep = (step: number): Record<string, string> => {
     case 1: // Employment Details
       if (!formData.employee_type) errors.employee_type = 'Employee type is required';
       if (!formData.hire_date) errors.hire_date = 'Hire date is required';
-      if (!formData.department_id) errors.department_id = 'Department is required';
-      if (!formData.designation.trim()) errors.designation = 'Designation is required';
+      if (!formData.department_id || formData.department_id === 0 || formData.department_id === '0') errors.department_id = 'Department is required';
+      if (!formData.designation || !formData.designation.toString().trim()) errors.designation = 'Designation is required';
       if (!formData.employment_status) errors.employment_status = 'Employment status is required';
       break;
 
@@ -510,36 +510,36 @@ const validateStep = (step: number): Record<string, string> => {
       if (!formData.basic_salary || Number(formData.basic_salary) <= 0) {
         errors.basic_salary = 'Basic salary is required and must be greater than 0';
       }
-      if (formData.bank_account_number && !/^[0-9]{9,18}$/.test(formData.bank_account_number)) {
+      if (formData.bank_account_number && !/^[0-9]{9,18}$/.test(formData.bank_account_number.toString())) {
         errors.bank_account_number = 'Invalid bank account number';
       }
-      if (formData.ifsc_code && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc_code)) {
+      if (formData.ifsc_code && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc_code.toString())) {
         errors.ifsc_code = 'Invalid IFSC code';
       }
-      if (formData.pan_number && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan_number)) {
+      if (formData.pan_number && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan_number.toString())) {
         errors.pan_number = 'Invalid PAN number';
       }
-      if (formData.aadhar_number && !/^[2-9]{1}[0-9]{11}$/.test(formData.aadhar_number)) {
+      if (formData.aadhar_number && !/^[2-9]{1}[0-9]{11}$/.test(formData.aadhar_number.toString())) {
         errors.aadhar_number = 'Invalid Aadhar number';
       }
       break;
 
     case 3: // Contact Information
-      if (!formData.current_address) errors.current_address = 'Current address is required';
-      if (!formData.current_city) errors.current_city = 'City is required';
-      if (!formData.current_state) errors.current_state = 'State is required';
+      if (!formData.current_address || !formData.current_address.toString().trim()) errors.current_address = 'Current address is required';
+      if (!formData.current_city || !formData.current_city.toString().trim()) errors.current_city = 'City is required';
+      if (!formData.current_state || !formData.current_state.toString().trim()) errors.current_state = 'State is required';
       if (!formData.current_pincode) {
         errors.current_pincode = 'Pincode is required';
-      } else if (!/^[1-9][0-9]{5}$/.test(formData.current_pincode)) {
+      } else if (!/^[1-9][0-9]{5}$/.test(formData.current_pincode.toString())) {
         errors.current_pincode = 'Invalid pincode';
       }
-      if (!formData.emergency_contact_name) errors.emergency_contact_name = 'Emergency contact name is required';
-      if (!formData.emergency_contact_phone) errors.emergency_contact_phone = 'Emergency contact phone is required';
+      if (!formData.emergency_contact_name || !formData.emergency_contact_name.toString().trim()) errors.emergency_contact_name = 'Emergency contact name is required';
+      if (!formData.emergency_contact_phone || !formData.emergency_contact_phone.toString().trim()) errors.emergency_contact_phone = 'Emergency contact phone is required';
       break;
 
     case 4: // Education & Experience
-      if (!formData.highest_qualification) errors.highest_qualification = 'Highest qualification is required';
-      if (!formData.institution_name) errors.institution_name = 'Institution name is required';
+      if (!formData.highest_qualification || !formData.highest_qualification.toString().trim()) errors.highest_qualification = 'Highest qualification is required';
+      if (!formData.institution_name || !formData.institution_name.toString().trim()) errors.institution_name = 'Institution name is required';
       break;
   }
 
@@ -562,7 +562,7 @@ const handleOpenDialog = (employee?: Employee) => {
       hire_date: employee.hire_date || new Date().toISOString().split('T')[0],
       date_of_birth: employee.date_of_birth || '',
       gender: employee.gender || 'male',
-      department_id: employee.department_id || 0,
+      department_id: employee.department_id || '',
       basic_salary: employee.basic_salary || 0,
       marital_status: employee.marital_status || 'single',
       work_shift: employee.work_shift || 'morning',
@@ -622,7 +622,7 @@ const handleCloseDialog = () => {
     hire_date: new Date().toISOString().split('T')[0],
     date_of_birth: '',
     gender: 'male',
-    department_id: 0,
+    department_id: '',
     designation: '',
     basic_salary: 0,
     marital_status: 'single',
